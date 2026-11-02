@@ -9,7 +9,6 @@ import DealerStockCatalog from "@/components/dealer/DealerStockCatalog";
 import FullPageVehicleDetail from "@/components/dealer/FullPageVehicleDetail";
 import DealerOrdersView from "@/components/dealer/DealerOrdersView";
 import DealershipProfileView from "@/components/dealer/DealershipProfileView";
-import CommercialBoundaryView from "@/components/dealer/CommercialBoundaryView";
 import JapanInventoryView from "@/components/japan/JapanInventoryView";
 import BatchUploadView from "@/components/japan/BatchUploadView";
 import AddVehicleForm from "@/components/japan/AddVehicleForm";
@@ -66,7 +65,7 @@ export default function DashboardShell({
     if (pathname === "/dealer/stocks" || pathname === "/dealer/stock" || initialTab === "stocks" || initialTab === "stock" || initialTab === "dealer-stock") return "dealer-stock";
     if (pathname === "/dealer/orders" || initialTab === "orders" || initialTab === "dealer-orders") return "dealer-orders";
     if (pathname === "/dealer/profile" || initialTab === "profile" || initialTab === "dealer-profile") return "dealer-profile";
-    if (pathname === "/dealer/terms" || pathname === "/dealer/commercial-boundary" || initialTab === "terms" || initialTab === "dealer-terms") return "dealer-terms";
+    if (pathname === "/dealer/terms" || pathname === "/dealer/commercial-boundary" || initialTab === "terms" || initialTab === "dealer-terms") return "dealer-stock";
 
     // Admin routes
     if (pathname === "/admin" || initialTab === "menu" || initialTab === "admin-menu") return "admin-menu";
@@ -109,7 +108,7 @@ export default function DashboardShell({
         return "/dealer/profile";
       case "dealer-terms":
       case "terms":
-        return "/dealer/terms";
+        return "/dealer/stocks";
       case "admin-menu":
       case "menu":
         return "/admin";
@@ -231,8 +230,6 @@ export default function DashboardShell({
           return <DealerOrdersView />;
         case "dealer-profile":
           return <DealershipProfileView />;
-        case "dealer-terms":
-          return <CommercialBoundaryView />;
         default:
           return (
             <DealerStockCatalog

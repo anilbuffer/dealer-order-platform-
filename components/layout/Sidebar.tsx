@@ -104,12 +104,6 @@ export default function Sidebar({
           icon: MapPin,
           href: "/dealer/profile",
         },
-        {
-          id: "dealer-terms",
-          label: "Pricing Terms",
-          icon: FileText,
-          href: "/dealer/terms",
-        },
       ];
     }
 
