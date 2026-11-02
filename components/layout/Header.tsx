@@ -3,7 +3,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useAuth } from "@/lib/auth-context";
 import { audio } from "@/lib/sound";
-import RoleSwitcher from "./RoleSwitcher";
 import {
   Search,
   Bell,
@@ -218,12 +217,6 @@ export default function Header({
             </div>
           )}
         </div>
-
-        {/* Vertical Divider */}
-        <div className="h-6 w-px bg-slate-200" />
-
-        {/* Interactive Role Switcher Component */}
-        <RoleSwitcher />
       </div>
     </header>
   );
