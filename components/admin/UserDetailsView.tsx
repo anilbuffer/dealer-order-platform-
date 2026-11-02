@@ -18,9 +18,7 @@ import {
   Clock,
   MapPin,
   DollarSign,
-  KeyRound,
   CheckCircle2,
-  XCircle,
   Lock,
   Unlock,
   RotateCcw,
@@ -305,9 +303,9 @@ export default function UserDetailsView({ userId, onBack }: UserDetailsViewProps
       </div>
 
       {/* ─────────────────────────────────────────────────────────── */}
-      {/* 2. Three Detail Columns                                    */}
+      {/* 2. Detail Columns                                          */}
       {/* ─────────────────────────────────────────────────────────── */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Column 1: Commercial & Dealership Assignment */}
         <div className="p-5 rounded-2xl bg-white border border-slate-200 space-y-4">
           <div className="flex items-center gap-2 pb-3 border-b border-slate-100">
@@ -431,76 +429,6 @@ export default function UserDetailsView({ userId, onBack }: UserDetailsViewProps
                 Revoke All Active Sessions
               </button>
             </div>
-          </div>
-        </div>
-
-        {/* Column 3: Effective Operational Permissions */}
-        <div className="p-5 rounded-2xl bg-white border border-slate-200 space-y-4">
-          <div className="flex items-center gap-2 pb-3 border-b border-slate-100">
-            <KeyRound className="w-4 h-4 text-[#E11D48]" />
-            <h3 className="font-bold text-sm text-slate-900">Effective Operational Scope</h3>
-          </div>
-
-          <div className="space-y-2 text-xs">
-            {[
-              {
-                label: "Browse Live Stock & Specs",
-                allowed: true,
-                desc: "Search, filter, view 360 photography",
-              },
-              {
-                label: "View Landed NZD Wholesale",
-                allowed: user.role !== "READONLY_AUDITOR",
-                desc: "Itemized FOB, RoRo, GST & MR2A",
-              },
-              {
-                label: "Place 24-Hour Atomic Hold",
-                allowed: user.role === "DEALER_USER" || user.role === "DEALER_ADMIN" || user.role === "AUTOHUB_ADMIN",
-                desc: "Atomic lock prevents duplicate allocation",
-              },
-              {
-                label: "View Retail Margin & Gross Profit",
-                allowed: user.role === "DEALER_ADMIN" || user.role === "AUTOHUB_ADMIN" || user.role === "DEALER_USER",
-                desc: "Calculate dealership ROI against trade price",
-              },
-              {
-                label: "Approve Dealership Onboarding",
-                allowed: user.role === "AUTOHUB_ADMIN",
-                desc: "Franchise sign-off & credit clearance",
-              },
-              {
-                label: "Attach Additional Logistic Costs",
-                allowed: user.role === "AUTOHUB_ADMIN" || user.role === "NISSAN_JAPAN",
-                desc: "Port demurrage, MR2A repairs, transport",
-              },
-              {
-                label: "Sign-off JEVIC Odometer & MR2A",
-                allowed: user.role === "NISSAN_JAPAN" || user.role === "AUTOHUB_ADMIN",
-                desc: "Official border entry verification",
-              },
-              {
-                label: "Audit Trail & Compliance Export",
-                allowed: user.role === "AUTOHUB_ADMIN" || user.role === "READONLY_AUDITOR",
-                desc: "Immutable CSV/JSON transaction ledger",
-              },
-            ].map((p, idx) => (
-              <div
-                key={idx}
-                className="flex items-start gap-2.5 p-2 rounded-xl bg-slate-50/70 border border-slate-100"
-              >
-                {p.allowed ? (
-                  <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
-                ) : (
-                  <XCircle className="w-4 h-4 text-slate-300 shrink-0 mt-0.5" />
-                )}
-                <div className="min-w-0">
-                  <div className={`font-semibold ${p.allowed ? "text-slate-900" : "text-slate-400"}`}>
-                    {p.label}
-                  </div>
-                  <div className="text-[10px] text-slate-400">{p.desc}</div>
-                </div>
-              </div>
-            ))}
           </div>
         </div>
       </div>
