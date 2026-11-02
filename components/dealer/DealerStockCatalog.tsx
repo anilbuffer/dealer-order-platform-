@@ -199,13 +199,10 @@ export default function DealerStockCatalog({
   // Navigate directly to FULL PAGE Vehicle Details (INSIDE PORTAL)
   const handleOpenFullPageDetails = (vehicleId: string) => {
     audio.playSubtleClick();
-    if (isAdminView) {
-      const veh = vehicles.find((item) => item.id === vehicleId);
-      if (veh) setDossierVehicle(veh);
-      return;
-    }
     if (onSelectVehicle) {
       onSelectVehicle(vehicleId);
+    } else if (isAdminView) {
+      router.push(`/admin/vehicles/${vehicleId}`);
     } else {
       router.push(`/dealer/vehicles/${vehicleId}`);
     }
@@ -241,14 +238,33 @@ export default function DealerStockCatalog({
         </div>
 
         <div className="flex items-center gap-2.5 text-xs self-start sm:self-auto">
-          <div className="px-3.5 py-2 rounded-xl bg-white border border-slate-200 text-slate-700 font-medium flex items-center gap-2 shadow-2xs">
-            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-            <span><strong className="text-slate-900 font-mono font-bold">{availableCount}</strong> Available for Hold</span>
-          </div>
-          <div className="px-3.5 py-2 rounded-xl bg-white border border-slate-200 text-slate-700 font-medium flex items-center gap-1.5 shadow-2xs">
-            <span className="text-slate-400 font-normal">Pricing Zone:</span>
-            <span className="font-extrabold font-mono text-[#0A1322]">{dealerZone}</span>
-          </div>
+          {isAdminView ? (
+            <>
+              <div className="px-3.5 py-2 rounded-xl bg-white border border-slate-200 text-slate-700 font-medium flex items-center gap-2 shadow-2xs">
+                <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span>
+                <span><strong className="text-slate-900 font-mono font-bold">{vehicles.length}</strong> Total Fleet</span>
+              </div>
+              <div className="px-3.5 py-2 rounded-xl bg-white border border-slate-200 text-slate-700 font-medium flex items-center gap-2 shadow-2xs">
+                <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+                <span><strong className="text-slate-900 font-mono font-bold">{availableCount}</strong> Available in Japan</span>
+              </div>
+              <div className="px-3.5 py-2 rounded-xl bg-white border border-slate-200 text-slate-700 font-medium flex items-center gap-1.5 shadow-2xs font-mono">
+                <Lock className="w-3.5 h-3.5 text-amber-600" />
+                <span><strong className="text-amber-800 font-bold">{vehicles.filter(v => v.status === "RESERVED").length}</strong> Active Holds</span>
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="px-3.5 py-2 rounded-xl bg-white border border-slate-200 text-slate-700 font-medium flex items-center gap-2 shadow-2xs">
+                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span><strong className="text-slate-900 font-mono font-bold">{availableCount}</strong> Available for Hold</span>
+              </div>
+              <div className="px-3.5 py-2 rounded-xl bg-white border border-slate-200 text-slate-700 font-medium flex items-center gap-1.5 shadow-2xs">
+                <span className="text-slate-400 font-normal">Pricing Zone:</span>
+                <span className="font-extrabold font-mono text-[#0A1322]">{dealerZone}</span>
+              </div>
+            </>
+          )}
         </div>
       </div>
 
@@ -606,31 +622,17 @@ export default function DealerStockCatalog({
 
                   <div className="flex items-center gap-2 shrink-0">
                     {isAdminView ? (
-                      isAvailable ? (
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleOpenFullPageDetails(vehicle.id);
-                          }}
-                          className="py-2 px-4 rounded-xl bg-slate-900 hover:bg-black text-white text-xs font-bold transition-all shadow-2xs flex items-center gap-1.5 cursor-pointer"
-                        >
-                          <Eye className="w-3.5 h-3.5" />
-                          <span>Inspect</span>
-                        </button>
-                      ) : (
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            router.push("/admin/reservations");
-                          }}
-                          className="btn-outline py-2 px-3.5 rounded-xl text-amber-900 text-xs font-bold font-mono flex items-center gap-1.5 cursor-pointer"
-                        >
-                          <Lock className="w-3.5 h-3.5 text-amber-600" />
-                          <span>Inspect Hold</span>
-                        </button>
-                      )
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleOpenFullPageDetails(vehicle.id);
+                        }}
+                        className="py-2.5 px-4 rounded-xl bg-slate-900 hover:bg-black text-white text-xs font-bold transition-all shadow-2xs flex items-center gap-1.5 cursor-pointer"
+                      >
+                        <Eye className="w-3.5 h-3.5" />
+                        <span>Inspect Vehicle</span>
+                      </button>
                     ) : isAvailable ? (
                       <button
                         type="button"

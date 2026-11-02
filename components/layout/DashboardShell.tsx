@@ -61,7 +61,12 @@ export default function DashboardShell({
 
   // Determine active view tab based on pathname and initialTab
   const resolveActiveTab = (): string => {
-    if (pathname.includes("/vehicles/")) return "dealer-stock";
+    if (pathname.includes("/vehicles/")) {
+      if (pathname.startsWith("/admin") || portal === "admin" || currentUser?.role === "AUTOHUB_ADMIN") {
+        return "admin-catalogue";
+      }
+      return "dealer-stock";
+    }
     if (pathname === "/settings" || initialTab === "settings") return "settings";
 
     // 1. Admin Portal routes (Priority when in admin path, portal, or admin role)
@@ -411,7 +416,7 @@ export default function DashboardShell({
     <div className="flex h-screen w-full bg-[#F8FAFC] overflow-hidden">
       {/* 1. Responsive Collapsible Navy Sidebar (Desktop persistent + Mobile/Tablet Drawer) */}
       <Sidebar
-        activeTab={viewingVehicleId ? "dealer-stock" : activeTab}
+        activeTab={viewingVehicleId ? (portal === "admin" || pathname.startsWith("/admin") || currentUser?.role === "AUTOHUB_ADMIN" ? "admin-catalogue" : "dealer-stock") : activeTab}
         onTabChange={handleTabChange}
         isCollapsed={isSidebarCollapsed}
         onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
@@ -449,7 +454,7 @@ export default function DashboardShell({
 
         {/* 3. Mobile / Small Tablet Bottom Navigation Bar (Hidden on Desktop & Laptop) */}
         <MobileBottomNav
-          activeTab={viewingVehicleId ? "dealer-stock" : activeTab}
+          activeTab={viewingVehicleId ? (portal === "admin" || pathname.startsWith("/admin") || currentUser?.role === "AUTOHUB_ADMIN" ? "admin-catalogue" : "dealer-stock") : activeTab}
           onTabChange={handleTabChange}
           onOpenMenu={() => setIsMobileDrawerOpen(true)}
         />
