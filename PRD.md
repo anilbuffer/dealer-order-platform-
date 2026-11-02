@@ -42,6 +42,24 @@ Currently, vehicle sourcing, landed cost estimation, and order status inquiries 
 - ❌ **Consumer-Facing Access & B2C Marketplace:** Strictly private B2B franchise dealer access.
 - ❌ **Live Bidding Auctions & AI Analytics:** Live bidding feeds and predictive AI algorithms remain post-MVP.
 
+### 2.3 Operational Data Ownership (Who Enters What?)
+
+| Information | Entered / Managed by | System Component |
+| :--- | :--- | :--- |
+| Vehicle model, year, grade | Nissan Japan | Single / Batch Vehicle Ingestion |
+| Chassis / VIN / Stock ID | Nissan Japan | Inventory Database Record |
+| Odometer and specifications | Nissan Japan | Spec Sheet & JEVIC Certification |
+| Vehicle photographs | Nissan Japan | Media Storage & 360 Gallery |
+| Condition report and defects | Nissan Japan | Auction Grading & Defect Checklist |
+| Vehicle acquisition cost | Nissan Japan, subject to confirmation | Baseline JPY FOB Wholesale Price |
+| Geographic zones | Autohub Admin | Dealer Geographic Profiles (Zones 1–5) |
+| Fixed-cost profiles | Autohub Admin | Ocean Freight & Marine Insurance Baseline |
+| Standard delivery costs | Autohub Admin | Zone Transport Carrier Tariffs |
+| Compliance cost components | Autohub Admin | MR2A Entry Inspection & WoF Schedule |
+| Programme component | Autohub Admin | Certified Programme Governance Fee |
+| Final dealer price calculation | Backend pricing engine | Automated Landed Price Calculation |
+| Dealer-visible Total Buy Price | Dealer Portal | Guaranteed Landed Price Display |
+
 ---
 
 ## 3. Commercial Price Boundary & Geographic Pricing Zones

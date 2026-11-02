@@ -16,7 +16,29 @@
 
 ---
 
-## 2. Role Taxonomy & Descriptions
+## 2. Who Enters What? (Operational Data Ownership Matrix)
+
+The following operational boundary matrix defines the official data entry and management responsibilities across programme participants:
+
+| # | Information | Entered / Managed by | System Component & Implementation |
+|---|:---|:---|:---|
+| 1 | **Vehicle model, year, grade** | **Nissan Japan** | `components/japan/AddVehicleForm.tsx`, `BatchUploadView.tsx` |
+| 2 | **Chassis / VIN / Stock ID** | **Nissan Japan** | `components/japan/AddVehicleForm.tsx`, `BatchUploadView.tsx` |
+| 3 | **Odometer and specifications** | **Nissan Japan** | Technical spec inputs (Fuel, transmission, engine, km) |
+| 4 | **Vehicle photographs** | **Nissan Japan** | Image gallery upload & 360 preview components |
+| 5 | **Condition report and defects** | **Nissan Japan** | Certified auction grade sheet & defect map review |
+| 6 | **Vehicle acquisition cost** | **Nissan Japan, subject to confirmation** | FOB JPY purchase price baseline |
+| 7 | **Geographic zones** | **Autohub Admin** | `components/admin/DealerApprovalsView.tsx` (Zones 1–5) |
+| 8 | **Fixed-cost profiles** | **Autohub Admin** | `lib/programme-context.tsx` (RoRo freight, insurance) |
+| 9 | **Standard delivery costs** | **Autohub Admin** | Regional carrier linehaul matrix |
+| 10 | **Compliance cost components** | **Autohub Admin** | MR2A entry inspection & 1-year WoF fee schedule |
+| 11 | **Programme component** | **Autohub Admin** | Nissan NZ certified programme fee |
+| 12 | **Final dealer price calculation** | **Backend pricing engine** | `calculateLandedPrice()` automated deterministic formula |
+| 13 | **Dealer-visible Total Buy Price** | **Dealer Portal** | `components/dealer/DealerStockCatalog.tsx`, `FullPageVehicleDetail.tsx` |
+
+---
+
+## 3. Role Taxonomy & Descriptions
 
 ```mermaid
 graph TD
