@@ -109,8 +109,8 @@ export default function AtomicReservationModal({
             {/* Vehicle Summary Card */}
             <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 flex items-center gap-4">
               <img
-                src={vehicle.images[0]}
-                alt={vehicle.model}
+                src={vehicle.images?.[0] || "/images/cars/kicks.png"}
+                alt={vehicle.model || "Vehicle"}
                 className="w-20 h-14 object-contain rounded-xl border border-slate-200 bg-white p-1 shrink-0"
               />
               <div className="min-w-0 flex-1 text-xs">

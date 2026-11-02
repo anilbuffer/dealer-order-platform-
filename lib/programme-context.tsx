@@ -10,6 +10,7 @@ import {
   AdditionalCostItem,
   ZoneId,
   UserAccount,
+  ReservationRequest,
 } from "./types";
 import {
   MOCK_VEHICLES,
@@ -17,6 +18,7 @@ import {
   MOCK_DEALERS,
   MOCK_AUDIT_LOGS,
   MOCK_USERS,
+  MOCK_RESERVATIONS,
 } from "./mock-data";
 import { calculateLandedPrice } from "./pricing-calculator";
 import { audio } from "./sound";
@@ -27,6 +29,7 @@ interface ProgrammeContextType {
   dealers: DealerAccount[];
   auditLogs: AuditEvent[];
   users: UserAccount[];
+  reservations: ReservationRequest[];
 
   // User Management Actions
   addUser: (user: Omit<UserAccount, "id">) => UserAccount;
@@ -35,9 +38,14 @@ interface ProgrammeContextType {
   deleteUser: (userId: string) => void;
 
   // Vehicle & Allocation actions
-  reserveVehicle: (vehicleId: string, dealerId: string) => boolean;
-  confirmAllocation: (vehicleId: string) => void;
-  releaseHold: (vehicleId: string) => void;
+  reserveVehicle: (
+    vehicleId: string,
+    dealerId: string,
+    user?: { id: string; name: string; email: string }
+  ) => boolean;
+  confirmAllocation: (vehicleId: string, reason?: string) => void;
+  releaseHold: (vehicleId: string, reason?: string) => void;
+  rejectReservation: (reservationId: string, reason: string) => void;
   addVehicle: (vehicle: Omit<Vehicle, "id">) => Vehicle;
   batchAddVehicles: (newVehicles: Vehicle[]) => void;
   toggleVehicleStatus: (vehicleId: string) => void;
@@ -58,7 +66,7 @@ interface ProgrammeContextType {
 
 const ProgrammeContext = createContext<ProgrammeContextType | undefined>(undefined);
 
-const STORAGE_KEY = "dealer_platform_programme_state_v3";
+const STORAGE_KEY = "dealer_platform_programme_state_v4";
 
 export function ProgrammeProvider({ children }: { children: React.ReactNode }) {
   const [vehicles, setVehicles] = useState<Vehicle[]>(MOCK_VEHICLES);
@@ -66,29 +74,39 @@ export function ProgrammeProvider({ children }: { children: React.ReactNode }) {
   const [dealers, setDealers] = useState<DealerAccount[]>(MOCK_DEALERS);
   const [auditLogs, setAuditLogs] = useState<AuditEvent[]>(MOCK_AUDIT_LOGS);
   const [users, setUsers] = useState<UserAccount[]>(MOCK_USERS);
+  const [reservations, setReservations] = useState<ReservationRequest[]>(MOCK_RESERVATIONS);
   const [isHydrated, setIsHydrated] = useState(false);
 
   // Hydrate from localStorage on client mount
   useEffect(() => {
     const timer = setTimeout(() => {
       try {
-        // Clear old stale storage keys with old Unsplash images
+        // Clear old stale storage keys
         try {
           localStorage.removeItem("dealer_platform_programme_state_v1");
           localStorage.removeItem("dealer_platform_programme_state_v2");
-        } catch (e) {}
+          localStorage.removeItem("dealer_platform_programme_state_v3");
+        } catch (e) { }
 
         const stored = localStorage.getItem(STORAGE_KEY);
         if (stored) {
           const parsed = JSON.parse(stored);
           if (parsed.vehicles && Array.isArray(parsed.vehicles)) {
-            // Always sync images with current MOCK_VEHICLES so transparent PNG cutouts take precedence
+            // Always sync images & location with current MOCK_VEHICLES so transparent PNG cutouts and metadata take precedence
             const syncedVehicles = parsed.vehicles.map((v: Vehicle) => {
               const mock = MOCK_VEHICLES.find((m) => m.id === v.id);
-              if (mock && mock.images) {
-                return { ...v, images: mock.images };
+              if (mock) {
+                return {
+                  ...mock,
+                  ...v,
+                  images: mock.images || v.images,
+                  location: v.location || mock.location || "Yokohama Yard",
+                };
               }
-              return v;
+              return {
+                ...v,
+                location: v.location || "Yokohama Yard",
+              };
             });
             setVehicles(syncedVehicles);
           } else {
@@ -100,8 +118,14 @@ export function ProgrammeProvider({ children }: { children: React.ReactNode }) {
           if (parsed.users && Array.isArray(parsed.users) && parsed.users.length > 0) {
             setUsers(parsed.users);
           }
+          if (parsed.reservations && Array.isArray(parsed.reservations) && parsed.reservations.length > 0) {
+            setReservations(parsed.reservations);
+          } else {
+            setReservations(MOCK_RESERVATIONS);
+          }
         } else {
           setVehicles(MOCK_VEHICLES);
+          setReservations(MOCK_RESERVATIONS);
         }
       } catch (e) {
         console.warn("Could not load persisted programme state:", e);
@@ -117,12 +141,12 @@ export function ProgrammeProvider({ children }: { children: React.ReactNode }) {
     try {
       localStorage.setItem(
         STORAGE_KEY,
-        JSON.stringify({ vehicles, orders, dealers, auditLogs, users })
+        JSON.stringify({ vehicles, orders, dealers, auditLogs, users, reservations })
       );
     } catch (e) {
       console.warn("Could not persist programme state:", e);
     }
-  }, [vehicles, orders, dealers, auditLogs, users, isHydrated]);
+  }, [vehicles, orders, dealers, auditLogs, users, reservations, isHydrated]);
 
   // Helper to log audit event
   const logAudit = (event: Omit<AuditEvent, "id" | "timestamp">) => {
@@ -134,44 +158,76 @@ export function ProgrammeProvider({ children }: { children: React.ReactNode }) {
     setAuditLogs((prev) => [newEvent, ...prev]);
   };
 
-  // 1. Reserve Vehicle (Atomic Lock by Dealer)
-  const reserveVehicle = (vehicleId: string, dealerId: string): boolean => {
+  // 1. Reserve Vehicle (Atomic Lock by Dealer with full ReservationRequest snapshot)
+  const reserveVehicle = (
+    vehicleId: string,
+    dealerId: string,
+    user?: { id: string; name: string; email: string }
+  ): boolean => {
     const target = vehicles.find((v) => v.id === vehicleId);
     if (!target || target.status !== "AVAILABLE") {
       return false; // Concurrency lock failure: already reserved or withdrawn
     }
 
     const now = new Date().toISOString();
+    const expires = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
+    const dealer = dealers.find((d) => d.id === dealerId) || dealers[0];
+    const priceSnapshot = calculateLandedPrice(target.fobPriceJPY, dealer.pricingZoneId);
+
+    const newReservation: ReservationRequest = {
+      id: `RES_${Date.now()}`,
+      requestId: `REQ-HOLD-${target.stockId}`,
+      vehicleId: target.id,
+      vehicle: target,
+      dealerId: dealer.id,
+      dealerName: dealer.legalTradingName,
+      dealerCode: dealer.dealerCode,
+      userId: user?.id || "USR_DEALER_01",
+      userName: user?.name || dealer.primaryContactName,
+      userEmail: user?.email || dealer.primaryContactEmail,
+      requestedAt: now,
+      expiresAt: expires,
+      status: "ACTIVE_HOLD",
+      priceSnapshot,
+      termsVersionSnapshot: dealer.termsAcceptedVersion || "v2026.1",
+      acknowledgedBoundary: true,
+      acknowledgedCancellation: true,
+    };
+
+    setReservations((prev) => [newReservation, ...prev]);
+
     setVehicles((prev) =>
       prev.map((v) =>
         v.id === vehicleId
           ? {
-              ...v,
-              status: "RESERVED",
-              reservedByDealerId: dealerId,
-              reservedAt: now,
-            }
+            ...v,
+            status: "RESERVED",
+            reservedByDealerId: dealerId,
+            reservedAt: now,
+            reservationExpiresAt: expires,
+          }
           : v
       )
     );
 
-    const dealer = dealers.find((d) => d.id === dealerId);
     logAudit({
-      actorName: dealer ? dealer.primaryContactName : "Franchise Dealer",
-      actorEmail: dealer ? dealer.primaryContactEmail : "dealer@nissan.co.nz",
+      actorName: user?.name || dealer.primaryContactName,
+      actorEmail: user?.email || dealer.primaryContactEmail,
       actorRole: "DEALER_USER",
       action: "ATOMIC_HOLD_RESERVED",
       category: "RESERVATION",
       objectType: "Vehicle",
       objectId: target.stockId,
-      details: `Placed 24h exclusivity hold on ${target.year} ${target.make} ${target.model} (${target.vinChassis}) for ${dealer?.legalTradingName || dealerId}.`,
+      details: `Placed 24h exclusivity hold on ${target.year} ${target.make} ${target.model} (${target.vinChassis}) for ${dealer.legalTradingName}.`,
+      beforeValue: { status: "AVAILABLE", reservedByDealerId: null },
+      afterValue: { status: "RESERVED", reservedByDealerId: dealerId, expiresAt: expires },
     });
 
     return true;
   };
 
-  // 2. Confirm Allocation (Admin confirms 24h hold into active Order)
-  const confirmAllocation = (vehicleId: string) => {
+  // 2. Confirm Allocation (Admin confirms 24h hold into active Order with reason)
+  const confirmAllocation = (vehicleId: string, reason?: string) => {
     const targetVehicle = vehicles.find((v) => v.id === vehicleId);
     if (!targetVehicle) return;
 
@@ -179,8 +235,24 @@ export function ProgrammeProvider({ children }: { children: React.ReactNode }) {
     const dealer = dealers.find((d) => d.id === dealerId) || dealers[0];
     const orderNum = `ORD-NZ-2026-${String(orders.length + 82).padStart(3, "0")}`;
     const priceBreakdown = calculateLandedPrice(targetVehicle.fobPriceJPY, dealer.pricingZoneId);
-
     const now = new Date().toISOString();
+
+    // Update matching reservation if active hold exists
+    setReservations((prev) =>
+      prev.map((r) =>
+        r.vehicleId === vehicleId && r.status === "ACTIVE_HOLD"
+          ? {
+            ...r,
+            status: "CONFIRMED_ALLOCATED",
+            decision: "CONFIRMED",
+            decisionReason: reason || "Wholesale allocation confirmed by Autohub Operations.",
+            decidedAt: now,
+            decidedBy: "Sarah Jenkins (Autohub)",
+          }
+          : r
+      )
+    );
+
     const newOrder: Order = {
       id: `ORD_${Date.now()}`,
       orderNumber: orderNum,
@@ -203,7 +275,7 @@ export function ProgrammeProvider({ children }: { children: React.ReactNode }) {
           key: "ORDER_CONFIRMED",
           label: "Order Confirmed",
           completedAt: now,
-          notes: "Autohub Operations confirmed allocation under agreed Terms of Trade.",
+          notes: reason || "Autohub Operations confirmed allocation under agreed Terms of Trade.",
           updatedBy: "Sarah Jenkins (Autohub)",
         },
         {
@@ -242,6 +314,22 @@ export function ProgrammeProvider({ children }: { children: React.ReactNode }) {
           eta: new Date(Date.now() + 18 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10),
         },
       ],
+      documents: [
+        {
+          id: `DOC_${Date.now()}_01`,
+          name: `${targetVehicle.year} ${targetVehicle.make} ${targetVehicle.model} Auction Sheet`,
+          type: "AUCTION_SHEET",
+          url: targetVehicle.conditionReportUrl || "https://example.com/auction-sheet.pdf",
+          uploadedAt: now,
+        },
+        {
+          id: `DOC_${Date.now()}_02`,
+          name: "JEVIC Pre-Shipment Inspection Certificate",
+          type: "JEVIC_CERTIFICATE",
+          url: "https://example.com/jevic-pending.pdf",
+          uploadedAt: now,
+        },
+      ],
       additionalCosts: [],
     };
 
@@ -251,9 +339,9 @@ export function ProgrammeProvider({ children }: { children: React.ReactNode }) {
       prev.map((v) =>
         v.id === vehicleId
           ? {
-              ...v,
-              status: "ALLOCATED",
-            }
+            ...v,
+            status: "ALLOCATED",
+          }
           : v
       )
     );
@@ -266,24 +354,43 @@ export function ProgrammeProvider({ children }: { children: React.ReactNode }) {
       category: "ALLOCATION",
       objectType: "Order",
       objectId: orderNum,
-      details: `Generated order ${orderNum} for ${dealer.legalTradingName}. Assigned vessel Trans-Pacific RoRo V.49.`,
+      details: `Generated order ${orderNum} for ${dealer.legalTradingName}. Reason: ${reason || "Confirmed wholesale purchase"}.`,
+      beforeValue: { status: "RESERVED", vehicleId },
+      afterValue: { status: "ALLOCATED", orderNumber: orderNum, allocatedToDealer: dealer.id },
     });
   };
 
-  // 3. Release Hold (returns vehicle to available stock)
-  const releaseHold = (vehicleId: string) => {
+  // 3. Release Hold (returns vehicle to available stock with reason)
+  const releaseHold = (vehicleId: string, reason?: string) => {
     const target = vehicles.find((v) => v.id === vehicleId);
     if (!target) return;
+    const now = new Date().toISOString();
+
+    setReservations((prev) =>
+      prev.map((r) =>
+        r.vehicleId === vehicleId && r.status === "ACTIVE_HOLD"
+          ? {
+            ...r,
+            status: "RELEASED",
+            decision: "RELEASED",
+            decisionReason: reason || "Released by Autohub Operations administratively.",
+            decidedAt: now,
+            decidedBy: "Sarah Jenkins (Autohub)",
+          }
+          : r
+      )
+    );
 
     setVehicles((prev) =>
       prev.map((v) =>
         v.id === vehicleId
           ? {
-              ...v,
-              status: "AVAILABLE",
-              reservedByDealerId: undefined,
-              reservedAt: undefined,
-            }
+            ...v,
+            status: "AVAILABLE",
+            reservedByDealerId: undefined,
+            reservedAt: undefined,
+            reservationExpiresAt: undefined,
+          }
           : v
       )
     );
@@ -296,7 +403,58 @@ export function ProgrammeProvider({ children }: { children: React.ReactNode }) {
       category: "RESERVATION",
       objectType: "Vehicle",
       objectId: target.stockId,
-      details: `Released 24-hour administrative hold on ${target.stockId}. Stock returned to public programme catalog.`,
+      details: `Released 24-hour administrative hold on ${target.stockId}. Reason: ${reason || "Administrative release"}.`,
+      beforeValue: { status: "RESERVED", reservedByDealerId: target.reservedByDealerId },
+      afterValue: { status: "AVAILABLE", reservedByDealerId: null },
+    });
+  };
+
+  // 3b. Reject Reservation (US-14: reject with reason)
+  const rejectReservation = (reservationId: string, reason: string) => {
+    const targetRes = reservations.find((r) => r.id === reservationId);
+    if (!targetRes) return;
+    const now = new Date().toISOString();
+
+    setReservations((prev) =>
+      prev.map((r) =>
+        r.id === reservationId
+          ? {
+            ...r,
+            status: "REJECTED",
+            decision: "REJECTED",
+            decisionReason: reason || "Declined during Autohub wholesale allocation review.",
+            decidedAt: now,
+            decidedBy: "Sarah Jenkins (Autohub)",
+          }
+          : r
+      )
+    );
+
+    setVehicles((prev) =>
+      prev.map((v) =>
+        v.id === targetRes.vehicleId
+          ? {
+            ...v,
+            status: "AVAILABLE",
+            reservedByDealerId: undefined,
+            reservedAt: undefined,
+            reservationExpiresAt: undefined,
+          }
+          : v
+      )
+    );
+
+    logAudit({
+      actorName: "Sarah Jenkins",
+      actorEmail: "ops@autohub.co.nz",
+      actorRole: "AUTOHUB_ADMIN",
+      action: "RESERVATION_REJECTED",
+      category: "RESERVATION",
+      objectType: "ReservationRequest",
+      objectId: targetRes.requestId,
+      details: `Rejected reservation ${targetRes.requestId} for dealer ${targetRes.dealerName}. Reason: ${reason}.`,
+      beforeValue: { status: "ACTIVE_HOLD" },
+      afterValue: { status: "REJECTED", reason },
     });
   };
 
@@ -379,11 +537,11 @@ export function ProgrammeProvider({ children }: { children: React.ReactNode }) {
           const updatedMilestones = o.milestones.map((m) =>
             m.key === nextMilestone
               ? {
-                  ...m,
-                  completedAt: nowStr,
-                  notes: notes || m.notes || "Milestone completed and verified.",
-                  updatedBy: "Sarah Jenkins (Autohub Ops)",
-                }
+                ...m,
+                completedAt: nowStr,
+                notes: notes || m.notes || "Milestone completed and verified.",
+                updatedBy: "Sarah Jenkins (Autohub Ops)",
+              }
               : m
           );
 
@@ -416,10 +574,10 @@ export function ProgrammeProvider({ children }: { children: React.ReactNode }) {
       prev.map((o) =>
         o.id === orderId
           ? {
-              ...o,
-              currentMilestone: "AWAITING_ADDITIONAL_COST",
-              additionalCosts: [...o.additionalCosts, costItem],
-            }
+            ...o,
+            currentMilestone: "AWAITING_ADDITIONAL_COST",
+            additionalCosts: [...o.additionalCosts, costItem],
+          }
           : o
       )
     );
@@ -449,10 +607,10 @@ export function ProgrammeProvider({ children }: { children: React.ReactNode }) {
           const updatedCosts = o.additionalCosts.map((c) =>
             c.id === costId
               ? {
-                  ...c,
-                  status: decision === "APPROVED" ? ("APPROVED" as const) : ("DECLINED" as const),
-                  decidedAt: new Date().toISOString(),
-                }
+                ...c,
+                status: decision === "APPROVED" ? ("APPROVED" as const) : ("DECLINED" as const),
+                decidedAt: new Date().toISOString(),
+              }
               : c
           );
 
@@ -493,10 +651,10 @@ export function ProgrammeProvider({ children }: { children: React.ReactNode }) {
       prev.map((d) =>
         d.id === dealerId
           ? {
-              ...d,
-              status: "APPROVED",
-              pricingZoneId,
-            }
+            ...d,
+            status: "APPROVED",
+            pricingZoneId,
+          }
           : d
       )
     );
@@ -630,9 +788,10 @@ export function ProgrammeProvider({ children }: { children: React.ReactNode }) {
     setDealers(MOCK_DEALERS);
     setAuditLogs(MOCK_AUDIT_LOGS);
     setUsers(MOCK_USERS);
+    setReservations(MOCK_RESERVATIONS);
     try {
       localStorage.removeItem(STORAGE_KEY);
-    } catch (e) {}
+    } catch (e) { }
   };
 
   return (
@@ -643,6 +802,7 @@ export function ProgrammeProvider({ children }: { children: React.ReactNode }) {
         dealers,
         auditLogs,
         users,
+        reservations,
         addUser,
         updateUser,
         toggleUserStatus,
@@ -650,6 +810,7 @@ export function ProgrammeProvider({ children }: { children: React.ReactNode }) {
         reserveVehicle,
         confirmAllocation,
         releaseHold,
+        rejectReservation,
         addVehicle,
         batchAddVehicles,
         toggleVehicleStatus,

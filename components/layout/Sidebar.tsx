@@ -43,7 +43,7 @@ interface SidebarProps {
   activeTab: string;
   onTabChange: (tabId: string) => void;
   isCollapsed: boolean;
-  onToggleCollapse: () => void;
+  onToggleCollapse?: () => void;
 }
 
 export default function Sidebar({
@@ -235,9 +235,8 @@ export default function Sidebar({
 
   return (
     <aside
-      className={`relative h-full bg-[#070D18] border-r border-slate-800/80 flex flex-col justify-between transition-sidebar z-30 select-none overflow-hidden ${
-        isCollapsed ? "w-[76px]" : "w-[268px]"
-      }`}
+      className={`relative h-full bg-[#070D18] border-r border-slate-800/80 flex flex-col justify-between transition-sidebar z-30 select-none overflow-hidden ${isCollapsed ? "w-[76px]" : "w-[268px]"
+        }`}
       aria-label="Platform Sidebar Navigation"
     >
       {/* Subtle background ambient glow */}
@@ -245,7 +244,7 @@ export default function Sidebar({
 
       {/* Top Branding Section */}
       <div className="relative z-10">
-        <div className="h-[68px] flex items-center px-4 border-b border-slate-800/80 justify-between">
+        <div className="h-[60px] flex items-center px-4 border-b border-slate-800/80">
           <div className="flex items-center gap-3 overflow-hidden">
             <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#E11D48] via-[#BE123C] to-[#881337] flex items-center justify-center font-black text-white shadow-[0_2px_12px_rgba(225,29,72,0.4)] ring-1 ring-white/20 shrink-0">
               D
@@ -259,20 +258,6 @@ export default function Sidebar({
               </div>
             )}
           </div>
-
-          {/* Collapse/Expand Toggle Button */}
-          <button
-            type="button"
-            onClick={() => {
-              audio.playSubtleClick();
-              onToggleCollapse();
-            }}
-            title={isCollapsed ? "Expand sidebar (268px)" : "Collapse sidebar (76px)"}
-            aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
-            className="p-1.5 rounded-xl text-slate-400 hover:text-white hover:bg-white/10 transition-colors focus-visible:ring-2 focus-visible:ring-rose-500 cursor-pointer"
-          >
-            {isCollapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
-          </button>
         </div>
 
         {/* Section Header for Panel Workspace */}
@@ -302,11 +287,10 @@ export default function Sidebar({
                   type="button"
                   onClick={() => handleItemClick(item)}
                   aria-current={active ? "page" : undefined}
-                  className={`group relative w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition-all duration-150 cursor-pointer ${
-                    active
+                  className={`group relative w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition-all duration-150 cursor-pointer ${active
                       ? "bg-gradient-to-r from-white/[0.14] to-white/[0.04] text-white border border-white/15 shadow-[0_2px_12px_rgba(0,0,0,0.25)] ring-1 ring-white/10"
                       : "text-slate-400 hover:text-white hover:bg-white/[0.06] border border-transparent"
-                  } ${isCollapsed ? "justify-center px-0" : ""}`}
+                    } ${isCollapsed ? "justify-center px-0" : ""}`}
                 >
                   {/* Glowing left pip on active tab */}
                   {active && !isCollapsed && (
@@ -314,9 +298,8 @@ export default function Sidebar({
                   )}
 
                   <Icon
-                    className={`w-4 h-4 shrink-0 transition-transform ${
-                      active ? "text-[#E11D48] scale-110" : "text-slate-400 group-hover:text-slate-300"
-                    }`}
+                    className={`w-4 h-4 shrink-0 transition-transform ${active ? "text-[#E11D48] scale-110" : "text-slate-400 group-hover:text-slate-300"
+                      }`}
                   />
 
                   {!isCollapsed && (
@@ -324,9 +307,8 @@ export default function Sidebar({
                       <span className="truncate">{item.label}</span>
                       {item.badge && (
                         <span
-                          className={`text-[10px] font-bold px-2 py-0.5 rounded-full border shadow-2xs ${
-                            item.badgeColor || "bg-white/10 text-slate-300 border-white/20"
-                          }`}
+                          className={`text-[10px] font-bold px-2 py-0.5 rounded-full border shadow-2xs ${item.badgeColor || "bg-white/10 text-slate-300 border-white/20"
+                            }`}
                         >
                           {item.badge}
                         </span>
@@ -367,13 +349,12 @@ export default function Sidebar({
                 setIsProfileMenuOpen(!isProfileMenuOpen);
               }}
               title="Click for Settings & Logout"
-              className={`flex items-center justify-between p-2 rounded-2xl transition-all cursor-pointer group ${
-                pathname === "/settings" || activeTab === "settings"
+              className={`flex items-center justify-between p-2 rounded-2xl transition-all cursor-pointer group ${pathname === "/settings" || activeTab === "settings"
                   ? "bg-gradient-to-r from-white/[0.12] to-white/[0.04] border border-white/15 ring-1 ring-white/10"
                   : isProfileMenuOpen
-                  ? "bg-white/10 border border-white/10"
-                  : "hover:bg-white/[0.06] border border-transparent"
-              }`}
+                    ? "bg-white/10 border border-white/10"
+                    : "hover:bg-white/[0.06] border border-transparent"
+                }`}
             >
               <div className="flex items-center gap-2.5 min-w-0">
                 <div className="relative">
@@ -393,9 +374,8 @@ export default function Sidebar({
               </div>
 
               <ChevronUp
-                className={`w-4 h-4 text-slate-400 transition-transform duration-200 shrink-0 ${
-                  isProfileMenuOpen ? "rotate-180 text-white" : "group-hover:text-white"
-                }`}
+                className={`w-4 h-4 text-slate-400 transition-transform duration-200 shrink-0 ${isProfileMenuOpen ? "rotate-180 text-white" : "group-hover:text-white"
+                  }`}
               />
             </div>
 
@@ -424,11 +404,10 @@ export default function Sidebar({
                       if (onTabChange) onTabChange("settings");
                       router.push("/settings");
                     }}
-                    className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-semibold transition-colors cursor-pointer text-left ${
-                      pathname === "/settings" || activeTab === "settings"
+                    className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-semibold transition-colors cursor-pointer text-left ${pathname === "/settings" || activeTab === "settings"
                         ? "bg-[#E11D48] text-white"
                         : "text-slate-200 hover:text-white hover:bg-white/10"
-                    }`}
+                      }`}
                   >
                     <User className="w-4 h-4 text-slate-300" />
                     <span>My Profile</span>
@@ -461,11 +440,10 @@ export default function Sidebar({
               }}
               title="Click for Settings & Logout"
               aria-label="User account & options"
-              className={`relative w-9 h-9 rounded-xl bg-gradient-to-br from-slate-700 via-slate-800 to-slate-900 border border-slate-700 flex items-center justify-center font-bold text-xs text-white transition-all cursor-pointer ${
-                pathname === "/settings" || activeTab === "settings"
+              className={`relative w-9 h-9 rounded-xl bg-gradient-to-br from-slate-700 via-slate-800 to-slate-900 border border-slate-700 flex items-center justify-center font-bold text-xs text-white transition-all cursor-pointer ${pathname === "/settings" || activeTab === "settings"
                   ? "ring-2 ring-[#E11D48]"
                   : "hover:ring-2 hover:ring-rose-500/50"
-              }`}
+                }`}
             >
               {currentUser?.name.charAt(0) || "U"}
               <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-500 ring-2 ring-[#070D18]" />
@@ -496,11 +474,10 @@ export default function Sidebar({
                       if (onTabChange) onTabChange("settings");
                       router.push("/settings");
                     }}
-                    className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold transition-colors cursor-pointer text-left ${
-                      pathname === "/settings" || activeTab === "settings"
+                    className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold transition-colors cursor-pointer text-left ${pathname === "/settings" || activeTab === "settings"
                         ? "bg-[#E11D48] text-white"
                         : "text-slate-200 hover:text-white hover:bg-white/10"
-                    }`}
+                      }`}
                   >
                     <User className="w-4 h-4 text-slate-300" />
                     <span>My Profile</span>

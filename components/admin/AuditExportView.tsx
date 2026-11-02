@@ -44,7 +44,18 @@ export default function AuditExportView() {
   // Export Audit Trail to CSV
   const handleExportAuditCSV = () => {
     audio.playSuccessChime();
-    const headers = ["Event ID", "Timestamp", "Actor Name", "Actor Role", "Action", "Category", "Object ID", "Details"];
+    const headers = [
+      "Event ID",
+      "Timestamp",
+      "Actor Name",
+      "Actor Role",
+      "Action",
+      "Category",
+      "Object ID",
+      "Details",
+      "Before Value",
+      "After Value",
+    ];
     const rows = filteredLogs.map((l) => [
       l.id,
       l.timestamp,
@@ -54,6 +65,8 @@ export default function AuditExportView() {
       l.category,
       l.objectId,
       `"${l.details.replace(/"/g, '""')}"`,
+      `"${l.beforeValue ? JSON.stringify(l.beforeValue).replace(/"/g, '""') : "—"}"`,
+      `"${l.afterValue ? JSON.stringify(l.afterValue).replace(/"/g, '""') : "—"}"`,
     ]);
 
     const csvContent = "data:text/csv;charset=utf-8," + [headers.join(","), ...rows.map((r) => r.join(","))].join("\n");
@@ -201,12 +214,13 @@ export default function AuditExportView() {
           <table className="w-full text-left text-xs text-slate-600">
             <thead className="bg-slate-50/80 border-b border-slate-200/80 text-[11px] font-bold uppercase tracking-wider text-slate-500">
               <tr>
-                <th className="py-3 px-5">Timestamp (UTC)</th>
+                <th className="py-3 px-5">Timestamp</th>
                 <th className="py-3 px-4">Actor &amp; Role</th>
                 <th className="py-3 px-4">Event Action</th>
                 <th className="py-3 px-4">Category</th>
                 <th className="py-3 px-4">Object Ref</th>
                 <th className="py-3 px-5">Details</th>
+                <th className="py-3 px-4">State Diff (Before → After)</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
@@ -242,8 +256,29 @@ export default function AuditExportView() {
                     {log.objectId}
                   </td>
 
-                  <td className="py-3.5 px-5 text-slate-600 max-w-md">
+                  <td className="py-3.5 px-5 text-slate-600 max-w-xs">
                     {log.details}
+                  </td>
+
+                  <td className="py-3.5 px-4 min-w-[200px]">
+                    {log.beforeValue || log.afterValue ? (
+                      <div className="space-y-1 font-mono text-[10px]">
+                        {log.beforeValue && (
+                          <div className="p-1 rounded bg-rose-50 text-rose-800 border border-rose-150 truncate max-w-[240px]" title={JSON.stringify(log.beforeValue)}>
+                            <span className="font-bold">Before: </span>
+                            {JSON.stringify(log.beforeValue)}
+                          </div>
+                        )}
+                        {log.afterValue && (
+                          <div className="p-1 rounded bg-emerald-50 text-emerald-800 border border-emerald-150 truncate max-w-[240px]" title={JSON.stringify(log.afterValue)}>
+                            <span className="font-bold">After: </span>
+                            {JSON.stringify(log.afterValue)}
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <span className="text-slate-300 font-mono text-xs">—</span>
+                    )}
                   </td>
                 </tr>
               ))}

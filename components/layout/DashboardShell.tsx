@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import Sidebar from "./Sidebar";
+import Header from "./Header";
 import { useAuth } from "@/lib/auth-context";
 import DealerStockCatalog from "@/components/dealer/DealerStockCatalog";
 import FullPageVehicleDetail from "@/components/dealer/FullPageVehicleDetail";
@@ -40,6 +41,7 @@ export default function DashboardShell({
 
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [viewingVehicleId, setViewingVehicleId] = useState<string | null>(initialVehicleId || null);
+  const [globalSearch, setGlobalSearch] = useState("");
 
   // Sync viewing vehicle ID when route changes
   useEffect(() => {
@@ -219,7 +221,12 @@ export default function DashboardShell({
     ) {
       switch (activeTab) {
         case "dealer-stock":
-          return <DealerStockCatalog onSelectVehicle={handleSelectVehicle} />;
+          return (
+            <DealerStockCatalog
+              onSelectVehicle={handleSelectVehicle}
+              externalSearchQuery={globalSearch}
+            />
+          );
         case "dealer-orders":
           return <DealerOrdersView />;
         case "dealer-profile":
@@ -227,7 +234,12 @@ export default function DashboardShell({
         case "dealer-terms":
           return <CommercialBoundaryView />;
         default:
-          return <DealerStockCatalog onSelectVehicle={handleSelectVehicle} />;
+          return (
+            <DealerStockCatalog
+              onSelectVehicle={handleSelectVehicle}
+              externalSearchQuery={globalSearch}
+            />
+          );
       }
     }
 
@@ -276,7 +288,12 @@ export default function DashboardShell({
         case "admin-dashboard":
           return <AdminDashboardView onNavigateTab={handleTabChange} />;
         case "admin-catalogue":
-          return <DealerStockCatalog onSelectVehicle={handleSelectVehicle} />;
+          return (
+            <DealerStockCatalog
+              onSelectVehicle={handleSelectVehicle}
+              externalSearchQuery={globalSearch}
+            />
+          );
         case "admin-orders":
           return <AllocationMilestonesView />;
         case "admin-reservations":
@@ -303,7 +320,12 @@ export default function DashboardShell({
       }
     }
 
-    return <DealerStockCatalog onSelectVehicle={handleSelectVehicle} />;
+    return (
+      <DealerStockCatalog
+        onSelectVehicle={handleSelectVehicle}
+        externalSearchQuery={globalSearch}
+      />
+    );
   };
 
   return (
@@ -316,8 +338,21 @@ export default function DashboardShell({
         onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
       />
 
-      {/* 2. Main Content Container (Full Height Canvas) */}
+      {/* 2. Main Content Container (Full Height Canvas with Top Header) */}
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+        {/* Top Header across all panels matching attached design */}
+        <Header
+          onToggleSidebar={() => setIsSidebarCollapsed((prev) => !prev)}
+          isSidebarCollapsed={isSidebarCollapsed}
+          searchValue={globalSearch}
+          onSearchChange={setGlobalSearch}
+          onSearchSubmit={(val) => {
+            if (!pathname.startsWith("/dealer/stocks") && !pathname.startsWith("/admin/catalogue")) {
+              router.push("/dealer/stocks");
+            }
+          }}
+        />
+
         {/* Scrollable View Content Canvas */}
         <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
           <div className="max-w-7xl mx-auto">{renderViewContent()}</div>

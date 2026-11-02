@@ -37,11 +37,15 @@ import {
 
 interface DealerStockCatalogProps {
   onSelectVehicle?: (vehicleId: string) => void;
+  externalSearchQuery?: string;
 }
 
-export default function DealerStockCatalog({ onSelectVehicle }: DealerStockCatalogProps = {}) {
+export default function DealerStockCatalog({
+  onSelectVehicle,
+  externalSearchQuery,
+}: DealerStockCatalogProps = {}) {
   const router = useRouter();
-  const { currentDealer } = useAuth();
+  const { currentDealer, currentUser } = useAuth();
   const { vehicles: rawVehicles, reserveVehicle: atomicReserve } = useProgramme();
 
   // Guarantee transparent studio PNG cutouts from MOCK_VEHICLES always take precedence
@@ -129,18 +133,25 @@ export default function DealerStockCatalog({ onSelectVehicle }: DealerStockCatal
 
   // Filtered & Sorted Stock (Live Synced with ProgrammeContext)
   const filteredVehicles = useMemo(() => {
+    const effectiveSearch =
+      externalSearchQuery !== undefined && externalSearchQuery !== ""
+        ? externalSearchQuery
+        : searchQuery;
+
     return vehicles
       .filter((v) => {
         // Hide withdrawn stock from dealer catalog
         if (v.status === "WITHDRAWN") return false;
 
-        if (searchQuery) {
-          const q = searchQuery.toLowerCase();
+        if (effectiveSearch) {
+          const q = effectiveSearch.toLowerCase();
           const matchStock = v.stockId.toLowerCase().includes(q);
           const matchModel = v.model.toLowerCase().includes(q);
           const matchVin = v.vinChassis.toLowerCase().includes(q);
           const matchGrade = v.grade.toLowerCase().includes(q);
-          if (!matchStock && !matchModel && !matchVin && !matchGrade) return false;
+          const matchMake = v.make.toLowerCase().includes(q);
+          const matchYear = String(v.year).includes(q);
+          if (!matchStock && !matchModel && !matchVin && !matchGrade && !matchMake && !matchYear) return false;
         }
 
         if (selectedModel !== "ALL" && !v.model.toLowerCase().includes(selectedModel.toLowerCase())) {
@@ -187,7 +198,11 @@ export default function DealerStockCatalog({ onSelectVehicle }: DealerStockCatal
   };
 
   const handleReservationSuccess = (vehicleId: string) => {
-    atomicReserve(vehicleId, currentDealer?.id || "DEALER_001");
+    atomicReserve(
+      vehicleId,
+      currentDealer?.id || "DEALER_001",
+      currentUser ? { id: currentUser.id, name: currentUser.name, email: currentUser.email } : undefined
+    );
   };
 
   const availableCount = filteredVehicles.filter((v) => v.status === "AVAILABLE").length;
@@ -568,7 +583,9 @@ export default function DealerStockCatalog({ onSelectVehicle }: DealerStockCatal
                 <div className="pt-3.5 mt-3 border-t border-slate-100 flex items-center justify-between gap-2">
                   <div className="flex items-center gap-1.5 text-[11px] text-slate-400 font-medium truncate">
                     <MapPin className="w-3 h-3 text-slate-400 shrink-0" />
-                    <span className="truncate">{vehicle.location.split("(")[0].trim()} · {dealerZone}</span>
+                    <span className="truncate">
+                      {(vehicle.location ? vehicle.location.split("(")[0]?.trim() : "Yokohama Yard")} · {dealerZone}
+                    </span>
                   </div>
 
                   <div className="flex items-center gap-2">
@@ -653,7 +670,7 @@ export default function DealerStockCatalog({ onSelectVehicle }: DealerStockCatal
                     <span>{vehicle.year} · {vehicle.grade}</span>
                     <span className="flex items-center gap-1 text-slate-500 text-[11px]">
                       <MapPin className="w-3 h-3 text-slate-400" />
-                      <span>{vehicle.location.split("(")[0].trim()}</span>
+                      <span>{vehicle.location ? vehicle.location.split("(")[0]?.trim() : "Yokohama Yard"}</span>
                     </span>
                   </div>
 

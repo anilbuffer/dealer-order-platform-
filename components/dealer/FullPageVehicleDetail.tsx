@@ -47,7 +47,7 @@ export default function FullPageVehicleDetail({
 }: FullPageVehicleDetailProps) {
   const router = useRouter();
   const { vehicles, reserveVehicle: atomicReserve } = useProgramme();
-  const { currentDealer } = useAuth();
+  const { currentDealer, currentUser } = useAuth();
   const dealerZone = currentDealer?.pricingZoneId || "ZONE_1";
 
   // Find vehicle from live programme context
@@ -681,7 +681,11 @@ export default function FullPageVehicleDetail({
         vehicle={isReserveModalOpen ? vehicle : null}
         onClose={() => setIsReserveModalOpen(false)}
         onSuccess={(vId) => {
-          atomicReserve(vId, currentDealer?.id || "DEALER_001");
+          atomicReserve(
+            vId,
+            currentDealer?.id || "DEALER_001",
+            currentUser ? { id: currentUser.id, name: currentUser.name, email: currentUser.email } : undefined
+          );
           setIsReserveModalOpen(false);
           handleBack();
         }}

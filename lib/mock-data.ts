@@ -546,6 +546,12 @@ export const MOCK_VEHICLES: Vehicle[] = [
     exteriorGrade: "A",
     conditionSummary: "Zero panel damage. 360-degree Around View Monitor operational. 24h dealer hold active.",
     inspectionDate: "2026-10-24",
+    location: "Yokohama Yard (Bay 2)",
+    images: [
+      "/images/cars/kicks.png",
+      "https://images.unsplash.com/photo-1541899481282-d53bffe3c35d?auto=format&fit=crop&w=1200&q=80",
+    ],
+    conditionReportUrl: "https://example.com/reports/NIS-2026-9046.pdf",
     knownDefects: ["Zero panel repairs detected", "Nissan Around View Monitor 360 camera"],
     fobPriceJPY: 2190000,
     status: "RESERVED",

@@ -173,8 +173,8 @@ export default function JapanInventoryView({
                     <td className="py-3 px-4">
                       <div className="flex items-center gap-3">
                         <img
-                          src={vehicle.images[0]}
-                          alt={vehicle.model}
+                          src={vehicle.images?.[0] || "/images/cars/kicks.png"}
+                          alt={vehicle.model || "Vehicle"}
                           className="w-12 h-9 object-contain rounded-md border border-slate-200 bg-slate-50 p-0.5 shrink-0"
                         />
                         <div>

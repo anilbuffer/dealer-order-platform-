@@ -7,24 +7,30 @@ import RoleSwitcher from "./RoleSwitcher";
 import {
   Search,
   Bell,
+  PanelLeft,
   CheckCircle2,
   Clock,
   AlertTriangle,
   Ship,
   Sparkles,
-  Command,
 } from "lucide-react";
 
 interface HeaderProps {
+  onToggleSidebar?: () => void;
+  isSidebarCollapsed?: boolean;
   onSearchClick?: () => void;
   searchValue?: string;
   onSearchChange?: (val: string) => void;
+  onSearchSubmit?: (val: string) => void;
 }
 
 export default function Header({
+  onToggleSidebar,
+  isSidebarCollapsed = false,
   onSearchClick,
   searchValue = "",
   onSearchChange,
+  onSearchSubmit,
 }: HeaderProps) {
   const { currentUser } = useAuth();
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
@@ -91,23 +97,45 @@ export default function Header({
   ];
 
   return (
-    <header className="h-[68px] bg-white border-b border-slate-200 px-4 sm:px-6 flex items-center justify-between gap-4 sticky top-0 z-20">
-      {/* Left: Global Quick Search Input with '/' Pill */}
-      <div className="flex-1 max-w-md relative">
-        <div className="relative flex items-center">
-          <Search className="w-4 h-4 text-slate-400 absolute left-3.5 pointer-events-none" />
-          <input
-            ref={searchInputRef}
-            type="text"
-            value={searchValue}
-            onChange={(e) => onSearchChange && onSearchChange(e.target.value)}
-            placeholder="Search stock ID, VIN chassis, model (e.g. X-Trail, Serena)..."
-            className="w-full pl-10 pr-12 py-2 text-xs sm:text-sm bg-slate-50 hover:bg-slate-100/80 focus:bg-white rounded-xl border border-slate-200 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-crimson-500/20 focus:border-crimson-600 transition-all shadow-soft"
-          />
-          <div className="absolute right-3 flex items-center gap-1 pointer-events-none">
-            <kbd className="hidden sm:inline-block px-1.5 py-0.5 text-[10px] font-mono font-semibold text-slate-400 bg-white border border-slate-200 rounded shadow-xs">
-              /
-            </kbd>
+    <header className="h-[60px] bg-white border-b border-slate-200/90 px-4 sm:px-6 flex items-center justify-between gap-4 sticky top-0 z-20 shrink-0">
+      {/* Left: Sidebar Toggle Icon + Search Bar (as attached screenshot) */}
+      <div className="flex items-center gap-3 flex-1 max-w-xl">
+        {onToggleSidebar && (
+          <button
+            type="button"
+            onClick={() => {
+              audio.playSubtleClick();
+              onToggleSidebar();
+            }}
+            title={isSidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+            aria-label={isSidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+            className="p-2 rounded-xl text-slate-500 hover:text-slate-900 hover:bg-slate-100/80 transition-colors cursor-pointer shrink-0"
+          >
+            <PanelLeft className="w-5 h-5 text-slate-600" />
+          </button>
+        )}
+
+        <div className="relative flex-1">
+          <div className="relative flex items-center">
+            <Search className="w-4 h-4 text-slate-400 absolute left-3.5 pointer-events-none" />
+            <input
+              ref={searchInputRef}
+              type="text"
+              value={searchValue}
+              onChange={(e) => onSearchChange && onSearchChange(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && onSearchSubmit) {
+                  onSearchSubmit(searchValue);
+                }
+              }}
+              placeholder="Search make, model, year or keyword..."
+              className="w-full pl-9 pr-10 py-1.5 sm:py-2 text-xs sm:text-sm bg-white hover:bg-slate-50/80 focus:bg-white rounded-xl border border-slate-200 text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-slate-400 transition-all shadow-2xs"
+            />
+            <div className="absolute right-3 flex items-center pointer-events-none">
+              <kbd className="hidden sm:inline-block px-1.5 py-0.5 text-[10px] font-mono font-medium text-slate-400 bg-slate-100 border border-slate-200 rounded">
+                /
+              </kbd>
+            </div>
           </div>
         </div>
       </div>
@@ -123,10 +151,10 @@ export default function Header({
               setIsNotificationsOpen(!isNotificationsOpen);
             }}
             aria-label="View notifications"
-            className="relative p-2 rounded-xl text-slate-600 hover:text-slate-900 bg-slate-50 hover:bg-slate-100 border border-slate-200 transition-colors cursor-pointer focus-visible:ring-2 focus-visible:ring-crimson-500"
+            className="relative p-2 rounded-xl text-slate-500 hover:text-slate-800 hover:bg-slate-100/80 transition-colors cursor-pointer"
           >
-            <Bell className="w-4 h-4" />
-            <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-crimson-600 ring-2 ring-white animate-pulse" />
+            <Bell className="w-5 h-5 text-slate-600" />
+            <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-[#E11D48] ring-2 ring-white animate-pulse" />
           </button>
 
           {isNotificationsOpen && (
@@ -134,14 +162,14 @@ export default function Header({
               <div className="flex items-center justify-between pb-3 border-b border-slate-100">
                 <div className="flex items-center gap-2">
                   <h4 className="font-semibold text-sm text-slate-900">Notifications</h4>
-                  <span className="text-[10px] bg-crimson-50 text-crimson-700 font-bold px-2 py-0.5 rounded-full border border-crimson-200">
+                  <span className="text-[10px] bg-rose-50 text-rose-700 font-bold px-2 py-0.5 rounded-full border border-rose-200">
                     2 New
                   </span>
                 </div>
                 <button
                   type="button"
                   onClick={() => audio.playSubtleClick()}
-                  className="text-[11px] text-blue-600 hover:underline font-medium"
+                  className="text-[11px] text-blue-600 hover:underline font-medium cursor-pointer"
                 >
                   Mark all read
                 </button>
@@ -182,7 +210,7 @@ export default function Header({
                     audio.playSubtleClick();
                     setIsNotificationsOpen(false);
                   }}
-                  className="text-xs font-semibold text-crimson-600 hover:text-crimson-700"
+                  className="text-xs font-semibold text-[#E11D48] hover:text-[#BE123C] cursor-pointer"
                 >
                   View All Programme Activity →
                 </button>
@@ -200,4 +228,3 @@ export default function Header({
     </header>
   );
 }
-

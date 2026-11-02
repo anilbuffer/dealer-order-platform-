@@ -127,11 +127,10 @@ export default function AdminInventoryControllerView() {
                   audio.playSubtleClick();
                   setStatusFilter(st);
                 }}
-                className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-colors cursor-pointer ${
-                  statusFilter === st
+                className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-colors cursor-pointer ${statusFilter === st
                     ? "bg-slate-900 text-white"
                     : "bg-slate-50 hover:bg-slate-100 text-slate-600 border border-slate-200/80"
-                }`}
+                  }`}
               >
                 {st === "ALL" ? "All" : st.charAt(0) + st.slice(1).toLowerCase()}
               </button>
@@ -169,8 +168,8 @@ export default function AdminInventoryControllerView() {
                     <td className="py-3.5 px-5">
                       <div className="flex items-center gap-3">
                         <img
-                          src={vehicle.images[0]}
-                          alt={vehicle.model}
+                          src={vehicle.images?.[0] || "/images/cars/kicks.png"}
+                          alt={vehicle.model || "Vehicle"}
                           className="w-14 h-10 object-contain rounded-lg border border-slate-200 bg-slate-50 p-0.5 shrink-0"
                         />
                         <div>
@@ -236,11 +235,10 @@ export default function AdminInventoryControllerView() {
                       <button
                         type="button"
                         onClick={() => handleToggleStatus(vehicle.id)}
-                        className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer shadow-2xs ${
-                          isWithdrawn
+                        className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer shadow-2xs ${isWithdrawn
                             ? "bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-white"
                             : "bg-white hover:bg-rose-50 hover:text-rose-700 hover:border-rose-200 text-slate-700 border border-slate-200/80"
-                        }`}
+                          }`}
                       >
                         {isWithdrawn ? "Republish" : "Withdraw"}
                       </button>

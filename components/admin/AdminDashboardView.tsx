@@ -4,19 +4,20 @@ import React, { useState } from "react";
 import { useProgramme } from "@/lib/programme-context";
 import { calculateLandedPrice } from "@/lib/pricing-calculator";
 import { audio } from "@/lib/sound";
+import { ZoneId } from "@/lib/types";
 import {
-  Car,
   Users,
-  Clock,
-  Ship,
-  AlertCircle,
+  Lock,
+  Unlock,
   CheckCircle2,
-  ArrowRight,
-  ShieldAlert,
-  MapPin,
-  ExternalLink,
-  ShieldCheck,
+  XCircle,
   Building2,
+  ArrowRight,
+  Clock,
+  Car,
+  MapPin,
+  ShieldCheck,
+  FileCheck2,
 } from "lucide-react";
 
 interface AdminDashboardViewProps {
@@ -24,240 +25,381 @@ interface AdminDashboardViewProps {
 }
 
 export default function AdminDashboardView({ onNavigateTab }: AdminDashboardViewProps) {
-  const { vehicles, orders, dealers, confirmAllocation, releaseHold } = useProgramme();
+  const {
+    vehicles,
+    dealers,
+    reservations,
+    approveDealer,
+    rejectDealer,
+    confirmAllocation,
+    releaseHold,
+  } = useProgramme();
 
-  const heldVehicles = vehicles.filter((v) => v.status === "RESERVED");
+  const [notification, setNotification] = useState<string | null>(null);
+  const [selectedZone, setSelectedZone] = useState<Record<string, ZoneId>>({});
+
+  // 1. Pending Dealer Onboarding Requests
   const pendingDealers = dealers.filter((d) => d.status === "PENDING_APPROVAL");
-  const availableStockCount = vehicles.filter((v) => v.status === "AVAILABLE").length;
-  const inTransitCount = orders.filter((o) => o.currentMilestone === "IN_TRANSIT").length;
-  const awaitingCostCount = orders.filter((o) => o.currentMilestone === "AWAITING_ADDITIONAL_COST").length;
 
-  // 1-Click Allocation Confirm from Dashboard
-  const handleConfirmHold = (vehicleId: string) => {
+  // 2. Active 24-Hour Atomic Reservation Holds
+  const activeHolds = reservations.filter((r) => r.status === "ACTIVE_HOLD");
+  const heldVehicles = (activeHolds.length > 0
+    ? activeHolds.map((r) => {
+        const live = vehicles.find((v) => v.id === r.vehicleId || v.id === r.vehicle?.id);
+        return {
+          ...r.vehicle,
+          ...live,
+          images:
+            live?.images && live.images.length > 0
+              ? live.images
+              : r.vehicle?.images && r.vehicle.images.length > 0
+              ? r.vehicle.images
+              : ["/images/cars/kicks.png"],
+        };
+      })
+    : vehicles.filter((v) => v.status === "RESERVED")
+  ).map((v) => ({
+    ...v,
+    images: v.images && v.images.length > 0 ? v.images : ["/images/cars/kicks.png"],
+  }));
+
+  // Dealer Approval Handler
+  const handleApprove = (dealerId: string, defaultZone: ZoneId) => {
     audio.playSuccessChime();
-    confirmAllocation(vehicleId);
+    const zone = selectedZone[dealerId] || defaultZone;
+    approveDealer(dealerId, zone);
+    setNotification(`Approved dealership and assigned to ${zone}.`);
+    setTimeout(() => setNotification(null), 4000);
   };
 
-  // 1-Click Release Hold back to available stock
-  const handleReleaseHold = (vehicleId: string) => {
+  // Dealer Rejection Handler
+  const handleReject = (dealerId: string) => {
     audio.playSubtleClick();
-    releaseHold(vehicleId);
+    rejectDealer(dealerId);
+    setNotification(`Dealer application declined.`);
+    setTimeout(() => setNotification(null), 4000);
+  };
+
+  // 1-Click Confirm Allocation
+  const handleConfirmReservation = (vehicleId: string) => {
+    audio.playSuccessChime();
+    confirmAllocation(vehicleId, "Confirmed directly from Admin Operations Dashboard.");
+    setNotification(`Allocation confirmed. Order generated and transferred to shipping pipeline.`);
+    setTimeout(() => setNotification(null), 4000);
+  };
+
+  // 1-Click Release Hold
+  const handleReleaseReservation = (vehicleId: string) => {
+    audio.playSubtleClick();
+    releaseHold(vehicleId, "Hold released from Admin Operations Dashboard.");
+    setNotification(`Reservation hold released. Vehicle returned to public catalogue.`);
+    setTimeout(() => setNotification(null), 4000);
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-in fade-in duration-300">
       {/* ─────────────────────────────────────────────────────────── */}
-      {/* 1. Header Banner & Status                                  */}
+      {/* 1. Header Banner                                            */}
       {/* ─────────────────────────────────────────────────────────── */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-100">
         <div>
           <div className="flex items-center gap-2 mb-1">
             <span className="text-[11px] font-bold uppercase tracking-wider text-[#E11D48]">
-              Autohub Logistics Operations
+              Autohub Platform Operations
             </span>
-            <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
-              ● Central Controller Active
+            <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 border border-slate-200">
+              Operations Dashboard
             </span>
           </div>
           <h1 className="text-2xl font-bold tracking-tight text-slate-900">
-            Operations Command Center
+            Operations Command Dashboard
           </h1>
           <p className="text-xs text-slate-500 mt-0.5">
-            Overseeing Nissan Japan Yokohama export dispatch, NZ RoRo logistics, and 5-zone franchise dealer allocations.
+            Real-time action center for dealer onboarding approvals and 24-hour atomic reservation requests.
           </p>
         </div>
-
-        <div className="flex items-center gap-2 text-xs">
-          <span className="px-3 py-1.5 rounded-xl bg-slate-100 font-mono text-slate-700 font-semibold border border-slate-200">
-            Port Operations: Auckland / Tauranga / Lyttelton
-          </span>
-        </div>
       </div>
 
-      {/* ─────────────────────────────────────────────────────────── */}
-      {/* 2. Executive KPI Metrics (Clean & Decision-Critical)       */}
-      {/* ─────────────────────────────────────────────────────────── */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
-        {/* Metric 1: Active Stock */}
-        <div
-          onClick={() => onNavigateTab("admin-stock")}
-          className="p-4 rounded-2xl bg-white border border-slate-200/90 shadow-sm hover:border-slate-300 transition-all cursor-pointer group"
-        >
-          <div className="flex items-center justify-between">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
-              Available Stock
-            </span>
-            <Car className="w-4 h-4 text-slate-400 group-hover:text-slate-800 transition-colors" />
-          </div>
-          <div className="text-2xl font-extrabold text-slate-900 font-mono mt-2">
-            {availableStockCount}
-          </div>
-          <div className="text-[11px] text-slate-500 mt-0.5">Yokohama &amp; Kobe Yard</div>
-        </div>
-
-        {/* Metric 2: Pending Applications */}
-        <div
-          onClick={() => onNavigateTab("admin-approvals")}
-          className="p-4 rounded-2xl bg-white border border-slate-200/90 shadow-sm hover:border-amber-300 transition-all cursor-pointer group"
-        >
-          <div className="flex items-center justify-between">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
-              Pending Dealers
-            </span>
-            <Users className="w-4 h-4 text-amber-500" />
-          </div>
-          <div className="text-2xl font-extrabold text-amber-600 font-mono mt-2">
-            {pendingDealers.length}
-          </div>
-          <div className="text-[11px] text-amber-700 font-semibold mt-0.5">Needs Zone Authorization</div>
-        </div>
-
-        {/* Metric 3: Active 24h Holds */}
-        <div
-          onClick={() => onNavigateTab("admin-milestones")}
-          className="p-4 rounded-2xl bg-white border border-slate-200/90 shadow-sm hover:border-slate-300 transition-all cursor-pointer group"
-        >
-          <div className="flex items-center justify-between">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
-              24h Active Holds
-            </span>
-            <Clock className="w-4 h-4 text-[#E11D48]" />
-          </div>
-          <div className="text-2xl font-extrabold text-slate-900 font-mono mt-2">
-            {heldVehicles.length}
-          </div>
-          <div className="text-[11px] text-slate-500 mt-0.5">Atomic Reservation Queue</div>
-        </div>
-
-        {/* Metric 4: RoRo In Transit */}
-        <div
-          onClick={() => onNavigateTab("admin-milestones")}
-          className="p-4 rounded-2xl bg-white border border-slate-200/90 shadow-sm hover:border-slate-300 transition-all cursor-pointer group"
-        >
-          <div className="flex items-center justify-between">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
-              RoRo In Transit
-            </span>
-            <Ship className="w-4 h-4 text-blue-600" />
-          </div>
-          <div className="text-2xl font-extrabold text-slate-900 font-mono mt-2">
-            {inTransitCount}
-          </div>
-          <div className="text-[11px] text-slate-500 mt-0.5">Vessel TP-2648</div>
-        </div>
-
-        {/* Metric 5: Awaiting Variation */}
-        <div
-          onClick={() => onNavigateTab("admin-milestones")}
-          className="p-4 rounded-2xl bg-white border border-slate-200/90 shadow-sm hover:border-rose-300 transition-all cursor-pointer group"
-        >
-          <div className="flex items-center justify-between">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
-              Cost Variations
-            </span>
-            <AlertCircle className="w-4 h-4 text-rose-500" />
-          </div>
-          <div className="text-2xl font-extrabold text-rose-600 font-mono mt-2">
-            {awaitingCostCount}
-          </div>
-          <div className="text-[11px] text-rose-700 font-semibold mt-0.5">Awaiting Dealer Signoff</div>
-        </div>
-      </div>
-
-      {/* ─────────────────────────────────────────────────────────── */}
-      {/* 3. Action Required Alert (Pending Dealer Application)       */}
-      {/* ─────────────────────────────────────────────────────────── */}
-      {pendingDealers.length > 0 && (
-        <div className="p-4 rounded-2xl bg-amber-50/80 border border-amber-200/90 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div className="flex items-start gap-3">
-            <ShieldAlert className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
-            <div>
-              <h4 className="font-bold text-xs text-amber-900">
-                Dealer Onboarding Approval Required ({pendingDealers[0].legalTradingName})
-              </h4>
-              <p className="text-[11px] text-amber-800 mt-0.5">
-                NZBN {pendingDealers[0].nzbn} · Lower South Island · Terms v2026.1 accepted. Waiting for Geographic Zone assignment.
-              </p>
-            </div>
-          </div>
-
-          <button
-            onClick={() => onNavigateTab("admin-approvals")}
-            className="px-4 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold transition-all shrink-0 cursor-pointer flex items-center gap-1.5 shadow-xs"
-          >
-            <span>Review &amp; Authorize</span>
-            <ArrowRight className="w-3.5 h-3.5" />
-          </button>
+      {notification && (
+        <div className="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-900 text-xs font-semibold flex items-center gap-2 shadow-xs animate-in fade-in">
+          <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+          <span>{notification}</span>
         </div>
       )}
 
       {/* ─────────────────────────────────────────────────────────── */}
-      {/* 4. Split Dashboard Grid (Queue & Live Logistics Tracker)   */}
+      {/* 2. ONLY TWO HORIZONTAL CARDS (As Requested)                 */}
       {/* ─────────────────────────────────────────────────────────── */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-        {/* Left Column (8 cols): 24h Holds & Orders */}
-        <div className="lg:col-span-8 space-y-6">
-          {/* Active 24-Hour Atomic Reservation Holds Queue */}
-          <div className="bg-white rounded-2xl border border-slate-200/90 p-5 shadow-sm space-y-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="font-bold text-slate-900 text-sm">
-                  24-Hour Atomic Reservation Queue
-                </h3>
-                <p className="text-[11px] text-slate-500">
-                  Dealer holds placed via self-service catalog awaiting formal Autohub confirmation.
-                </p>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
+        {/* ========================================================= */}
+        {/* CARD 1: Dealer Onboarding Approval Request                 */}
+        {/* ========================================================= */}
+        <div className="bg-white rounded-3xl border border-slate-200/90 shadow-sm p-6 flex flex-col justify-between hover:border-slate-300 transition-all space-y-5">
+          <div className="space-y-4">
+            {/* Card Header */}
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-amber-50 border border-amber-200/80 flex items-center justify-center text-amber-600 shadow-2xs">
+                  <Building2 className="w-5 h-5" />
+                </div>
+                <div>
+                  <h2 className="text-base font-bold text-slate-900">
+                    Dealer Onboarding Approval Request
+                  </h2>
+                  <p className="text-xs text-slate-500">
+                    Dealership registration and geographic zone verification
+                  </p>
+                </div>
               </div>
 
-              <span className="px-2.5 py-1 rounded-full bg-slate-100 text-[11px] font-mono font-bold text-slate-700">
-                {heldVehicles.length} active hold
+              <span
+                className={`px-3 py-1 rounded-full text-xs font-bold font-mono border ${
+                  pendingDealers.length > 0
+                    ? "bg-amber-50 text-amber-800 border-amber-200"
+                    : "bg-emerald-50 text-emerald-800 border-emerald-200"
+                }`}
+              >
+                {pendingDealers.length} Pending
               </span>
             </div>
 
-            {heldVehicles.length === 0 ? (
-              <div className="p-8 text-center text-slate-400 text-xs bg-slate-50 rounded-xl">
-                No active 24-hour reservation holds pending allocation.
+            {/* Card Content */}
+            {pendingDealers.length === 0 ? (
+              <div className="p-8 text-center bg-slate-50 rounded-2xl border border-slate-100 space-y-2">
+                <CheckCircle2 className="w-8 h-8 text-emerald-500 mx-auto" />
+                <h3 className="text-xs font-bold text-slate-800">All Dealerships Approved</h3>
+                <p className="text-[11px] text-slate-500 max-w-xs mx-auto">
+                  There are no pending dealership onboarding requests. All active applicants have been verified.
+                </p>
               </div>
             ) : (
-              <div className="space-y-3">
-                {heldVehicles.map((v) => {
-                  const price = calculateLandedPrice(v.fobPriceJPY, "ZONE_1");
+              <div className="space-y-3.5">
+                {pendingDealers.map((dealer) => {
+                  const currentAssignedZone = selectedZone[dealer.id] || dealer.pricingZoneId || "ZONE_1";
+
                   return (
                     <div
-                      key={v.id}
-                      className="p-4 rounded-xl border border-slate-200 bg-slate-50/50 flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+                      key={dealer.id}
+                      className="p-4 rounded-2xl border border-slate-200/90 bg-slate-50/70 hover:bg-slate-50 transition-colors space-y-3 text-xs"
                     >
-                      <div className="flex items-center gap-3">
-                        <img
-                          src={v.images[0]}
-                          alt={v.model}
-                          className="w-16 h-12 object-contain bg-white rounded-lg border border-slate-200 p-1 shrink-0"
-                        />
-                        <div className="text-xs">
-                          <div className="font-bold text-slate-900">
-                            {v.year} {v.make} {v.model} {v.grade}
+                      <div className="flex items-start justify-between gap-3">
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <h3 className="font-bold text-sm text-slate-900">
+                              {dealer.legalTradingName}
+                            </h3>
+                            <span className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded bg-amber-100 text-amber-800 border border-amber-200">
+                              {dealer.dealerCode}
+                            </span>
                           </div>
-                          <div className="text-[11px] text-slate-500 font-mono">
-                            Stock: {v.stockId} · Chassis: {v.vinChassis}
-                          </div>
-                          <div className="text-[11px] text-[#E11D48] font-semibold mt-0.5">
-                            Held by Auckland Nissan City · Expiry: 18h remaining
-                          </div>
+                          <p className="text-slate-500 text-[11px] mt-0.5 flex items-center gap-1">
+                            <MapPin className="w-3 h-3 text-slate-400" />
+                            <span>{dealer.address}</span>
+                          </p>
+                        </div>
+
+                        <span className="text-[11px] font-mono text-slate-500 shrink-0">
+                          NZBN: {dealer.nzbn}
+                        </span>
+                      </div>
+
+                      {/* Contact & Terms Verification */}
+                      <div className="grid grid-cols-2 gap-2 text-[11px] bg-white p-2.5 rounded-xl border border-slate-200/80">
+                        <div>
+                          <span className="text-slate-400 block">Primary Contact:</span>
+                          <strong className="text-slate-800">{dealer.primaryContactName}</strong>
+                          <span className="text-slate-500 block truncate">{dealer.primaryContactEmail}</span>
+                        </div>
+                        <div>
+                          <span className="text-slate-400 block">Terms &amp; Boundary:</span>
+                          <strong className="text-emerald-700 flex items-center gap-1 mt-0.5">
+                            <FileCheck2 className="w-3.5 h-3.5 text-emerald-600" />
+                            <span>{dealer.termsAcceptedVersion || "v2026.1"} Accepted</span>
+                          </strong>
                         </div>
                       </div>
 
-                      <div className="flex items-center gap-2">
+                      {/* Zone Assignment & Action Buttons */}
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pt-1">
+                        <div className="flex items-center gap-2">
+                          <label className="text-[11px] font-bold text-slate-600">Assign Pricing Zone:</label>
+                          <select
+                            value={currentAssignedZone}
+                            onChange={(e) =>
+                              setSelectedZone({
+                                ...selectedZone,
+                                [dealer.id]: e.target.value as ZoneId,
+                              })
+                            }
+                            className="text-xs px-2.5 py-1 rounded-lg border border-slate-200 bg-white font-mono font-bold text-slate-800 focus:outline-none focus:ring-1 focus:ring-slate-400"
+                          >
+                            <option value="ZONE_1">Zone 1 (Auckland $650)</option>
+                            <option value="ZONE_2">Zone 2 (Tauranga $850)</option>
+                            <option value="ZONE_3">Zone 3 (Wellington $1,150)</option>
+                            <option value="ZONE_4">Zone 4 (Canterbury $1,450)</option>
+                            <option value="ZONE_5">Zone 5 (Otago $1,750)</option>
+                          </select>
+                        </div>
+
+                        <div className="flex items-center gap-2 shrink-0">
+                          <button
+                            type="button"
+                            onClick={() => handleReject(dealer.id)}
+                            className="px-3 py-1.5 rounded-xl border border-slate-200 hover:bg-rose-50 hover:border-rose-200 hover:text-rose-700 text-slate-600 text-xs font-semibold transition-colors cursor-pointer"
+                          >
+                            Decline
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleApprove(dealer.id, currentAssignedZone)}
+                            className="px-3.5 py-1.5 rounded-xl bg-slate-900 hover:bg-black text-white text-xs font-bold transition-colors cursor-pointer shadow-xs flex items-center gap-1"
+                          >
+                            <CheckCircle2 className="w-3.5 h-3.5" />
+                            <span>Authorize</span>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+
+          {/* Card Footer Link */}
+          <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
+            <span className="text-[11px] text-slate-400">
+              Manage complete dealer onboarding registry
+            </span>
+            <button
+              type="button"
+              onClick={() => onNavigateTab("admin-dealers")}
+              className="text-xs font-bold text-[#E11D48] hover:text-[#BE123C] flex items-center gap-1 cursor-pointer"
+            >
+              <span>View Dealers Directory</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        </div>
+
+        {/* ========================================================= */}
+        {/* CARD 2: Atomic Reservation Queue Request                   */}
+        {/* ========================================================= */}
+        <div className="bg-white rounded-3xl border border-slate-200/90 shadow-sm p-6 flex flex-col justify-between hover:border-slate-300 transition-all space-y-5">
+          <div className="space-y-4">
+            {/* Card Header */}
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-rose-50 border border-rose-200/80 flex items-center justify-center text-[#E11D48] shadow-2xs">
+                  <Lock className="w-5 h-5" />
+                </div>
+                <div>
+                  <h2 className="text-base font-bold text-slate-900">
+                    Atomic Reservation Queue Request
+                  </h2>
+                  <p className="text-xs text-slate-500">
+                    24-hour exclusivity holds placed by franchise dealers
+                  </p>
+                </div>
+              </div>
+
+              <span
+                className={`px-3 py-1 rounded-full text-xs font-bold font-mono border ${
+                  heldVehicles.length > 0
+                    ? "bg-rose-50 text-rose-800 border-rose-200"
+                    : "bg-slate-50 text-slate-700 border-slate-200"
+                }`}
+              >
+                {heldVehicles.length} Active Hold{heldVehicles.length === 1 ? "" : "s"}
+              </span>
+            </div>
+
+            {/* Card Content */}
+            {heldVehicles.length === 0 ? (
+              <div className="p-8 text-center bg-slate-50 rounded-2xl border border-slate-100 space-y-2">
+                <Clock className="w-8 h-8 text-slate-300 mx-auto" />
+                <h3 className="text-xs font-bold text-slate-800">No Active 24h Holds</h3>
+                <p className="text-[11px] text-slate-500 max-w-xs mx-auto">
+                  All Japanese export units are currently available for purchase across all 5 pricing zones.
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-3.5">
+                {heldVehicles.map((vehicle) => {
+                  const matchingRes = reservations.find(
+                    (r) => r.vehicleId === vehicle.id && r.status === "ACTIVE_HOLD"
+                  );
+                  const dealerName = matchingRes?.dealerName || "Auckland Nissan City";
+                  const dealerZone = matchingRes?.priceSnapshot.zoneId || "ZONE_1";
+                  const price = matchingRes?.priceSnapshot || calculateLandedPrice(vehicle.fobPriceJPY, dealerZone);
+
+                  return (
+                    <div
+                      key={vehicle.id}
+                      className="p-4 rounded-2xl border border-slate-200/90 bg-slate-50/70 hover:bg-slate-50 transition-colors space-y-3 text-xs"
+                    >
+                      <div className="flex items-center justify-between gap-4">
+                        <div className="flex items-center gap-3 min-w-0">
+                          <div className="w-16 h-12 rounded-xl bg-white border border-slate-200/80 p-1 flex items-center justify-center shrink-0">
+                            <img
+                              src={vehicle.images?.[0] || "/images/cars/kicks.png"}
+                              alt={vehicle.model || "Vehicle"}
+                              className="w-full h-full object-contain filter drop-shadow-xs"
+                            />
+                          </div>
+
+                          <div className="min-w-0">
+                            <div className="flex items-center gap-1.5">
+                              <span className="font-mono text-[11px] font-bold text-slate-500">
+                                #{vehicle.stockId}
+                              </span>
+                              <span className="text-[10px] px-1.5 py-0.2 rounded bg-amber-50 text-amber-800 font-semibold border border-amber-200 font-mono">
+                                24h Lock Active
+                              </span>
+                            </div>
+                            <h3 className="font-bold text-sm text-slate-900 truncate">
+                              {vehicle.year} {vehicle.make} {vehicle.model}
+                            </h3>
+                            <p className="text-[11px] text-slate-500 truncate">
+                              {vehicle.grade} · {vehicle.fuelType} · {vehicle.odometerKm.toLocaleString()} {vehicle.odometerUnit || "km"}
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="text-right shrink-0">
+                          <span className="text-[10px] text-slate-400 block uppercase font-bold">Landed Total</span>
+                          <span className="font-mono font-bold text-slate-900 text-sm block">
+                            ${price.totalBuyPriceNZD.toLocaleString()} NZD
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Dealership Info Strip */}
+                      <div className="flex items-center justify-between text-[11px] bg-white p-2.5 rounded-xl border border-slate-200/80">
+                        <div>
+                          <span className="text-slate-400">Reserved Dealership: </span>
+                          <strong className="text-slate-800">{dealerName}</strong>
+                        </div>
+                        <div className="font-mono text-slate-500">
+                          Pricing Basis: <strong className="text-slate-700">{dealerZone}</strong>
+                        </div>
+                      </div>
+
+                      {/* Action Buttons */}
+                      <div className="flex items-center justify-end gap-2 pt-1">
                         <button
                           type="button"
-                          onClick={() => handleReleaseHold(v.id)}
-                          className="px-3.5 py-2 rounded-xl border border-slate-200/90 bg-white hover:bg-rose-50 hover:border-rose-200 hover:text-rose-600 text-slate-700 text-xs font-bold transition-all cursor-pointer shadow-2xs active:scale-[0.98]"
+                          onClick={() => handleReleaseReservation(vehicle.id)}
+                          className="px-3 py-1.5 rounded-xl border border-slate-200 hover:bg-slate-100 text-slate-700 text-xs font-semibold transition-colors cursor-pointer flex items-center gap-1"
                         >
-                          Release Hold
+                          <Unlock className="w-3.5 h-3.5 text-slate-400" />
+                          <span>Release Hold</span>
                         </button>
+
                         <button
                           type="button"
-                          onClick={() => handleConfirmHold(v.id)}
-                          className="px-4 py-2 rounded-xl bg-gradient-to-r from-slate-900 to-slate-800 hover:from-black hover:to-slate-900 text-white text-xs font-bold transition-all shadow-xs hover:shadow cursor-pointer flex items-center gap-1.5 active:scale-[0.98]"
+                          onClick={() => handleConfirmReservation(vehicle.id)}
+                          className="px-3.5 py-1.5 rounded-xl bg-[#E11D48] hover:bg-[#BE123C] text-white text-xs font-bold transition-colors cursor-pointer shadow-xs flex items-center gap-1.5"
                         >
                           <CheckCircle2 className="w-3.5 h-3.5" />
                           <span>Confirm Allocation</span>
@@ -270,135 +412,22 @@ export default function AdminDashboardView({ onNavigateTab }: AdminDashboardView
             )}
           </div>
 
-          {/* Active Logistics RoRo Shipments Tracker */}
-          <div className="bg-white rounded-2xl border border-slate-200/90 p-5 shadow-sm space-y-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="font-bold text-slate-900 text-sm">
-                  Active Programme Orders &amp; RoRo Tracking
-                </h3>
-                <p className="text-[11px] text-slate-500">
-                  Real-time status across 9 RoRo logistics milestones.
-                </p>
-              </div>
-
-              <button
-                onClick={() => onNavigateTab("admin-milestones")}
-                className="text-xs font-bold text-[#E11D48] hover:underline cursor-pointer flex items-center gap-1"
-              >
-                <span>Manage Milestones</span>
-                <ArrowRight className="w-3.5 h-3.5" />
-              </button>
-            </div>
-
-            <div className="space-y-3">
-              {orders.map((o) => (
-                <div
-                  key={o.id}
-                  className="p-4 rounded-xl border border-slate-200 bg-white hover:border-slate-300 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-4"
-                >
-                  <div className="space-y-1 text-xs">
-                    <div className="flex items-center gap-2">
-                      <span className="font-mono font-bold text-slate-900">{o.orderNumber}</span>
-                      <span className="text-slate-400">•</span>
-                      <span className="font-semibold text-slate-700">{o.dealerName}</span>
-                    </div>
-                    <div className="text-slate-600 font-medium">
-                      {o.vehicle.year} {o.vehicle.make} {o.vehicle.model} ({o.vehicle.vinChassis})
-                    </div>
-                    <div className="text-[11px] text-slate-500">
-                      Vessel: <strong className="text-slate-800">{o.vesselName}</strong> · ETA: {o.etaDeliveryDate}
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-3">
-                    <span
-                      className={`px-3 py-1 rounded-full text-xs font-bold font-mono ${o.currentMilestone === "AWAITING_ADDITIONAL_COST"
-                          ? "bg-rose-100 text-rose-800 border border-rose-200"
-                          : "bg-blue-100 text-blue-800 border border-blue-200"
-                        }`}
-                    >
-                      {o.currentMilestone === "AWAITING_ADDITIONAL_COST"
-                        ? "Variation Review ($480)"
-                        : "In Transit (On Vessel)"}
-                    </span>
-
-                    <button
-                      onClick={() => onNavigateTab("admin-milestones")}
-                      className="p-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors cursor-pointer"
-                      title="Update Milestones"
-                    >
-                      <ExternalLink className="w-4 h-4" />
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* Right Column (4 cols): Geographic Zones Coverage & Policy */}
-        <div className="lg:col-span-4 space-y-6">
-          {/* 5 Geographic Pricing Zones Coverage Card */}
-          <div className="bg-white rounded-2xl border border-slate-200/90 p-5 shadow-sm space-y-4">
-            <div>
-              <div className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
-                Official Programme Policy
-              </div>
-              <h3 className="font-bold text-slate-900 text-sm mt-0.5">
-                5 Geographic Pricing Zones
-              </h3>
-            </div>
-
-            <div className="space-y-2 text-xs">
-              <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200/80 flex items-center justify-between">
-                <div>
-                  <span className="font-bold text-slate-900 block">Zone 1: Upper North Island</span>
-                  <span className="text-[11px] text-slate-500">Auckland, Northland</span>
-                </div>
-                <strong className="text-slate-900 font-mono">$650</strong>
-              </div>
-
-              <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200/80 flex items-center justify-between">
-                <div>
-                  <span className="font-bold text-slate-900 block">Zone 2: Central North Island</span>
-                  <span className="text-[11px] text-slate-500">Waikato, Bay of Plenty, Rotorua</span>
-                </div>
-                <strong className="text-slate-900 font-mono">$850</strong>
-              </div>
-
-              <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200/80 flex items-center justify-between">
-                <div>
-                  <span className="font-bold text-slate-900 block">Zone 3: Lower North Island</span>
-                  <span className="text-[11px] text-slate-500">Taranaki, Hawke&apos;s Bay, Wellington</span>
-                </div>
-                <strong className="text-slate-900 font-mono">$1,150</strong>
-              </div>
-
-              <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200/80 flex items-center justify-between">
-                <div>
-                  <span className="font-bold text-slate-900 block">Zone 4: Upper South Island</span>
-                  <span className="text-[11px] text-slate-500">Nelson, Marlborough, Canterbury</span>
-                </div>
-                <strong className="text-slate-900 font-mono">$1,450</strong>
-              </div>
-
-              <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200/80 flex items-center justify-between">
-                <div>
-                  <span className="font-bold text-slate-900 block">Zone 5: Lower South Island</span>
-                  <span className="text-[11px] text-slate-500">West Coast, Otago, Southland</span>
-                </div>
-                <strong className="text-slate-900 font-mono">$1,750</strong>
-              </div>
-            </div>
-
-            <div className="p-3 rounded-xl bg-slate-100 text-[11px] text-slate-600 leading-relaxed">
-              Delivery amounts cover transport from arrival port to dealership yard plus 2 metro compliance tow moves.
-            </div>
+          {/* Card Footer Link */}
+          <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
+            <span className="text-[11px] text-slate-400">
+              Manage complete atomic reservations &amp; history
+            </span>
+            <button
+              type="button"
+              onClick={() => onNavigateTab("admin-reservations")}
+              className="text-xs font-bold text-[#E11D48] hover:text-[#BE123C] flex items-center gap-1 cursor-pointer"
+            >
+              <span>View Full Reservations Queue</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </button>
           </div>
         </div>
       </div>
     </div>
   );
 }
-

@@ -108,8 +108,8 @@ export default function AllocationMilestonesView() {
               <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
                 <div className="flex items-start gap-4">
                   <img
-                    src={order.vehicle.images[0]}
-                    alt={order.vehicle.model}
+                    src={order.vehicle?.images?.[0] || "/images/cars/kicks.png"}
+                    alt={order.vehicle?.model || "Vehicle"}
                     className="w-20 h-14 object-contain rounded-xl border border-slate-200 bg-slate-50 p-1 shrink-0"
                   />
                   <div>
