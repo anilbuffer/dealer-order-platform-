@@ -8,6 +8,7 @@ import {
   Building2,
   Mail,
   Phone,
+  User,
   MapPin,
   FileText,
   CheckCircle2,
@@ -29,10 +30,8 @@ interface FormData {
   physicalAddress: string;
   postalCode: string;
   contactName: string;
-  contactTitle: string;
   contactEmail: string;
   contactPhone: string;
-  dispatchEmail: string;
   acceptTerms: boolean;
   acceptCostBoundary: boolean;
 }
@@ -40,27 +39,135 @@ interface FormData {
 const STEPS = [
   {
     id: 1,
-    title: "Dealership Entity",
-    subtitle: "Legal name, Nissan code & location",
+    title: "Dealership & Authorized Buyer",
+    subtitle: "Entity profile, Nissan dealer code & primary credentials",
     icon: Building2,
   },
   {
     id: 2,
-    title: "Authorized Contacts",
-    subtitle: "Designated buyer & portal credentials",
-    icon: Mail,
-  },
-  {
-    id: 3,
-    title: "Commercial Boundary",
-    subtitle: "Terms of Trade & landed pricing rules",
+    title: "Commercial Boundary & Terms",
+    subtitle: "Terms of Trade & landed pricing policy",
     icon: FileText,
   },
   {
-    id: 4,
+    id: 3,
     title: "Review & Submit",
-    subtitle: "Verification & Autohub authorization",
+    subtitle: "Final verification & Autohub authorization",
     icon: ShieldCheck,
+  },
+];
+
+export interface NZLocation {
+  city: string;
+  island: "North Island" | "South Island";
+  zoneId: "ZONE_1" | "ZONE_2" | "ZONE_3" | "ZONE_4" | "ZONE_5";
+  zoneName: string;
+  deliveryNotes: string;
+}
+
+export const NZ_LOCATIONS: NZLocation[] = [
+  // Zone 1: Upper North Island
+  {
+    city: "Auckland",
+    island: "North Island",
+    zoneId: "ZONE_1",
+    zoneName: "Zone 1 - Upper North Island",
+    deliveryNotes: "Direct Auckland Port clearance (<24h metro delivery)",
+  },
+  {
+    city: "Whangārei / Northland",
+    island: "North Island",
+    zoneId: "ZONE_1",
+    zoneName: "Zone 1 - Upper North Island",
+    deliveryNotes: "Northern linehaul via Auckland port hub",
+  },
+  // Zone 2: Central North Island
+  {
+    city: "Hamilton / Waikato",
+    island: "North Island",
+    zoneId: "ZONE_2",
+    zoneName: "Zone 2 - Central North Island",
+    deliveryNotes: "Central arterial highway carrier dispatch",
+  },
+  {
+    city: "Tauranga / Bay of Plenty",
+    island: "North Island",
+    zoneId: "ZONE_2",
+    zoneName: "Zone 2 - Central North Island",
+    deliveryNotes: "Port of Tauranga or arterial linehaul link",
+  },
+  {
+    city: "Rotorua / Taupō",
+    island: "North Island",
+    zoneId: "ZONE_2",
+    zoneName: "Zone 2 - Central North Island",
+    deliveryNotes: "Central plateau linehaul delivery depot",
+  },
+  // Zone 3: Lower North Island
+  {
+    city: "Wellington",
+    island: "North Island",
+    zoneId: "ZONE_3",
+    zoneName: "Zone 3 - Lower North Island",
+    deliveryNotes: "Capital metro direct delivery pass",
+  },
+  {
+    city: "Palmerston North / Manawatū",
+    island: "North Island",
+    zoneId: "ZONE_3",
+    zoneName: "Zone 3 - Lower North Island",
+    deliveryNotes: "Lower North Island central logistics depot",
+  },
+  {
+    city: "Napier / Hastings (Hawke's Bay)",
+    island: "North Island",
+    zoneId: "ZONE_3",
+    zoneName: "Zone 3 - Lower North Island",
+    deliveryNotes: "East Coast arterial carrier movement",
+  },
+  {
+    city: "New Plymouth / Taranaki",
+    island: "North Island",
+    zoneId: "ZONE_3",
+    zoneName: "Zone 3 - Lower North Island",
+    deliveryNotes: "Western arterial linehaul delivery",
+  },
+  // Zone 4: Upper South Island
+  {
+    city: "Christchurch / Canterbury",
+    island: "South Island",
+    zoneId: "ZONE_4",
+    zoneName: "Zone 4 - Upper South Island",
+    deliveryNotes: "Lyttelton Port arrival or Cook Strait coastal carrier",
+  },
+  {
+    city: "Nelson / Marlborough / Blenheim",
+    island: "South Island",
+    zoneId: "ZONE_4",
+    zoneName: "Zone 4 - Upper South Island",
+    deliveryNotes: "Cook Strait coastal ferry & regional linehaul",
+  },
+  // Zone 5: Lower South Island
+  {
+    city: "Dunedin / Otago",
+    island: "South Island",
+    zoneId: "ZONE_5",
+    zoneName: "Zone 5 - Lower South Island",
+    deliveryNotes: "Southern regional carrier depot delivery",
+  },
+  {
+    city: "Queenstown / Central Otago",
+    island: "South Island",
+    zoneId: "ZONE_5",
+    zoneName: "Zone 5 - Lower South Island",
+    deliveryNotes: "Southern Lakes linehaul delivery route",
+  },
+  {
+    city: "Invercargill / Southland",
+    island: "South Island",
+    zoneId: "ZONE_5",
+    zoneName: "Zone 5 - Lower South Island",
+    deliveryNotes: "Deep South linehaul depot dispatch",
   },
 ];
 
@@ -74,17 +181,21 @@ export default function DealerRegistrationWizard() {
     dealershipName: "",
     dealerCode: "",
     nzbn: "",
-    region: "Upper North Island (Zone 1 - Auckland, Northland)",
+    region: "Auckland",
     physicalAddress: "",
     postalCode: "",
     contactName: "",
-    contactTitle: "Dealer Principal",
     contactEmail: "",
     contactPhone: "",
-    dispatchEmail: "",
     acceptTerms: false,
     acceptCostBoundary: false,
   });
+
+  // Automatically find Island, Pricing Zone, and linehaul notes from selected city
+  const selectedLocation =
+    NZ_LOCATIONS.find(
+      (loc) => loc.city.toLowerCase() === (formData.region || "").toLowerCase()
+    ) || NZ_LOCATIONS[0];
 
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -102,13 +213,12 @@ export default function DealerRegistrationWizard() {
   const validateStep = (step: number): boolean => {
     const newErrors: Record<string, string> = {};
 
+    // STEP 1: Dealership Entity + Authorized Contact Validation
     if (step === 1) {
       if (!formData.dealershipName.trim()) newErrors.dealershipName = "Legal / Trading Name is required";
       if (!formData.dealerCode.trim()) newErrors.dealerCode = "Nissan Dealer Code is required";
       if (!formData.physicalAddress.trim()) newErrors.physicalAddress = "Physical delivery address is required";
-    }
 
-    if (step === 2) {
       if (!formData.contactName.trim()) newErrors.contactName = "Primary Contact Name is required";
       if (!formData.contactEmail.trim() || !formData.contactEmail.includes("@")) {
         newErrors.contactEmail = "Valid business email is required";
@@ -116,10 +226,10 @@ export default function DealerRegistrationWizard() {
       if (!formData.contactPhone.trim()) newErrors.contactPhone = "Direct phone number is required";
     }
 
-    if (step === 3) {
-      if (!formData.acceptTerms) newErrors.acceptTerms = "Terms of Trade must be explicitly accepted";
-      if (!formData.acceptCostBoundary) {
-        newErrors.acceptCostBoundary = "Commercial Additional-Cost Boundary acknowledgement is mandatory";
+    // STEP 2: Commercial Boundary & Terms
+    if (step === 2) {
+      if (!formData.acceptTerms || !formData.acceptCostBoundary) {
+        newErrors.acceptTerms = "Terms of Trade and Commercial Cost Boundary must be accepted";
       }
     }
 
@@ -149,7 +259,7 @@ export default function DealerRegistrationWizard() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (validateStep(1) && validateStep(2) && validateStep(3)) {
+    if (validateStep(1) && validateStep(2)) {
       audio.playSuccessChime();
       setIsSubmitted(true);
     }
@@ -160,13 +270,17 @@ export default function DealerRegistrationWizard() {
   return (
     <div className="min-h-screen w-full flex flex-col lg:flex-row bg-[#F8FAFC]">
       {/* ─────────────────────────────────────────────────────────── */}
-      {/* LEFT SIDEBAR: Full Height Dark Navy Canvas with Step Tabs */}
+      {/* LEFT SIDEBAR: Full Height Luxury Navy Canvas with Step Tabs */}
       {/* ─────────────────────────────────────────────────────────── */}
-      <aside className="w-full lg:w-[380px] xl:w-[420px] bg-[#0A1322] border-b lg:border-b-0 lg:border-r border-[#1B2A42] text-white flex flex-col justify-between p-6 sm:p-8 lg:p-10 shrink-0">
-        <div className="space-y-8">
+      <aside className="relative overflow-hidden w-full lg:w-[390px] xl:w-[420px] bg-[#070D18] border-b lg:border-b-0 lg:border-r border-slate-800/80 text-white flex flex-col justify-between p-6 sm:p-8 lg:p-10 shrink-0">
+        {/* Subtle background ambient glow */}
+        <div className="pointer-events-none absolute -top-24 -left-24 w-96 h-96 bg-rose-600/10 rounded-full blur-3xl" />
+        <div className="pointer-events-none absolute bottom-0 right-0 w-80 h-80 bg-blue-600/5 rounded-full blur-3xl" />
+
+        <div className="relative z-10 space-y-8">
           {/* Brand Header */}
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#E11D48] to-[#9F1239] flex items-center justify-center font-bold text-lg text-white shadow-soft shadow-crimson-600/30">
+          <div className="flex items-center gap-3.5">
+            <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-[#E11D48] via-[#BE123C] to-[#881337] flex items-center justify-center font-black text-xl text-white shadow-[0_4px_20px_rgba(225,29,72,0.4)] ring-1 ring-white/20">
               D
             </div>
             <div>
@@ -180,14 +294,16 @@ export default function DealerRegistrationWizard() {
           </div>
 
           {/* Progress Overview Bar */}
-          <div className="p-4 rounded-2xl bg-[#0F1B2E] border border-[#1B2A42] space-y-2.5">
+          <div className="p-4 rounded-2xl bg-[#0D1829]/90 border border-slate-800/90 backdrop-blur-md shadow-[0_4px_20px_rgba(0,0,0,0.2)] space-y-3">
             <div className="flex items-center justify-between text-xs">
               <span className="font-semibold text-slate-300">Application Progress</span>
-              <span className="font-mono text-crimson-400 font-bold">{progressPercent}%</span>
+              <span className="font-mono text-rose-400 font-bold px-2 py-0.5 rounded-full bg-rose-500/10 border border-rose-500/20 text-[11px]">
+                {progressPercent}%
+              </span>
             </div>
-            <div className="w-full h-1.5 bg-[#1B2A42] rounded-full overflow-hidden">
+            <div className="w-full h-2 bg-slate-800/80 rounded-full overflow-hidden p-0.5">
               <div
-                className="h-full bg-gradient-to-r from-crimson-600 to-crimson-400 transition-all duration-500 rounded-full"
+                className="h-full bg-gradient-to-r from-[#E11D48] via-[#F43F5E] to-[#FB7185] transition-all duration-500 rounded-full shadow-[0_0_12px_rgba(225,29,72,0.6)]"
                 style={{ width: `${Math.max(progressPercent, 10)}%` }}
               />
             </div>
@@ -197,7 +313,7 @@ export default function DealerRegistrationWizard() {
           </div>
 
           {/* Vertical Step Tabs */}
-          <nav aria-label="Registration Steps" className="space-y-2">
+          <nav aria-label="Registration Steps" className="space-y-2.5">
             {STEPS.map((step) => {
               const Icon = step.icon;
               const isActive = currentStep === step.id;
@@ -209,37 +325,37 @@ export default function DealerRegistrationWizard() {
                   type="button"
                   onClick={() => handleStepClick(step.id)}
                   disabled={step.id > currentStep}
-                  className={`w-full flex items-start gap-3.5 p-3.5 rounded-xl transition-all text-left group relative ${
-                    isActive
-                      ? "bg-white/10 text-white nav-active-glow shadow-soft border border-white/10"
+                  className={`w-full flex items-start gap-3.5 p-3.5 rounded-2xl transition-all duration-200 text-left group relative ${isActive
+                      ? "bg-gradient-to-r from-white/[0.12] to-white/[0.04] text-white shadow-[0_4px_20px_rgba(0,0,0,0.3)] border border-white/20 backdrop-blur-md ring-1 ring-white/10"
                       : isPassed
-                      ? "text-slate-300 hover:text-white hover:bg-white/5 cursor-pointer"
-                      : "text-slate-500 cursor-not-allowed opacity-60"
-                  }`}
-                >
-                  {/* Step Number Circle */}
-                  <div
-                    className={`w-8 h-8 rounded-lg flex items-center justify-center font-bold text-xs shrink-0 transition-colors ${
-                      isActive
-                        ? "bg-crimson-600 text-white shadow-soft"
-                        : isPassed
-                        ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"
-                        : "bg-[#142239] text-slate-500 border border-[#1B2A42]"
+                        ? "text-slate-300 hover:text-white hover:bg-white/[0.06] cursor-pointer border border-transparent hover:border-white/10"
+                        : "text-slate-500 cursor-not-allowed opacity-50 border border-transparent"
                     }`}
+                >
+                  {/* Step Number Badge */}
+                  <div
+                    className={`w-9 h-9 rounded-xl flex items-center justify-center font-bold text-xs shrink-0 transition-all duration-200 ${isActive
+                        ? "bg-gradient-to-br from-[#E11D48] to-[#BE123C] text-white shadow-[0_0_16px_rgba(225,29,72,0.5)] ring-2 ring-white/20"
+                        : isPassed
+                          ? "bg-emerald-500/15 text-emerald-400 border border-emerald-500/30"
+                          : "bg-[#111C2E] text-slate-500 border border-slate-800"
+                      }`}
                   >
                     {isPassed && !isActive ? <CheckCircle2 className="w-4 h-4" /> : step.id}
                   </div>
 
                   <div className="min-w-0 flex-1">
                     <div className="font-semibold text-xs text-white flex items-center justify-between">
-                      <span>{step.title}</span>
+                      <span className={isActive ? "text-white font-bold" : "text-slate-300"}>
+                        {step.title}
+                      </span>
                       {isActive && (
-                        <span className="text-[9px] font-bold px-1.5 py-0.2 rounded bg-crimson-600/30 text-rose-300 border border-crimson-500/40">
+                        <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/40 tracking-wider">
                           Active
                         </span>
                       )}
                     </div>
-                    <p className="text-[11px] text-slate-400 mt-0.5 leading-snug">
+                    <p className="text-[11px] text-slate-400 mt-1 leading-snug">
                       {step.subtitle}
                     </p>
                   </div>
@@ -250,9 +366,9 @@ export default function DealerRegistrationWizard() {
         </div>
 
         {/* Bottom Help & Navigation Card */}
-        <div className="pt-6 border-t border-[#1B2A42] space-y-4">
-          <div className="flex items-center gap-2 text-[11px] text-slate-400">
-            <Lock className="w-3.5 h-3.5 text-amber-500" />
+        <div className="relative z-10 pt-6 border-t border-slate-800/80 space-y-4">
+          <div className="flex items-center gap-2 text-[11px] text-slate-400 bg-[#0D1829]/60 px-3 py-2 rounded-xl border border-slate-800/60">
+            <Lock className="w-3.5 h-3.5 text-amber-400 shrink-0" />
             <span>256-bit Encrypted Programme Verification</span>
           </div>
 
@@ -273,21 +389,25 @@ export default function DealerRegistrationWizard() {
       {/* ─────────────────────────────────────────────────────────── */}
       {/* RIGHT SIDE: Step Form Cards (Clean & Simple Light Canvas)  */}
       {/* ─────────────────────────────────────────────────────────── */}
-      <main className="flex-1 flex flex-col justify-between p-6 sm:p-10 lg:p-14 overflow-y-auto">
-        <div className="max-w-2xl w-full mx-auto">
+      <main className="relative flex-1 flex flex-col justify-between p-6 sm:p-10 lg:p-14 overflow-y-auto bg-gradient-to-br from-slate-50 via-[#F8FAFC] to-slate-100/60">
+        {/* Subtle background ambient glow */}
+        <div className="pointer-events-none absolute top-0 right-0 w-[500px] h-[500px] bg-rose-100/30 rounded-full blur-3xl -z-0" />
+        <div className="pointer-events-none absolute bottom-0 left-10 w-[400px] h-[400px] bg-slate-200/40 rounded-full blur-3xl -z-0" />
+
+        <div className="relative z-10 max-w-2xl w-full mx-auto my-auto">
           {/* SUCCESS CONFIRMATION VIEW (US-01 / AC-01) */}
           {isSubmitted ? (
-            <div className="bg-white rounded-2xl border border-slate-200 p-8 sm:p-12 shadow-soft space-y-6 text-center animate-in fade-in zoom-in-95 duration-300">
-              <div className="w-20 h-20 rounded-full bg-emerald-50 border border-emerald-200 flex items-center justify-center mx-auto text-emerald-600 shadow-soft">
+            <div className="bg-white/95 backdrop-blur-xl rounded-3xl border border-slate-200/90 p-8 sm:p-12 shadow-[0_20px_50px_-15px_rgba(15,23,42,0.06)] space-y-6 text-center animate-in fade-in zoom-in-95 duration-300">
+              <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-emerald-100 to-emerald-50 border border-emerald-200/80 flex items-center justify-center mx-auto text-emerald-600 shadow-[0_8px_30px_rgba(16,185,129,0.2)]">
                 <CheckCircle2 className="w-10 h-10" />
               </div>
 
               <div className="space-y-2">
-                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-xs font-semibold text-emerald-700">
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-xs font-semibold text-emerald-700 shadow-2xs">
                   <Sparkles className="w-3.5 h-3.5" />
                   <span>Application Successfully Logged</span>
                 </div>
-                <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900">
+                <h2 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
                   Dealership Onboarding Received
                 </h2>
                 <p className="text-sm text-slate-600 max-w-lg mx-auto leading-relaxed">
@@ -301,7 +421,7 @@ export default function DealerRegistrationWizard() {
               </div>
 
               {/* Status Callout - AC-01 Acceptance */}
-              <div className="bg-amber-50/80 border border-amber-200 rounded-2xl p-5 text-left text-xs text-amber-900 space-y-2">
+              <div className="bg-gradient-to-br from-amber-50/90 to-amber-50/40 border border-amber-200/80 rounded-2xl p-5 text-left text-xs text-amber-900 space-y-2 shadow-2xs">
                 <div className="font-bold flex items-center gap-2 text-sm text-amber-950">
                   <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0" />
                   <span>Current State: Blocked Pending Autohub Authorization (AC-01)</span>
@@ -319,28 +439,28 @@ export default function DealerRegistrationWizard() {
                 <button
                   type="button"
                   onClick={() => router.push("/")}
-                  className="w-full sm:w-auto px-6 py-3 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs transition-colors shadow-soft cursor-pointer"
+                  className="w-full sm:w-auto px-7 py-3 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs transition-all shadow-soft cursor-pointer active:scale-[0.99]"
                 >
                   Return to Sign In Portal
                 </button>
                 <button
                   type="button"
                   onClick={() => alert("Application PDF receipt generated with UTC timestamp and terms hash.")}
-                  className="w-full sm:w-auto px-5 py-3 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-semibold text-xs transition-colors cursor-pointer"
+                  className="w-full sm:w-auto px-6 py-3 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-semibold text-xs transition-all cursor-pointer active:scale-[0.99]"
                 >
                   Download Application Copy
                 </button>
               </div>
             </div>
           ) : (
-            <div className="bg-white rounded-2xl border border-slate-200 p-6 sm:p-10 shadow-soft">
+            <div className="bg-white/95 backdrop-blur-xl rounded-3xl border border-slate-200/90 p-7 sm:p-10 shadow-[0_20px_50px_-15px_rgba(15,23,42,0.06),0_1px_3px_rgba(0,0,0,0.02)]">
               {/* Step Header */}
-              <div className="mb-8 pb-4 border-b border-slate-100 flex items-start justify-between">
+              <div className="mb-8 pb-5 border-b border-slate-100 flex items-start justify-between">
                 <div>
-                  <span className="text-[11px] font-bold uppercase tracking-wider text-crimson-600">
+                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md bg-rose-50 border border-rose-200/80 text-[10px] font-bold uppercase tracking-wider text-[#E11D48]">
                     Step {currentStep} of {STEPS.length}
                   </span>
-                  <h2 className="text-xl sm:text-2xl font-extrabold text-slate-900 mt-0.5">
+                  <h2 className="text-xl sm:text-2xl font-black text-slate-900 mt-2 tracking-tight">
                     {STEPS[currentStep - 1].title}
                   </h2>
                   <p className="text-xs sm:text-sm text-slate-500 mt-1">
@@ -350,136 +470,154 @@ export default function DealerRegistrationWizard() {
               </div>
 
               {/* ────────────────────────────────────────────── */}
-              {/* STEP 1: Dealership Entity Information          */}
+              {/* STEP 1: Dealership & Authorized Buyer          */}
               {/* ────────────────────────────────────────────── */}
               {currentStep === 1 && (
-                <div className="space-y-5 animate-in fade-in duration-200">
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-semibold text-slate-700">
-                      Legal / Trading Dealership Name *
-                    </label>
-                    <div className="relative">
-                      <Building2 className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
-                      <input
-                        type="text"
-                        value={formData.dealershipName}
-                        onChange={(e) => updateField("dealershipName", e.target.value)}
-                        placeholder="e.g. Auckland Nissan City Ltd"
-                        className={`w-full pl-10 pr-3.5 py-2.5 text-sm bg-white rounded-xl border ${
-                          errors.dealershipName ? "border-crimson-500 ring-1 ring-crimson-500" : "border-slate-200"
-                        } text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-crimson-500/20 focus:border-crimson-600 transition-all`}
-                      />
+                <div className="space-y-6 animate-in fade-in duration-200">
+                  {/* Subsection A: Dealership Entity */}
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-2.5 pb-3 border-b border-slate-100">
+                      <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-rose-50 to-rose-100/80 text-[#E11D48] border border-rose-200/70 flex items-center justify-center shadow-xs">
+                        <Building2 className="w-4 h-4" />
+                      </div>
+                      <div>
+                        <h3 className="text-xs font-bold uppercase tracking-wider text-slate-900">
+                          Dealership Legal Entity &amp; Facility
+                        </h3>
+                        <p className="text-[11px] text-slate-400">
+                          Trading name, official dealer code and delivery yard location
+                        </p>
+                      </div>
                     </div>
-                    {errors.dealershipName && (
-                      <p className="text-[11px] text-crimson-600">{errors.dealershipName}</p>
-                    )}
-                  </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-1.5">
                       <label className="text-xs font-semibold text-slate-700">
-                        Nissan Dealer Code *
+                        Legal / Trading Dealership Name *
                       </label>
-                      <input
-                        type="text"
-                        value={formData.dealerCode}
-                        onChange={(e) => updateField("dealerCode", e.target.value.toUpperCase())}
-                        placeholder="e.g. NZ-NIS-AKL04"
-                        className={`w-full px-3.5 py-2.5 text-sm font-mono bg-white rounded-xl border ${
-                          errors.dealerCode ? "border-crimson-500 ring-1 ring-crimson-500" : "border-slate-200"
-                        } text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-crimson-500/20 focus:border-crimson-600 transition-all`}
-                      />
-                      {errors.dealerCode && (
-                        <p className="text-[11px] text-crimson-600">{errors.dealerCode}</p>
+                      <div className="relative group">
+                        <Building2 className="w-4 h-4 text-slate-400 group-focus-within:text-[#E11D48] absolute left-3.5 top-3 transition-colors" />
+                        <input
+                          type="text"
+                          value={formData.dealershipName}
+                          onChange={(e) => updateField("dealershipName", e.target.value)}
+                          placeholder="e.g. Auckland Nissan City Ltd"
+                          className={`w-full pl-10 pr-3.5 py-2.5 text-sm bg-slate-50/70 hover:bg-slate-50/90 focus:bg-white rounded-xl border ${errors.dealershipName
+                              ? "border-crimson-500 ring-2 ring-crimson-500/20 bg-rose-50/20"
+                              : "border-slate-200/90 hover:border-slate-300"
+                            } text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-4 focus:ring-rose-500/10 focus:border-[#E11D48] transition-all shadow-xs`}
+                        />
+                      </div>
+                      {errors.dealershipName && (
+                        <p className="text-[11px] text-crimson-600">{errors.dealershipName}</p>
                       )}
                     </div>
 
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div className="space-y-1.5">
+                        <label className="text-xs font-semibold text-slate-700">
+                          Nissan Dealer Code *
+                        </label>
+                        <input
+                          type="text"
+                          value={formData.dealerCode}
+                          onChange={(e) => updateField("dealerCode", e.target.value.toUpperCase())}
+                          placeholder="e.g. NZ-NIS-AKL04"
+                          className={`w-full px-3.5 py-2.5 text-sm font-mono bg-slate-50/70 hover:bg-slate-50/90 focus:bg-white rounded-xl border ${errors.dealerCode
+                              ? "border-crimson-500 ring-2 ring-crimson-500/20 bg-rose-50/20"
+                              : "border-slate-200/90 hover:border-slate-300"
+                            } text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-4 focus:ring-rose-500/10 focus:border-[#E11D48] transition-all shadow-xs`}
+                        />
+                        {errors.dealerCode && (
+                          <p className="text-[11px] text-crimson-600">{errors.dealerCode}</p>
+                        )}
+                      </div>
+
+                      <div className="space-y-1.5">
+                        <label className="text-xs font-semibold text-slate-700">
+                          NZBN (NZ Business Number)
+                        </label>
+                        <input
+                          type="text"
+                          value={formData.nzbn}
+                          onChange={(e) => updateField("nzbn", e.target.value)}
+                          placeholder="942903829..."
+                          className="w-full px-3.5 py-2.5 text-sm font-mono bg-slate-50/70 hover:bg-slate-50/90 focus:bg-white rounded-xl border border-slate-200/90 hover:border-slate-300 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-4 focus:ring-rose-500/10 focus:border-[#E11D48] transition-all shadow-xs"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div className="space-y-1.5">
+                        <label className="text-xs font-semibold text-slate-700">
+                          Geographic Region / Island *
+                        </label>
+                        <select
+                          value={formData.region}
+                          onChange={(e) => updateField("region", e.target.value)}
+                          className="w-full px-3.5 py-2.5 text-sm bg-slate-50/70 hover:bg-slate-50/90 focus:bg-white rounded-xl border border-slate-200/90 hover:border-slate-300 text-slate-900 focus:outline-none focus:ring-4 focus:ring-rose-500/10 focus:border-[#E11D48] transition-all cursor-pointer shadow-xs"
+                        >
+                          {NZ_LOCATIONS.map((loc) => (
+                            <option key={loc.city} value={loc.city}>
+                              {loc.city}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+
+                      <div className="space-y-1.5">
+                        <label className="text-xs font-semibold text-slate-700">Postal Code</label>
+                        <input
+                          type="text"
+                          value={formData.postalCode}
+                          onChange={(e) => updateField("postalCode", e.target.value)}
+                          placeholder="e.g. 1051"
+                          className="w-full px-3.5 py-2.5 text-sm bg-slate-50/70 hover:bg-slate-50/90 focus:bg-white rounded-xl border border-slate-200/90 hover:border-slate-300 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-4 focus:ring-rose-500/10 focus:border-[#E11D48] transition-all shadow-xs"
+                        />
+                      </div>
+                    </div>
+
                     <div className="space-y-1.5">
                       <label className="text-xs font-semibold text-slate-700">
-                        NZBN (NZ Business Number)
+                        Dealership Physical Delivery Address *
                       </label>
-                      <input
-                        type="text"
-                        value={formData.nzbn}
-                        onChange={(e) => updateField("nzbn", e.target.value)}
-                        placeholder="942903829..."
-                        className="w-full px-3.5 py-2.5 text-sm font-mono bg-white rounded-xl border border-slate-200 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-crimson-500/20 focus:border-crimson-600 transition-all"
-                      />
+                      <div className="relative group">
+                        <MapPin className="w-4 h-4 text-slate-400 group-focus-within:text-[#E11D48] absolute left-3.5 top-3 transition-colors" />
+                        <input
+                          type="text"
+                          value={formData.physicalAddress}
+                          onChange={(e) => updateField("physicalAddress", e.target.value)}
+                          placeholder="Street address where vehicles will be delivered"
+                          className={`w-full pl-10 pr-3.5 py-2.5 text-sm bg-slate-50/70 hover:bg-slate-50/90 focus:bg-white rounded-xl border ${errors.physicalAddress
+                              ? "border-crimson-500 ring-2 ring-crimson-500/20 bg-rose-50/20"
+                              : "border-slate-200/90 hover:border-slate-300"
+                            } text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-4 focus:ring-rose-500/10 focus:border-[#E11D48] transition-all shadow-xs`}
+                        />
+                      </div>
+                      {errors.physicalAddress && (
+                        <p className="text-[11px] text-crimson-600">{errors.physicalAddress}</p>
+                      )}
+                      <p className="text-[11px] text-slate-400">
+                        Standard pricing includes two NZ domestic carrier delivery movements to this address.
+                      </p>
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="space-y-1.5">
-                      <label className="text-xs font-semibold text-slate-700">
-                        Geographic Region / Island *
-                      </label>
-                      <select
-                        value={formData.region}
-                        onChange={(e) => updateField("region", e.target.value)}
-                        className="w-full px-3.5 py-2.5 text-sm bg-white rounded-xl border border-slate-200 text-slate-900 focus:outline-none focus:ring-2 focus:ring-crimson-500/20 focus:border-crimson-600 transition-all cursor-pointer"
-                      >
-                        <option value="Upper North Island (Zone 1 - Auckland, Northland)">
-                          Zone 1: Upper North Island (Auckland, Northland)
-                        </option>
-                        <option value="Central North Island (Zone 2 - Waikato, Bay of Plenty, Rotorua, Taupō)">
-                          Zone 2: Central North Island (Waikato, Bay of Plenty, Rotorua, Taupō)
-                        </option>
-                        <option value="Lower North Island (Zone 3 - Taranaki, Hawke&apos;s Bay, Gisborne, Manawatū, Wellington)">
-                          Zone 3: Lower North Island (Taranaki, Hawke&apos;s Bay, Gisborne, Manawatū, Wellington)
-                        </option>
-                        <option value="Upper South Island (Zone 4 - Nelson, Marlborough, Canterbury)">
-                          Zone 4: Upper South Island (Nelson, Marlborough, Canterbury)
-                        </option>
-                        <option value="Lower South Island (Zone 5 - West Coast, Otago, Southland)">
-                          Zone 5: Lower South Island (West Coast, Otago, Southland)
-                        </option>
-                      </select>
+                  {/* Subsection B: Primary Authorized Buyer */}
+                  <div className="space-y-4 pt-5 border-t border-slate-200/80">
+                    <div className="flex items-center gap-2.5 pb-3 border-b border-slate-100">
+                      <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-blue-50 to-blue-100/80 text-blue-600 border border-blue-200/70 flex items-center justify-center shadow-xs">
+                        <User className="w-4 h-4" />
+                      </div>
+                      <div>
+                        <h3 className="text-xs font-bold uppercase tracking-wider text-slate-900">
+                          Primary Authorized Buyer &amp; Portal Credentials
+                        </h3>
+                        <p className="text-[11px] text-slate-400">
+                          Designated Buyer / Principal authorized to place 24-hour atomic vehicle holds
+                        </p>
+                      </div>
                     </div>
 
-                    <div className="space-y-1.5">
-                      <label className="text-xs font-semibold text-slate-700">Postal Code</label>
-                      <input
-                        type="text"
-                        value={formData.postalCode}
-                        onChange={(e) => updateField("postalCode", e.target.value)}
-                        placeholder="e.g. 1051"
-                        className="w-full px-3.5 py-2.5 text-sm bg-white rounded-xl border border-slate-200 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-crimson-500/20 focus:border-crimson-600 transition-all"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-semibold text-slate-700">
-                      Dealership Physical Delivery Address *
-                    </label>
-                    <div className="relative">
-                      <MapPin className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
-                      <input
-                        type="text"
-                        value={formData.physicalAddress}
-                        onChange={(e) => updateField("physicalAddress", e.target.value)}
-                        placeholder="Street address where vehicles will be delivered"
-                        className={`w-full pl-10 pr-3.5 py-2.5 text-sm bg-white rounded-xl border ${
-                          errors.physicalAddress ? "border-crimson-500 ring-1 ring-crimson-500" : "border-slate-200"
-                        } text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-crimson-500/20 focus:border-crimson-600 transition-all`}
-                      />
-                    </div>
-                    {errors.physicalAddress && (
-                      <p className="text-[11px] text-crimson-600">{errors.physicalAddress}</p>
-                    )}
-                    <p className="text-[11px] text-slate-400">
-                      Standard pricing includes two NZ domestic carrier delivery movements to this address.
-                    </p>
-                  </div>
-                </div>
-              )}
-
-              {/* ────────────────────────────────────────────── */}
-              {/* STEP 2: Authorized Contacts                    */}
-              {/* ────────────────────────────────────────────── */}
-              {currentStep === 2 && (
-                <div className="space-y-5 animate-in fade-in duration-200">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-1.5">
                       <label className="text-xs font-semibold text-slate-700">
                         Primary Contact Full Name *
@@ -489,271 +627,279 @@ export default function DealerRegistrationWizard() {
                         value={formData.contactName}
                         onChange={(e) => updateField("contactName", e.target.value)}
                         placeholder="e.g. Jason Bell"
-                        className={`w-full px-3.5 py-2.5 text-sm bg-white rounded-xl border ${
-                          errors.contactName ? "border-crimson-500 ring-1 ring-crimson-500" : "border-slate-200"
-                        } text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-crimson-500/20 focus:border-crimson-600 transition-all`}
+                        className={`w-full px-3.5 py-2.5 text-sm bg-slate-50/70 hover:bg-slate-50/90 focus:bg-white rounded-xl border ${errors.contactName
+                            ? "border-crimson-500 ring-2 ring-crimson-500/20 bg-rose-50/20"
+                            : "border-slate-200/90 hover:border-slate-300"
+                          } text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-4 focus:ring-rose-500/10 focus:border-[#E11D48] transition-all shadow-xs`}
                       />
                       {errors.contactName && (
                         <p className="text-[11px] text-crimson-600">{errors.contactName}</p>
                       )}
                     </div>
 
-                    <div className="space-y-1.5">
-                      <label className="text-xs font-semibold text-slate-700">Role / Position</label>
-                      <input
-                        type="text"
-                        value={formData.contactTitle}
-                        onChange={(e) => updateField("contactTitle", e.target.value)}
-                        placeholder="Dealer Principal / General Manager"
-                        className="w-full px-3.5 py-2.5 text-sm bg-white rounded-xl border border-slate-200 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-crimson-500/20 focus:border-crimson-600 transition-all"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="space-y-1.5">
-                      <label className="text-xs font-semibold text-slate-700">
-                        Business Email (Sign-In) *
-                      </label>
-                      <div className="relative">
-                        <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
-                        <input
-                          type="email"
-                          value={formData.contactEmail}
-                          onChange={(e) => updateField("contactEmail", e.target.value)}
-                          placeholder="jason@dealership.co.nz"
-                          className={`w-full pl-10 pr-3.5 py-2.5 text-sm bg-white rounded-xl border ${
-                            errors.contactEmail ? "border-crimson-500 ring-1 ring-crimson-500" : "border-slate-200"
-                          } text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-crimson-500/20 focus:border-crimson-600 transition-all`}
-                        />
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div className="space-y-1.5">
+                        <label className="text-xs font-semibold text-slate-700">
+                          Business Email *
+                        </label>
+                        <div className="relative group">
+                          <Mail className="w-4 h-4 text-slate-400 group-focus-within:text-[#E11D48] absolute left-3.5 top-3 transition-colors" />
+                          <input
+                            type="email"
+                            value={formData.contactEmail}
+                            onChange={(e) => updateField("contactEmail", e.target.value)}
+                            placeholder="jason@dealership.co.nz"
+                            className={`w-full pl-10 pr-3.5 py-2.5 text-sm bg-slate-50/70 hover:bg-slate-50/90 focus:bg-white rounded-xl border ${errors.contactEmail
+                                ? "border-crimson-500 ring-2 ring-crimson-500/20 bg-rose-50/20"
+                                : "border-slate-200/90 hover:border-slate-300"
+                              } text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-4 focus:ring-rose-500/10 focus:border-[#E11D48] transition-all shadow-xs`}
+                          />
+                        </div>
+                        {errors.contactEmail && (
+                          <p className="text-[11px] text-crimson-600">{errors.contactEmail}</p>
+                        )}
                       </div>
-                      {errors.contactEmail && (
-                        <p className="text-[11px] text-crimson-600">{errors.contactEmail}</p>
-                      )}
-                    </div>
 
-                    <div className="space-y-1.5">
-                      <label className="text-xs font-semibold text-slate-700">
-                        Direct Phone / Mobile *
-                      </label>
-                      <div className="relative">
-                        <Phone className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
-                        <input
-                          type="tel"
-                          value={formData.contactPhone}
-                          onChange={(e) => updateField("contactPhone", e.target.value)}
-                          placeholder="+64 21 000 0000"
-                          className={`w-full pl-10 pr-3.5 py-2.5 text-sm bg-white rounded-xl border ${
-                            errors.contactPhone ? "border-crimson-500 ring-1 ring-crimson-500" : "border-slate-200"
-                          } text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-crimson-500/20 focus:border-crimson-600 transition-all`}
-                        />
+                      <div className="space-y-1.5">
+                        <label className="text-xs font-semibold text-slate-700">
+                          Direct Phone / Mobile *
+                        </label>
+                        <div className="relative group">
+                          <Phone className="w-4 h-4 text-slate-400 group-focus-within:text-[#E11D48] absolute left-3.5 top-3 transition-colors" />
+                          <input
+                            type="tel"
+                            value={formData.contactPhone}
+                            onChange={(e) => updateField("contactPhone", e.target.value)}
+                            placeholder="+64 21 000 0000"
+                            className={`w-full pl-10 pr-3.5 py-2.5 text-sm bg-slate-50/70 hover:bg-slate-50/90 focus:bg-white rounded-xl border ${errors.contactPhone
+                                ? "border-crimson-500 ring-2 ring-crimson-500/20 bg-rose-50/20"
+                                : "border-slate-200/90 hover:border-slate-300"
+                              } text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-4 focus:ring-rose-500/10 focus:border-[#E11D48] transition-all shadow-xs`}
+                          />
+                        </div>
+                        {errors.contactPhone && (
+                          <p className="text-[11px] text-crimson-600">{errors.contactPhone}</p>
+                        )}
                       </div>
-                      {errors.contactPhone && (
-                        <p className="text-[11px] text-crimson-600">{errors.contactPhone}</p>
-                      )}
                     </div>
-                  </div>
-
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-semibold text-slate-700">
-                      Secondary Logistics / Dispatch Notification Email (Optional)
-                    </label>
-                    <input
-                      type="email"
-                      value={formData.dispatchEmail}
-                      onChange={(e) => updateField("dispatchEmail", e.target.value)}
-                      placeholder="logistics@dealership.co.nz"
-                      className="w-full px-3.5 py-2.5 text-sm bg-white rounded-xl border border-slate-200 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-crimson-500/20 focus:border-crimson-600 transition-all"
-                    />
-                    <p className="text-[11px] text-slate-400">
-                      Receives shipping arrival and compliance milestone notices.
-                    </p>
                   </div>
                 </div>
               )}
 
               {/* ────────────────────────────────────────────── */}
-              {/* STEP 3: Commercial Boundary & Terms (US-02)    */}
+              {/* STEP 2: Commercial Boundary & Terms (US-02)    */}
               {/* ────────────────────────────────────────────── */}
-              {currentStep === 3 && (
+              {currentStep === 2 && (
                 <div className="space-y-6 animate-in fade-in duration-200">
-                  {/* Price Boundary Comparison Box */}
-                  <div className="rounded-2xl border border-slate-200 overflow-hidden bg-slate-50/70">
-                    <div className="px-4 py-3 bg-slate-100/80 border-b border-slate-200 flex items-center justify-between text-xs font-bold text-slate-800">
-                      <span>Dealer-Visible Commercial Boundary</span>
-                      <span className="font-mono text-[10px] bg-white px-2 py-0.5 rounded border border-slate-200">
+                  {/* Single Unified Commercial Boundary Container with scroll-y */}
+                  <div className="rounded-2xl border border-slate-200/90 overflow-hidden bg-white shadow-xs">
+                    {/* Header */}
+                    <div className="px-5 py-3.5 bg-gradient-to-r from-slate-50 to-slate-100/70 border-b border-slate-200/80 flex items-center justify-between text-xs font-bold text-slate-800">
+                      <span className="flex items-center gap-2">
+                        <div className="w-6 h-6 rounded-lg bg-rose-50 border border-rose-200/60 flex items-center justify-center text-[#E11D48]">
+                          <FileText className="w-3.5 h-3.5" />
+                        </div>
+                        <span>Dealer-Visible Commercial Boundary</span>
+                      </span>
+                      <span className="font-mono text-[10px] font-semibold bg-white px-2.5 py-1 rounded-full border border-slate-200 text-slate-600 shadow-2xs">
                         v2026.1 Official Policy
                       </span>
                     </div>
 
-                    <div className="p-4 grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
-                      <div className="bg-white p-3.5 rounded-xl border border-emerald-200/80 space-y-1.5">
-                        <span className="font-bold text-emerald-800 flex items-center gap-1.5">
-                          <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                          Included in Total Buy Price:
-                        </span>
-                        <ul className="text-[11px] text-slate-600 space-y-1 list-disc list-inside">
-                          <li>Vehicle FOB acquisition cost (Japan)</li>
-                          <li>Standard door-to-door RoRo ocean shipment</li>
-                          <li>NZ Customs processing & NZ GST</li>
-                          <li>Standard MR2A compliance inspection</li>
-                          <li>Two standard NZ delivery carrier movements</li>
-                          <li>Nissan programme component fee</li>
+                    {/* Scrollable Single Card Body */}
+                    <div className="max-h-[300px] overflow-y-auto p-5 space-y-4 text-xs divide-y divide-slate-100">
+                      {/* Section 1: Included in Guaranteed Total Buy Price */}
+                      <div className="space-y-2.5">
+                        <div className="flex items-center gap-2 font-bold text-emerald-900 text-xs">
+                          <div className="w-5 h-5 rounded-full bg-emerald-100/80 text-emerald-700 flex items-center justify-center text-[10px] font-black">
+                            ✓
+                          </div>
+                          <span>Included in Total Buy Price (Guaranteed Fixed Landed):</span>
+                        </div>
+                        <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px] text-slate-600 pt-1">
+                          <li className="flex items-start gap-2 bg-emerald-50/40 hover:bg-emerald-50/70 transition-colors p-2.5 rounded-xl border border-emerald-100/80">
+                            <span className="text-emerald-600 font-bold shrink-0">✓</span>
+                            <span>Vehicle FOB acquisition cost (Japan JPY to NZD)</span>
+                          </li>
+                          <li className="flex items-start gap-2 bg-emerald-50/40 hover:bg-emerald-50/70 transition-colors p-2.5 rounded-xl border border-emerald-100/80">
+                            <span className="text-emerald-600 font-bold shrink-0">✓</span>
+                            <span>Standard door-to-door RoRo ocean freight &amp; marine cover</span>
+                          </li>
+                          <li className="flex items-start gap-2 bg-emerald-50/40 hover:bg-emerald-50/70 transition-colors p-2.5 rounded-xl border border-emerald-100/80">
+                            <span className="text-emerald-600 font-bold shrink-0">✓</span>
+                            <span>NZ Customs border processing, tariffs &amp; 15% NZ GST</span>
+                          </li>
+                          <li className="flex items-start gap-2 bg-emerald-50/40 hover:bg-emerald-50/70 transition-colors p-2.5 rounded-xl border border-emerald-100/80">
+                            <span className="text-emerald-600 font-bold shrink-0">✓</span>
+                            <span>Standard entry compliance pass (MR2A &amp; 1-year WoF)</span>
+                          </li>
+                          <li className="flex items-start gap-2 bg-emerald-50/40 hover:bg-emerald-50/70 transition-colors p-2.5 rounded-xl border border-emerald-100/80">
+                            <span className="text-emerald-600 font-bold shrink-0">✓</span>
+                            <span>Two standard domestic delivery carrier movements</span>
+                          </li>
+                          <li className="flex items-start gap-2 bg-emerald-50/40 hover:bg-emerald-50/70 transition-colors p-2.5 rounded-xl border border-emerald-100/80">
+                            <span className="text-emerald-600 font-bold shrink-0">✓</span>
+                            <span>Nissan NZ certified programme component fee</span>
+                          </li>
                         </ul>
                       </div>
 
-                      <div className="bg-white p-3.5 rounded-xl border border-amber-200/80 space-y-1.5">
-                        <span className="font-bold text-amber-800 flex items-center gap-1.5">
-                          <AlertTriangle className="w-4 h-4 text-amber-600" />
-                          Potential Additional Cost:
-                        </span>
-                        <ul className="text-[11px] text-slate-600 space-y-1 list-disc list-inside">
-                          <li>Non-standard compliance repairs</li>
-                          <li>Repair certification / engineering evidence</li>
-                          <li>Parts & labour beyond standard inspection</li>
-                          <li>Border flag bio-security clearance</li>
-                          <li>Non-standard storage or regional redelivery</li>
-                          <li>Dealer-requested accessories or grooming</li>
+                      {/* Section 2: Potential Additional Costs */}
+                      <div className="space-y-2.5 pt-3.5">
+                        <div className="flex items-center gap-2 font-bold text-amber-900 text-xs">
+                          <div className="w-5 h-5 rounded-full bg-amber-100/80 text-amber-700 flex items-center justify-center text-[10px] font-black">
+                            !
+                          </div>
+                          <span>Potential Additional Costs (Requires Prior Dealership Approval):</span>
+                        </div>
+                        <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px] text-slate-600 pt-1">
+                          <li className="flex items-start gap-2 bg-amber-50/40 hover:bg-amber-50/70 transition-colors p-2.5 rounded-xl border border-amber-100/80">
+                            <span className="text-amber-600 font-bold shrink-0">•</span>
+                            <span>Non-standard structural or mechanical compliance repairs</span>
+                          </li>
+                          <li className="flex items-start gap-2 bg-amber-50/40 hover:bg-amber-50/70 transition-colors p-2.5 rounded-xl border border-amber-100/80">
+                            <span className="text-amber-600 font-bold shrink-0">•</span>
+                            <span>LVVTA repair certification or engineering evidence</span>
+                          </li>
+                          <li className="flex items-start gap-2 bg-amber-50/40 hover:bg-amber-50/70 transition-colors p-2.5 rounded-xl border border-amber-100/80">
+                            <span className="text-amber-600 font-bold shrink-0">•</span>
+                            <span>Replacement parts &amp; labour beyond standard MR2A inspection</span>
+                          </li>
+                          <li className="flex items-start gap-2 bg-amber-50/40 hover:bg-amber-50/70 transition-colors p-2.5 rounded-xl border border-amber-100/80">
+                            <span className="text-amber-600 font-bold shrink-0">•</span>
+                            <span>MPI border biosecurity flag &amp; decontamination treatment</span>
+                          </li>
+                          <li className="flex items-start gap-2 bg-amber-50/40 hover:bg-amber-50/70 transition-colors p-2.5 rounded-xl border border-amber-100/80">
+                            <span className="text-amber-600 font-bold shrink-0">•</span>
+                            <span>Non-standard demurrage storage or regional re-delivery</span>
+                          </li>
+                          <li className="flex items-start gap-2 bg-amber-50/40 hover:bg-amber-50/70 transition-colors p-2.5 rounded-xl border border-amber-100/80">
+                            <span className="text-amber-600 font-bold shrink-0">•</span>
+                            <span>Dealer-requested accessories, towbars, tinting or grooming</span>
+                          </li>
                         </ul>
                       </div>
                     </div>
 
-                    <div className="px-4 py-2.5 bg-slate-100/50 border-t border-slate-200 text-[11px] text-slate-500 italic">
-                      Notice: Fixed pricing assumes a standard compliance pass. Any separately chargeable work will be identified and evidenced prior to work execution.
+                    {/* Notice Footer */}
+                    <div className="px-5 py-2.5 bg-slate-50/80 border-t border-slate-200/80 text-[11px] text-slate-500 italic">
+                      Notice: Fixed pricing assumes a standard compliance pass. Any separately chargeable work will be identified, photographed, and evidenced prior to work execution.
                     </div>
                   </div>
 
-                  {/* Mandatory Checkbox 1: Terms of Trade */}
-                  <label
-                    className={`flex items-start gap-3.5 p-4 rounded-xl border cursor-pointer transition-all ${
-                      formData.acceptTerms
-                        ? "bg-emerald-50/40 border-emerald-300 ring-1 ring-emerald-300"
-                        : errors.acceptTerms
-                        ? "bg-crimson-50/40 border-crimson-300 ring-1 ring-crimson-300"
-                        : "bg-white border-slate-200 hover:bg-slate-50"
-                    }`}
-                  >
-                    <input
-                      type="checkbox"
-                      checked={formData.acceptTerms}
-                      onChange={(e) => updateField("acceptTerms", e.target.checked)}
-                      className="mt-1 w-4 h-4 rounded text-crimson-600 focus:ring-crimson-500 border-slate-300"
-                    />
-                    <div className="text-xs text-slate-700 leading-relaxed">
-                      <strong className="text-slate-900 block mb-0.5">
-                        Acceptance of Nissan NZ Programme Terms of Trade (v2026.1) *
-                      </strong>
-                      I confirm that our dealership accepts the Terms of Trade governing stock assessment, 24-hour reservation holding rules, and binding purchase allocations.
-                    </div>
-                  </label>
-                  {errors.acceptTerms && (
-                    <p className="text-[11px] text-crimson-600 mt-1">{errors.acceptTerms}</p>
-                  )}
+                  {/* Single Line Mandatory Agreement Checkbox */}
+                  <div className="space-y-1.5 pt-1">
+                    <label
+                      className={`flex items-center gap-3.5 p-4 rounded-2xl border cursor-pointer transition-all duration-200 ${formData.acceptTerms && formData.acceptCostBoundary
+                          ? "bg-gradient-to-r from-emerald-50/60 to-emerald-50/20 border-emerald-300 ring-2 ring-emerald-500/20 shadow-xs"
+                          : errors.acceptTerms || errors.acceptCostBoundary
+                            ? "bg-rose-50/40 border-rose-300 ring-2 ring-rose-500/20"
+                            : "bg-white border-slate-200 hover:border-slate-300 hover:bg-slate-50/50 shadow-xs"
+                        }`}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={formData.acceptTerms && formData.acceptCostBoundary}
+                        onChange={(e) => {
+                          updateField("acceptTerms", e.target.checked);
+                          updateField("acceptCostBoundary", e.target.checked);
+                        }}
+                        className="w-4 h-4 rounded text-[#E11D48] focus:ring-rose-500 border-slate-300 shrink-0 cursor-pointer"
+                      />
+                      <span className="text-xs text-slate-700 leading-snug">
+                        I accept the <strong className="text-slate-900 font-bold">Nissan NZ Terms of Trade (v2026.1)</strong> and acknowledge the <strong className="text-slate-900 font-bold">Commercial Cost Boundary</strong>. *
+                      </span>
+                    </label>
 
-                  {/* Mandatory Checkbox 2: Additional Cost Boundary */}
-                  <label
-                    className={`flex items-start gap-3.5 p-4 rounded-xl border cursor-pointer transition-all ${
-                      formData.acceptCostBoundary
-                        ? "bg-emerald-50/40 border-emerald-300 ring-1 ring-emerald-300"
-                        : errors.acceptCostBoundary
-                        ? "bg-crimson-50/40 border-crimson-300 ring-1 ring-crimson-300"
-                        : "bg-white border-slate-200 hover:bg-slate-50"
-                    }`}
-                  >
-                    <input
-                      type="checkbox"
-                      checked={formData.acceptCostBoundary}
-                      onChange={(e) => updateField("acceptCostBoundary", e.target.checked)}
-                      className="mt-1 w-4 h-4 rounded text-crimson-600 focus:ring-crimson-500 border-slate-300"
-                    />
-                    <div className="text-xs text-slate-700 leading-relaxed">
-                      <strong className="text-slate-900 block mb-0.5">
-                        Commercial Additional-Cost Boundary Acknowledgement *
-                      </strong>
-                      I acknowledge that fixed prices assume a standard compliance pass. Any unexpected repairs or certifications will be evidenced and approved separately before work commences.
-                    </div>
-                  </label>
-                  {errors.acceptCostBoundary && (
-                    <p className="text-[11px] text-crimson-600 mt-1">{errors.acceptCostBoundary}</p>
-                  )}
+                    {(errors.acceptTerms || errors.acceptCostBoundary) && (
+                      <p className="text-[11px] text-rose-600 font-medium">
+                        {errors.acceptTerms || errors.acceptCostBoundary}
+                      </p>
+                    )}
+                  </div>
                 </div>
               )}
 
               {/* ────────────────────────────────────────────── */}
-              {/* STEP 4: Review & Final Submission              */}
+              {/* STEP 3: Review & Final Submission              */}
               {/* ────────────────────────────────────────────── */}
-              {currentStep === 4 && (
-                <div className="space-y-6 animate-in fade-in duration-200">
-                  <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-4 text-xs">
-                    <div className="flex items-center justify-between pb-2 border-b border-slate-200">
-                      <span className="font-bold text-slate-800">1. Dealership Entity</span>
+              {currentStep === 3 && (
+                <div className="space-y-4 animate-in fade-in duration-200">
+                  <div className="p-5 rounded-2xl bg-slate-50/80 border border-slate-200/90 shadow-2xs space-y-3.5 text-xs">
+                    <div className="flex items-center justify-between pb-2.5 border-b border-slate-200/70">
+                      <span className="font-bold text-slate-900 tracking-tight">1. Dealership Entity</span>
                       <button
                         type="button"
                         onClick={() => setCurrentStep(1)}
-                        className="text-crimson-600 hover:underline font-semibold"
+                        className="text-xs text-[#E11D48] hover:text-[#BE123C] font-semibold cursor-pointer hover:underline"
                       >
                         Edit
                       </button>
                     </div>
-                    <div className="grid grid-cols-2 gap-2 text-slate-600">
+                    <div className="grid grid-cols-2 gap-3 text-slate-600">
                       <div>
-                        <span className="text-slate-400 block">Dealership:</span>
-                        <strong className="text-slate-900">{formData.dealershipName}</strong>
+                        <span className="text-slate-400 block text-[11px]">Dealership:</span>
+                        <strong className="text-slate-900 font-semibold">{formData.dealershipName}</strong>
                       </div>
                       <div>
-                        <span className="text-slate-400 block">Dealer Code:</span>
-                        <strong className="text-slate-900 font-mono">{formData.dealerCode}</strong>
+                        <span className="text-slate-400 block text-[11px]">Dealer Code:</span>
+                        <strong className="text-slate-900 font-mono font-bold">{formData.dealerCode}</strong>
                       </div>
                       <div>
-                        <span className="text-slate-400 block">Region:</span>
-                        <span className="text-slate-900">{formData.region}</span>
+                        <span className="text-slate-400 block text-[11px]">Location &amp; Pricing Profile:</span>
+                        <span className="text-slate-900 font-medium">
+                          {formData.region} · {selectedLocation.island} (<strong className="text-[#E11D48] font-mono">{selectedLocation.zoneId}</strong>)
+                        </span>
                       </div>
                       <div>
-                        <span className="text-slate-400 block">Physical Address:</span>
+                        <span className="text-slate-400 block text-[11px]">Physical Address:</span>
                         <span className="text-slate-900 truncate block">{formData.physicalAddress}</span>
                       </div>
                     </div>
                   </div>
 
-                  <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-4 text-xs">
-                    <div className="flex items-center justify-between pb-2 border-b border-slate-200">
-                      <span className="font-bold text-slate-800">2. Primary Contact</span>
+                  <div className="p-5 rounded-2xl bg-slate-50/80 border border-slate-200/90 shadow-2xs space-y-3.5 text-xs">
+                    <div className="flex items-center justify-between pb-2.5 border-b border-slate-200/70">
+                      <span className="font-bold text-slate-900 tracking-tight">2. Primary Authorized Contact</span>
                       <button
                         type="button"
-                        onClick={() => setCurrentStep(2)}
-                        className="text-crimson-600 hover:underline font-semibold"
+                        onClick={() => setCurrentStep(1)}
+                        className="text-xs text-[#E11D48] hover:text-[#BE123C] font-semibold cursor-pointer hover:underline"
                       >
                         Edit
                       </button>
                     </div>
-                    <div className="grid grid-cols-2 gap-2 text-slate-600">
+                    <div className="grid grid-cols-2 gap-3 text-slate-600">
                       <div>
-                        <span className="text-slate-400 block">Contact Name:</span>
-                        <strong className="text-slate-900">{formData.contactName} ({formData.contactTitle})</strong>
+                        <span className="text-slate-400 block text-[11px]">Contact Name:</span>
+                        <strong className="text-slate-900 font-semibold">{formData.contactName}</strong>
                       </div>
                       <div>
-                        <span className="text-slate-400 block">Business Email:</span>
+                        <span className="text-slate-400 block text-[11px]">Business Email:</span>
                         <strong className="text-slate-900 font-mono">{formData.contactEmail}</strong>
                       </div>
                       <div>
-                        <span className="text-slate-400 block">Direct Phone:</span>
+                        <span className="text-slate-400 block text-[11px]">Direct Phone:</span>
                         <span className="text-slate-900 font-mono">{formData.contactPhone}</span>
                       </div>
-                      {formData.dispatchEmail && (
-                        <div>
-                          <span className="text-slate-400 block">Dispatch Email:</span>
-                          <span className="text-slate-900 font-mono">{formData.dispatchEmail}</span>
-                        </div>
-                      )}
                     </div>
                   </div>
 
-                  <div className="p-4 rounded-xl bg-emerald-50/50 border border-emerald-200 text-xs space-y-1.5 text-emerald-900">
-                    <div className="font-bold flex items-center gap-1.5 text-emerald-950">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                      <span>Commercial Boundary & Terms Confirmed</span>
+                  <div className="p-5 rounded-2xl bg-gradient-to-br from-emerald-50/70 to-emerald-50/20 border border-emerald-200/80 text-xs space-y-2 text-emerald-900 shadow-2xs">
+                    <div className="flex items-center justify-between pb-2.5 border-b border-emerald-200/60">
+                      <div className="font-bold flex items-center gap-2 text-emerald-950">
+                        <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                        <span>3. Commercial Boundary &amp; Terms Confirmed</span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setCurrentStep(2)}
+                        className="text-xs text-[#E11D48] hover:text-[#BE123C] font-semibold cursor-pointer hover:underline"
+                      >
+                        Edit
+                      </button>
                     </div>
-                    <p className="text-[11px] text-emerald-800">
+                    <p className="text-[11px] text-emerald-800 leading-relaxed">
                       Both Terms of Trade (v2026.1) and Additional-Cost Boundary acknowledgements have been evidenced and will be archived with an immutable UTC audit event upon submission.
                     </p>
                   </div>
@@ -766,7 +912,7 @@ export default function DealerRegistrationWizard() {
                   <button
                     type="button"
                     onClick={handleBack}
-                    className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold transition-colors cursor-pointer"
+                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 hover:border-slate-300 text-slate-700 text-xs font-semibold transition-all shadow-xs active:scale-[0.99] cursor-pointer"
                   >
                     <ArrowLeft className="w-4 h-4" />
                     <span>Previous Step</span>
@@ -774,7 +920,7 @@ export default function DealerRegistrationWizard() {
                 ) : (
                   <Link
                     href="/"
-                    className="inline-flex items-center gap-1.5 text-xs text-slate-500 hover:text-slate-800 transition-colors"
+                    className="inline-flex items-center gap-1.5 text-xs text-slate-500 hover:text-slate-800 transition-colors font-medium"
                   >
                     <ArrowLeft className="w-3.5 h-3.5" />
                     <span>Cancel Application</span>
@@ -785,7 +931,7 @@ export default function DealerRegistrationWizard() {
                   <button
                     type="button"
                     onClick={handleNext}
-                    className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[#E11D48] hover:bg-[#BE123C] text-white text-xs font-semibold transition-all shadow-soft shadow-crimson-600/20 group cursor-pointer"
+                    className="inline-flex items-center gap-2 px-7 py-2.5 rounded-xl bg-gradient-to-r from-[#E11D48] via-[#BE123C] to-[#9F1239] hover:from-[#BE123C] hover:to-[#881337] text-white text-xs font-semibold transition-all shadow-[0_4px_18px_rgba(225,29,72,0.35)] hover:shadow-[0_6px_22px_rgba(225,29,72,0.45)] active:scale-[0.99] group cursor-pointer"
                   >
                     <span>Continue to Step {currentStep + 1}</span>
                     <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
@@ -794,7 +940,7 @@ export default function DealerRegistrationWizard() {
                   <button
                     type="button"
                     onClick={handleSubmit}
-                    className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-crimson-600 hover:bg-crimson-700 text-white text-xs font-semibold transition-all shadow-soft shadow-crimson-600/30 cursor-pointer"
+                    className="inline-flex items-center gap-2 px-7 py-2.5 rounded-xl bg-gradient-to-r from-[#E11D48] via-[#BE123C] to-[#9F1239] hover:from-[#BE123C] hover:to-[#881337] text-white text-xs font-semibold transition-all shadow-[0_4px_18px_rgba(225,29,72,0.35)] hover:shadow-[0_6px_22px_rgba(225,29,72,0.45)] active:scale-[0.99] cursor-pointer"
                   >
                     <ShieldCheck className="w-4 h-4" />
                     <span>Submit Dealership Application</span>

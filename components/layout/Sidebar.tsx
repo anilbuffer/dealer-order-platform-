@@ -23,8 +23,8 @@ import {
   MapPin,
   ExternalLink,
   Settings,
+  ChevronUp,
 } from "lucide-react";
-import SettingsModal from "./SettingsModal";
 
 interface NavItem {
   id: string;
@@ -50,7 +50,7 @@ export default function Sidebar({
   const { currentUser, currentDealer, logout } = useAuth();
   const { vehicles, orders, dealers, users } = useProgramme();
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
-  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
 
   // Dynamic live synced counts
   const dealerOrdersCount = orders.filter(
@@ -296,18 +296,22 @@ export default function Sidebar({
         </nav>
       </div>
 
-      {/* Bottom User Profile, Settings & Sign Out Section */}
-      <div className="p-3 border-t border-[#1B2A42] bg-[#070D18]/60">
+      {/* Bottom User Profile Section: Opens Settings & Logout Popover */}
+      <div className="relative p-3 border-t border-[#1B2A42] bg-[#070D18]/60">
         {!isCollapsed ? (
-          <div className="space-y-2">
-            {/* Clickable Profile Card -> Opens Settings */}
+          <div>
+            {/* Clickable Profile Card -> Opens Popover Menu */}
             <div
               onClick={() => {
                 audio.playSubtleClick();
-                setIsSettingsOpen(true);
+                setIsProfileMenuOpen(!isProfileMenuOpen);
               }}
-              title="Click to open Profile & Settings"
-              className="flex items-center justify-between p-2 rounded-xl hover:bg-white/5 transition-all cursor-pointer group"
+              title="Click for Settings & Logout"
+              className={`flex items-center justify-between p-2 rounded-xl transition-all cursor-pointer group ${
+                activeTab === "settings"
+                  ? "bg-white/10 ring-1 ring-white/15"
+                  : "hover:bg-white/5"
+              }`}
             >
               <div className="flex items-center gap-2.5 min-w-0">
                 <div className="relative">
@@ -326,85 +330,117 @@ export default function Sidebar({
                 </div>
               </div>
 
-              {/* Action Buttons: Settings & Sign Out */}
-              <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
-                <button
-                  type="button"
-                  onClick={() => {
-                    audio.playSubtleClick();
-                    setIsSettingsOpen(true);
-                  }}
-                  title="Platform Settings"
-                  aria-label="Platform Settings"
-                  className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
-                >
-                  <Settings className="w-4 h-4" />
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    audio.playSubtleClick();
-                    logout();
-                  }}
-                  title="Sign Out"
-                  aria-label="Sign Out"
-                  className="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-rose-500/20 transition-colors cursor-pointer"
-                >
-                  <LogOut className="w-4 h-4" />
-                </button>
-              </div>
+              <ChevronUp
+                className={`w-4 h-4 text-slate-400 transition-transform duration-200 ${
+                  isProfileMenuOpen ? "rotate-180 text-white" : "group-hover:text-white"
+                }`}
+              />
             </div>
+
+            {/* Popover Menu with Settings and Logout */}
+            {isProfileMenuOpen && (
+              <>
+                <div
+                  className="fixed inset-0 z-40"
+                  onClick={() => setIsProfileMenuOpen(false)}
+                />
+                <div className="absolute bottom-full mb-2 left-3 right-3 bg-[#0D1829] border border-[#1B2A42] rounded-2xl p-1.5 shadow-2xl z-50 animate-in fade-in zoom-in-95 duration-150 space-y-0.5">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      audio.playSubtleClick();
+                      setIsProfileMenuOpen(false);
+                      onTabChange("settings");
+                    }}
+                    className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-semibold transition-colors cursor-pointer text-left ${
+                      activeTab === "settings"
+                        ? "bg-[#E11D48] text-white"
+                        : "text-slate-200 hover:text-white hover:bg-white/10"
+                    }`}
+                  >
+                    <Settings className="w-4 h-4 text-slate-300" />
+                    <span>Settings</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      audio.playSubtleClick();
+                      setIsProfileMenuOpen(false);
+                      logout();
+                    }}
+                    className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-semibold text-rose-400 hover:text-rose-300 hover:bg-rose-500/15 transition-colors cursor-pointer text-left"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    <span>Logout</span>
+                  </button>
+                </div>
+              </>
+            )}
           </div>
         ) : (
-          <div className="flex flex-col items-center gap-2">
+          <div className="flex flex-col items-center">
             <button
               type="button"
               onClick={() => {
                 audio.playSubtleClick();
-                setIsSettingsOpen(true);
+                setIsProfileMenuOpen(!isProfileMenuOpen);
               }}
-              title="Profile & Settings"
-              aria-label="Profile & Settings"
-              className="w-8 h-8 rounded-full bg-gradient-to-br from-slate-700 to-slate-900 border border-[#1B2A42] flex items-center justify-center font-bold text-xs text-white hover:ring-2 hover:ring-rose-500/50 transition-all cursor-pointer"
+              title="Click for Settings & Logout"
+              aria-label="User account & options"
+              className={`relative w-9 h-9 rounded-full bg-gradient-to-br from-slate-700 to-slate-900 border border-[#1B2A42] flex items-center justify-center font-bold text-xs text-white transition-all cursor-pointer ${
+                activeTab === "settings"
+                  ? "ring-2 ring-[#E11D48]"
+                  : "hover:ring-2 hover:ring-rose-500/50"
+              }`}
             >
               {currentUser?.name.charAt(0) || "U"}
+              <span className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-emerald-500 ring-2 ring-[#0A1322]" />
             </button>
 
-            <button
-              type="button"
-              onClick={() => {
-                audio.playSubtleClick();
-                setIsSettingsOpen(true);
-              }}
-              title="Platform Settings"
-              aria-label="Platform Settings"
-              className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
-            >
-              <Settings className="w-4 h-4" />
-            </button>
+            {/* Collapsed Popover Menu */}
+            {isProfileMenuOpen && (
+              <>
+                <div
+                  className="fixed inset-0 z-40"
+                  onClick={() => setIsProfileMenuOpen(false)}
+                />
+                <div className="absolute left-full ml-2 bottom-3 w-40 bg-[#0D1829] border border-[#1B2A42] rounded-2xl p-1.5 shadow-2xl z-50 animate-in fade-in zoom-in-95 duration-150 space-y-0.5">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      audio.playSubtleClick();
+                      setIsProfileMenuOpen(false);
+                      onTabChange("settings");
+                    }}
+                    className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold transition-colors cursor-pointer text-left ${
+                      activeTab === "settings"
+                        ? "bg-[#E11D48] text-white"
+                        : "text-slate-200 hover:text-white hover:bg-white/10"
+                    }`}
+                  >
+                    <Settings className="w-4 h-4 text-slate-300" />
+                    <span>Settings</span>
+                  </button>
 
-            <button
-              type="button"
-              onClick={() => {
-                audio.playSubtleClick();
-                logout();
-              }}
-              title="Sign Out"
-              aria-label="Sign Out"
-              className="p-2 rounded-xl text-slate-400 hover:text-rose-400 hover:bg-rose-500/20 transition-colors cursor-pointer"
-            >
-              <LogOut className="w-4 h-4" />
-            </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      audio.playSubtleClick();
+                      setIsProfileMenuOpen(false);
+                      logout();
+                    }}
+                    className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-rose-400 hover:text-rose-300 hover:bg-rose-500/15 transition-colors cursor-pointer text-left"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    <span>Logout</span>
+                  </button>
+                </div>
+              </>
+            )}
           </div>
         )}
       </div>
-
-      {/* Platform Settings Modal */}
-      <SettingsModal
-        isOpen={isSettingsOpen}
-        onClose={() => setIsSettingsOpen(false)}
-      />
     </aside>
   );
 }

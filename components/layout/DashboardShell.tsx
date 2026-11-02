@@ -18,6 +18,7 @@ import AllocationMilestonesView from "@/components/admin/AllocationMilestonesVie
 import AuditExportView from "@/components/admin/AuditExportView";
 import UserManagementView from "@/components/admin/UserManagementView";
 import RolesPermissionsView from "@/components/admin/RolesPermissionsView";
+import PlatformSettingsView from "@/components/settings/PlatformSettingsView";
 
 interface DashboardShellProps {
   initialVehicleId?: string;
@@ -76,6 +77,23 @@ export default function DashboardShell({ initialVehicleId }: DashboardShellProps
         <FullPageVehicleDetail
           vehicleId={viewingVehicleId}
           onBack={handleBackFromVehicle}
+        />
+      );
+    }
+
+    // 0. SETTINGS INNER PAGE (Available to all roles)
+    if (activeTab === "settings") {
+      return (
+        <PlatformSettingsView
+          onBack={() => {
+            if (currentUser?.role === "AUTOHUB_ADMIN") {
+              setActiveTab("admin-dashboard");
+            } else if (currentUser?.role === "NISSAN_JAPAN") {
+              setActiveTab("japan-inventory");
+            } else {
+              setActiveTab("dealer-stock");
+            }
+          }}
         />
       );
     }

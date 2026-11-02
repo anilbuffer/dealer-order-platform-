@@ -28,47 +28,6 @@ export default function LoginPage() {
   const [errorMsg, setErrorMsg] = useState("");
   const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
 
-  // Quick switch presets
-  const presets = [
-    {
-      tab: "DEALER" as ActiveTab,
-      email: "dealer@aucklandnissan.co.nz",
-      title: "Auckland Nissan",
-      subtitle: "David Miller · Dealer",
-      badge: "DEALER VIEW",
-      badgeColor: "bg-emerald-50 text-emerald-700 border-emerald-200",
-      icon: Car,
-      iconColor: "text-emerald-600 bg-emerald-50",
-    },
-    {
-      tab: "ADMIN" as ActiveTab,
-      email: "ops@autohub.co.nz",
-      title: "Platform Admin",
-      subtitle: "Operations Command",
-      badge: "ADMIN VIEW",
-      badgeColor: "bg-blue-50 text-blue-700 border-blue-200",
-      icon: Shield,
-      iconColor: "text-blue-600 bg-blue-50",
-    },
-    {
-      tab: "JAPAN" as ActiveTab,
-      email: "kenji.sato@nissan.co.jp",
-      title: "Nissan Japan",
-      subtitle: "Tokyo HQ · Inventory",
-      badge: "JAPAN VIEW",
-      badgeColor: "bg-purple-50 text-purple-700 border-purple-200",
-      icon: Globe2,
-      iconColor: "text-purple-600 bg-purple-50",
-    },
-  ];
-
-  const handleSelectPreset = (preset: (typeof presets)[0]) => {
-    setActiveTab(preset.tab);
-    setEmail(preset.email);
-    setPassword("password123");
-    setErrorMsg("");
-  };
-
   const handleTabChange = (tab: ActiveTab) => {
     setActiveTab(tab);
     setErrorMsg("");
@@ -179,70 +138,6 @@ export default function LoginPage() {
             <p className="text-xs sm:text-sm text-slate-500">
               Select your workspace or sign in with your credentials.
             </p>
-          </div>
-
-          {/* ONE-CLICK QUICK ACCESS CARDS */}
-          <div className="space-y-2.5">
-            <div className="flex items-center justify-between text-[11px] font-semibold uppercase tracking-wider text-slate-400">
-              <span>ONE-CLICK QUICK ACCESS</span>
-              <span className="text-slate-400 font-normal lowercase">instant demo switch</span>
-            </div>
-
-            <div className="grid grid-cols-2 gap-3">
-              {presets.slice(0, 2).map((p) => {
-                const Icon = p.icon;
-                const isSelected = email === p.email;
-                return (
-                  <button
-                    key={p.email}
-                    type="button"
-                    onClick={() => handleSelectPreset(p)}
-                    className={`p-3.5 text-left rounded-xl border transition-all text-xs flex flex-col justify-between relative group cursor-pointer ${
-                      isSelected
-                        ? "border-emerald-500 bg-emerald-50/40 ring-1 ring-emerald-500 shadow-soft"
-                        : "border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50/60 shadow-soft"
-                    }`}
-                  >
-                    <div className="flex items-start justify-between w-full mb-2">
-                      <div className={`p-2 rounded-lg ${p.iconColor}`}>
-                        <Icon className="w-4 h-4" />
-                      </div>
-                      <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full border ${p.badgeColor}`}>
-                        {p.badge}
-                      </span>
-                    </div>
-                    <div>
-                      <div className="font-semibold text-slate-900 text-sm">{p.title}</div>
-                      <div className="text-[11px] text-slate-500">{p.subtitle}</div>
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
-
-            {/* Third role card for Nissan Japan inventory */}
-            <button
-              type="button"
-              onClick={() => handleSelectPreset(presets[2])}
-              className={`w-full p-2.5 px-3.5 text-left rounded-xl border transition-all text-xs flex items-center justify-between cursor-pointer ${
-                email === presets[2].email
-                  ? "border-purple-500 bg-purple-50/40 ring-1 ring-purple-500 shadow-soft"
-                  : "border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50/60 shadow-soft"
-              }`}
-            >
-              <div className="flex items-center gap-3">
-                <div className={`p-1.5 rounded-lg ${presets[2].iconColor}`}>
-                  <Globe2 className="w-3.5 h-3.5" />
-                </div>
-                <div>
-                  <span className="font-semibold text-slate-900">{presets[2].title}</span>
-                  <span className="text-slate-400 ml-2 text-[11px]">{presets[2].subtitle}</span>
-                </div>
-              </div>
-              <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full border ${presets[2].badgeColor}`}>
-                {presets[2].badge}
-              </span>
-            </button>
           </div>
 
           {/* Role Toggle Tabs */}
