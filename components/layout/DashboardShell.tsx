@@ -284,131 +284,127 @@ export default function DashboardShell({
       );
     }
 
-    // 3. Dealer Portal Views
+    // 3. Admin Portal Views (Path begins with /admin OR portal is admin OR admin role on neutral route)
     if (
-      pathname.startsWith("/dealer") ||
-      currentUser?.role === "DEALER_USER" ||
-      currentUser?.role === "DEALER_ADMIN" ||
-      portal === "dealer"
+      pathname.startsWith('/admin') ||
+      portal === 'admin' ||
+      ((currentUser?.role === 'AUTOHUB_ADMIN' || currentUser?.role === 'READONLY_AUDITOR') &&
+        !pathname.startsWith('/dealer') &&
+        !pathname.startsWith('/japan'))
     ) {
       switch (activeTab) {
-        case "dealer-stock":
-          return (
-            <DealerStockCatalog
-              onSelectVehicle={handleSelectVehicle}
-              externalSearchQuery={globalSearch}
-            />
-          );
-        case "dealer-orders":
-          return <DealerOrdersView />;
-        case "dealer-profile":
-          return <DealershipProfileView />;
-        default:
-          return (
-            <DealerStockCatalog
-              onSelectVehicle={handleSelectVehicle}
-              externalSearchQuery={globalSearch}
-            />
-          );
-      }
-    }
-
-    // 4. Japan Portal Views
-    if (
-      pathname.startsWith("/japan") ||
-      currentUser?.role === "NISSAN_JAPAN" ||
-      portal === "japan"
-    ) {
-      switch (activeTab) {
-        case "japan-inventory":
-          return (
-            <JapanInventoryView
-              onNavigateAdd={() => router.push("/japan/add-vehicle")}
-              onNavigateBatch={() => router.push("/japan/upload")}
-            />
-          );
-        case "japan-upload":
-          return (
-            <BatchUploadView onSuccessReturn={() => router.push("/japan/inventory")} />
-          );
-        case "japan-add-single":
-          return (
-            <AddVehicleForm onSuccessReturn={() => router.push("/japan/inventory")} />
-          );
-        default:
-          return (
-            <JapanInventoryView
-              onNavigateAdd={() => router.push("/japan/add-vehicle")}
-              onNavigateBatch={() => router.push("/japan/upload")}
-            />
-          );
-      }
-    }
-
-    // 5. Admin Portal Views
-    if (
-      pathname.startsWith("/admin") ||
-      currentUser?.role === "AUTOHUB_ADMIN" ||
-      currentUser?.role === "READONLY_AUDITOR" ||
-      portal === "admin"
-    ) {
-      switch (activeTab) {
-        case "admin-menu":
+        case 'admin-menu':
           return <AdminMenuPortalView onNavigateTab={handleTabChange} />;
-        case "admin-dashboard":
+        case 'admin-dashboard':
           return <AdminDashboardView onNavigateTab={handleTabChange} />;
-        case "admin-catalogue":
+        case 'admin-catalogue':
           return (
             <DealerStockCatalog
               onSelectVehicle={handleSelectVehicle}
               externalSearchQuery={globalSearch}
             />
           );
-        case "admin-orders":
-        case "dealer-orders":
-        case "orders":
+        case 'admin-orders':
+        case 'dealer-orders':
+        case 'orders':
           return <AllocationMilestonesView />;
-        case "admin-reservations":
-        case "reservations":
+        case 'admin-reservations':
+        case 'reservations':
+        case 'holds':
           return <AdminReservationsView onNavigateTab={handleTabChange} />;
-        case "admin-dealers":
-        case "dealers":
+        case 'admin-dealers':
+        case 'dealers':
           return <DealerApprovalsView />;
-        case "admin-inventory":
-        case "inventory":
+        case 'admin-inventory':
+        case 'inventory':
           return <AdminInventoryControllerView />;
         // legacy aliases
-        case "admin-users":
+        case 'admin-users':
           return <UserManagementView />;
-        case "admin-roles":
+        case 'admin-roles':
           return <RolesPermissionsView />;
-        case "admin-approvals":
+        case 'admin-approvals':
           return <DealerApprovalsView />;
-        case "admin-stock":
+        case 'admin-stock':
           return <AdminInventoryControllerView />;
-        case "admin-milestones":
+        case 'admin-milestones':
           return <AllocationMilestonesView />;
-        case "admin-audit":
+        case 'admin-audit':
           return <AuditExportView />;
         default:
-          if (pathname === "/admin/orders") return <AllocationMilestonesView />;
-          if (pathname === "/admin/dashboard") return <AdminDashboardView onNavigateTab={handleTabChange} />;
-          if (pathname === "/admin/catalogue" || pathname === "/admin/catalog") return <DealerStockCatalog onSelectVehicle={handleSelectVehicle} externalSearchQuery={globalSearch} />;
-          if (pathname === "/admin/reservations") return <AdminReservationsView onNavigateTab={handleTabChange} />;
-          if (pathname === "/admin/dealers") return <DealerApprovalsView />;
-          if (pathname === "/admin/inventory") return <AdminInventoryControllerView />;
-          if (pathname === "/admin/users") return <UserManagementView />;
-          if (pathname === "/admin/roles") return <RolesPermissionsView />;
-          return <AdminMenuPortalView onNavigateTab={handleTabChange} />;
+          if (pathname === '/admin/orders') return <AllocationMilestonesView />;
+          if (pathname === '/admin/dashboard') return <AdminDashboardView onNavigateTab={handleTabChange} />;
+          if (pathname === '/admin/catalogue' || pathname === '/admin/catalog')
+            return (
+              <DealerStockCatalog
+                onSelectVehicle={handleSelectVehicle}
+                externalSearchQuery={globalSearch}
+              />
+            );
+          if (pathname === '/admin/reservations') return <AdminReservationsView onNavigateTab={handleTabChange} />;
+          if (pathname === '/admin/dealers') return <DealerApprovalsView />;
+          if (pathname === '/admin/inventory') return <AdminInventoryControllerView />;
+          if (pathname === '/admin/users') return <UserManagementView />;
+          if (pathname === '/admin/roles') return <RolesPermissionsView />;
+          return <AdminDashboardView onNavigateTab={handleTabChange} />;
       }
     }
 
-    return (
-      <DealerStockCatalog
-        onSelectVehicle={handleSelectVehicle}
-        externalSearchQuery={globalSearch}
-      />
-    );
+    // 4. Japan Portal Views (Path begins with /japan OR portal is japan OR Japan role on neutral route)
+    if (
+      pathname.startsWith('/japan') ||
+      portal === 'japan' ||
+      (currentUser?.role === 'NISSAN_JAPAN' &&
+        !pathname.startsWith('/dealer') &&
+        !pathname.startsWith('/admin'))
+    ) {
+      switch (activeTab) {
+        case 'japan-inventory':
+          return (
+            <JapanInventoryView
+              onNavigateAdd={() => router.push('/japan/add-vehicle')}
+              onNavigateBatch={() => router.push('/japan/upload')}
+            />
+          );
+        case 'japan-upload':
+          return (
+            <BatchUploadView onSuccessReturn={() => router.push('/japan/inventory')} />
+          );
+        case 'japan-add-single':
+          return (
+            <AddVehicleForm onSuccessReturn={() => router.push('/japan/inventory')} />
+          );
+        default:
+          return (
+            <JapanInventoryView
+              onNavigateAdd={() => router.push('/japan/add-vehicle')}
+              onNavigateBatch={() => router.push('/japan/upload')}
+            />
+          );
+      }
+    }
+
+    // 5. Dealer Portal Views (Path begins with /dealer OR portal is dealer OR default)
+    switch (activeTab) {
+      case 'dealer-stock':
+        return (
+          <DealerStockCatalog
+            onSelectVehicle={handleSelectVehicle}
+            externalSearchQuery={globalSearch}
+          />
+        );
+      case 'dealer-orders':
+        return <DealerOrdersView />;
+      case 'dealer-profile':
+        return <DealershipProfileView />;
+      default:
+        return (
+          <DealerStockCatalog
+            onSelectVehicle={handleSelectVehicle}
+            externalSearchQuery={globalSearch}
+          />
+        );
+    }
   };
 
   return (

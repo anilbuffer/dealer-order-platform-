@@ -1,6 +1,7 @@
-﻿"use client";
+"use client";
 
 import React, { useState, useRef, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
 import { UserRole } from "@/lib/types";
 import { audio } from "@/lib/sound";
@@ -47,6 +48,7 @@ const ROLES: RoleOption[] = [
 ];
 
 export default function RoleSwitcher() {
+  const router = useRouter();
   const { currentUser, switchRole } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -69,6 +71,15 @@ export default function RoleSwitcher() {
     audio.playSoftChime();
     switchRole(role);
     setIsOpen(false);
+    if (role === "AUTOHUB_ADMIN") {
+      router.push("/admin/dashboard");
+    } else if (role === "NISSAN_JAPAN") {
+      router.push("/japan/inventory");
+    } else if (role === "READONLY_AUDITOR") {
+      router.push("/admin/audit");
+    } else {
+      router.push("/dealer/stocks");
+    }
   };
 
   return (
