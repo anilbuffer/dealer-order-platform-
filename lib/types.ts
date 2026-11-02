@@ -114,6 +114,7 @@ export interface Vehicle {
   grade: string;
   year: number;
   odometerKm: number;
+  odometerUnit?: "km" | "mi";
   transmission: "Automatic" | "CVT" | "e-Power Drive" | "Manual";
   color: string;
   fuelType: "Petrol" | "Hybrid" | "e-Power" | "100% Electric";
@@ -122,6 +123,8 @@ export interface Vehicle {
   auctionGrade: string; // e.g. "4.5", "4.0", "RA"
   interiorGrade: string; // "A", "B", "C"
   exteriorGrade: string; // "A", "B", "C"
+  conditionSummary?: string;
+  inspectionDate?: string;
   location: string;
   images: string[];
   conditionReportUrl?: string;
@@ -131,6 +134,38 @@ export interface Vehicle {
   reservedByDealerId?: string;
   reservedAt?: string;
   reservationExpiresAt?: string;
+}
+
+export type ReservationStatus =
+  | "ACTIVE_HOLD"
+  | "CONFIRMED_ALLOCATED"
+  | "RELEASED"
+  | "EXPIRED"
+  | "REJECTED"
+  | "CANCELLED";
+
+export interface ReservationRequest {
+  id: string;
+  requestId: string;
+  vehicleId: string;
+  vehicle: Vehicle;
+  dealerId: string;
+  dealerName: string;
+  dealerCode: string;
+  userId: string;
+  userName: string;
+  userEmail: string;
+  requestedAt: string;
+  expiresAt: string;
+  status: ReservationStatus;
+  priceSnapshot: LandedPriceBreakdown;
+  termsVersionSnapshot: string;
+  acknowledgedBoundary: boolean;
+  acknowledgedCancellation: boolean;
+  decision?: "CONFIRMED" | "RELEASED" | "EXPIRED" | "REJECTED" | "CANCELLED";
+  decisionReason?: string;
+  decidedAt?: string;
+  decidedBy?: string;
 }
 
 export type OrderMilestone =
@@ -166,6 +201,14 @@ export interface AdditionalCostItem {
   notes?: string;
 }
 
+export interface OrderDocument {
+  id: string;
+  name: string;
+  type: "AUCTION_SHEET" | "JEVIC_CERTIFICATE" | "MR2A_PASS" | "BILL_OF_LADING" | "CUSTOMS_ENTRY" | "INVOICE";
+  url: string;
+  uploadedAt: string;
+}
+
 export interface Order {
   id: string;
   orderNumber: string;
@@ -181,6 +224,7 @@ export interface Order {
   currentMilestone: OrderMilestone;
   milestones: MilestoneStep[];
   additionalCosts: AdditionalCostItem[];
+  documents?: OrderDocument[];
   etaDeliveryDate?: string;
   deliveryAddress: string;
   vesselName?: string;
@@ -198,4 +242,6 @@ export interface AuditEvent {
   objectId: string;
   details: string;
   timestamp: string;
+  beforeValue?: any;
+  afterValue?: any;
 }

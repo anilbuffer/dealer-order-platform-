@@ -77,7 +77,7 @@ export default function PlatformSettingsView({ onBack }: PlatformSettingsViewPro
       </div>
 
       {/* Main Profile Container (Just My Profile - No other tabs) */}
-      <div className="bg-white rounded-3xl border border-slate-200/90 shadow-soft p-6 sm:p-8 space-y-6 max-w-4xl">
+      <div className="bg-white rounded-3xl border border-slate-200/90 shadow-soft p-6 sm:p-8 space-y-6 max-w-7xl">
         {/* User Identity Hero Card */}
         <div className="p-6 rounded-2xl bg-gradient-to-br from-slate-900 via-slate-900 to-slate-950 text-white shadow-md flex flex-col sm:flex-row sm:items-center justify-between gap-5">
           <div className="flex items-center gap-4">

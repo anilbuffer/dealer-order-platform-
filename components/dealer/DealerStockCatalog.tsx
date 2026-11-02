@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Vehicle } from "@/lib/types";
 import { useProgramme } from "@/lib/programme-context";
 import { useAuth } from "@/lib/auth-context";
+import { MOCK_VEHICLES } from "@/lib/mock-data";
 import { calculateLandedPrice } from "@/lib/pricing-calculator";
 import { audio } from "@/lib/sound";
 import AtomicReservationModal from "./AtomicReservationModal";
@@ -41,7 +42,18 @@ interface DealerStockCatalogProps {
 export default function DealerStockCatalog({ onSelectVehicle }: DealerStockCatalogProps = {}) {
   const router = useRouter();
   const { currentDealer } = useAuth();
-  const { vehicles, reserveVehicle: atomicReserve } = useProgramme();
+  const { vehicles: rawVehicles, reserveVehicle: atomicReserve } = useProgramme();
+
+  // Guarantee transparent studio PNG cutouts from MOCK_VEHICLES always take precedence
+  const vehicles = useMemo(() => {
+    return rawVehicles.map((v) => {
+      const mock = MOCK_VEHICLES.find((m) => m.id === v.id);
+      return {
+        ...v,
+        images: mock?.images || v.images,
+      };
+    });
+  }, [rawVehicles]);
 
   const dealerZone = currentDealer?.pricingZoneId || "ZONE_1";
 
@@ -187,13 +199,13 @@ export default function DealerStockCatalog({ onSelectVehicle }: DealerStockCatal
       {/* ─────────────────────────────────────────────────────────── */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-3 border-b border-slate-200">
         <div>
-          <div className="flex items-baseline gap-2.5">
-            <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-slate-900">
+          <div className="pb-2">
+            <h1 className="text-2xl font-bold tracking-tight text-slate-900">
               In Stock ({filteredVehicles.length})
             </h1>
-            <span className="text-xs text-slate-400 font-medium hidden sm:inline">
-              · Landed wholesale inventory for {currentDealer?.legalTradingName || "Auckland Nissan City Ltd"} ({dealerZone})
-            </span>
+            <p className="text-xs text-slate-500 mt-0.5">
+              Landed wholesale inventory for {currentDealer?.legalTradingName || "Auckland Nissan City Ltd"} ({dealerZone})
+            </p>
           </div>
         </div>
 
@@ -466,28 +478,31 @@ export default function DealerStockCatalog({ onSelectVehicle }: DealerStockCatal
                   </div>
 
                   {/* Card Center: Vehicle Image Presentation with studio styling */}
-                  <div className="relative w-full h-44 sm:h-48 my-3.5 rounded-2xl overflow-hidden bg-gradient-to-b from-slate-50/70 to-slate-100/50 p-2.5 flex items-center justify-center border border-slate-100/80">
+                  <div className="relative w-full h-44 sm:h-52 my-3 rounded-2xl overflow-hidden bg-gradient-to-b from-slate-50/60 via-slate-100/30 to-slate-100/70 p-3 flex items-center justify-center border border-slate-100">
+                    {/* Realistic studio floor contact shadow directly beneath tires */}
+                    <div className="absolute bottom-3 w-4/5 h-3.5 bg-black/15 rounded-[50%] blur-md pointer-events-none transform scale-y-60" />
+
                     <img
                       src={vehicle.images[0]}
                       alt={`${vehicle.make} ${vehicle.model}`}
-                      className="w-full h-full object-cover sm:object-contain rounded-xl group-hover:scale-105 transition-transform duration-500 ease-out select-none"
+                      className="relative z-10 w-full h-full object-contain filter drop-shadow-[0_12px_14px_rgba(0,0,0,0.14)] group-hover:scale-105 group-hover:-translate-y-1 transition-all duration-300 ease-out select-none"
                     />
 
                     {/* Top-Left: Discreet Auction Grade Pill */}
-                    <div className="absolute top-3 left-3 px-2.5 py-0.5 rounded-full bg-slate-900/85 backdrop-blur-md text-[10px] font-mono font-bold text-amber-300 border border-white/10 shadow-xs flex items-center gap-1">
-                      <span>★</span>
+                    <div className="absolute top-3 left-3 z-20 px-2.5 py-0.5 rounded-full bg-white/90 backdrop-blur-md text-[10px] font-mono font-bold text-slate-800 border border-slate-200/80 shadow-2xs flex items-center gap-1">
+                      <span className="text-amber-500 font-bold">★</span>
                       <span>Grade {vehicle.auctionGrade}</span>
                     </div>
 
                     {/* Top-Right: Favorite Button */}
-                    <div className="absolute top-3 right-3">
+                    <div className="absolute top-3 right-3 z-20">
                       <button
                         type="button"
                         onClick={(e) => toggleFavorite(e, vehicle.id)}
                         aria-label="Add to favorites"
                         className={`p-1.5 rounded-full backdrop-blur-md transition-all cursor-pointer ${isFav
                           ? "bg-[#E11D48] text-white shadow-xs"
-                          : "bg-slate-900/60 text-white/80 hover:text-white hover:bg-slate-900/90 shadow-2xs"
+                          : "bg-white/90 text-slate-400 hover:text-[#E11D48] hover:bg-white border border-slate-200/80 shadow-2xs"
                           }`}
                       >
                         <Heart className={`w-3.5 h-3.5 ${isFav ? "fill-white" : ""}`} />
@@ -495,18 +510,18 @@ export default function DealerStockCatalog({ onSelectVehicle }: DealerStockCatal
                     </div>
 
                     {/* Bottom-Left: Stock ID */}
-                    <div className="absolute bottom-2.5 left-3 px-2 py-0.5 rounded-md bg-black/60 backdrop-blur-md text-[10px] font-mono font-medium text-slate-200 border border-white/10">
+                    <div className="absolute bottom-2.5 left-3 z-20 px-2 py-0.5 rounded-md bg-white/90 backdrop-blur-md text-[10px] font-mono font-bold text-slate-600 border border-slate-200/70 shadow-2xs">
                       #{vehicle.stockId}
                     </div>
 
                     {/* Bottom-Right: Fuel/Powertrain Pill */}
-                    <div className="absolute bottom-2.5 right-3 px-2 py-0.5 rounded-md bg-white/95 backdrop-blur-md text-[10px] font-bold text-slate-900 shadow-xs">
+                    <div className="absolute bottom-2.5 right-3 z-20 px-2 py-0.5 rounded-md bg-slate-900/90 backdrop-blur-md text-[10px] font-bold text-white shadow-2xs">
                       {vehicle.fuelType}
                     </div>
 
                     {/* Reserved / 24h Hold Overlay */}
                     {!isAvailable && (
-                      <div className="absolute inset-0 bg-slate-950/65 backdrop-blur-xs flex items-center justify-center rounded-2xl">
+                      <div className="absolute inset-0 z-30 bg-slate-950/65 backdrop-blur-xs flex items-center justify-center rounded-2xl">
                         <span className="px-3.5 py-1.5 rounded-full bg-slate-900/95 border border-white/15 text-white font-bold text-xs flex items-center gap-1.5 shadow-lg">
                           <Lock className="w-3.5 h-3.5 text-rose-400" />
                           <span>Reserved (24h Hold Active)</span>
@@ -599,30 +614,31 @@ export default function DealerStockCatalog({ onSelectVehicle }: DealerStockCatal
                 onClick={() => handleOpenFullPageDetails(vehicle.id)}
                 className="bg-white rounded-2xl border border-slate-200/90 hover:border-slate-300 shadow-2xs hover:shadow-md transition-all duration-300 p-4 flex flex-col md:flex-row items-stretch md:items-center gap-4 group cursor-pointer"
               >
-                {/* Left: Thumbnail with Cover */}
-                <div className="relative w-full md:w-56 h-36 rounded-xl overflow-hidden bg-slate-900 shrink-0">
+                {/* Left: Thumbnail with Studio Styling */}
+                <div className="relative w-full md:w-56 h-36 rounded-2xl overflow-hidden bg-gradient-to-b from-slate-50 to-slate-100/80 flex items-center justify-center p-3 shrink-0 border border-slate-100">
+                  <div className="absolute bottom-2.5 w-4/5 h-3 bg-black/15 rounded-[50%] blur-sm pointer-events-none transform scale-y-60" />
                   <img
                     src={vehicle.images[0]}
                     alt={`${vehicle.make} ${vehicle.model}`}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out select-none"
+                    className="relative z-10 w-full h-full object-contain filter drop-shadow-[0_8px_10px_rgba(0,0,0,0.12)] group-hover:scale-105 transition-transform duration-300 ease-out select-none"
                   />
 
                   {/* Overlays */}
-                  <div className="absolute top-2 left-2 px-2 py-0.5 rounded-full bg-slate-900/80 backdrop-blur-md text-[9px] font-mono font-bold text-amber-300 border border-white/10 shadow-xs flex items-center gap-1">
-                    <span>★</span>
+                  <div className="absolute top-2 left-2 z-20 px-2 py-0.5 rounded-full bg-white/90 backdrop-blur-md text-[9px] font-mono font-bold text-slate-800 border border-slate-200/80 shadow-2xs flex items-center gap-1">
+                    <span className="text-amber-500">★</span>
                     <span>Grade {vehicle.auctionGrade}</span>
                   </div>
 
-                  <div className="absolute bottom-2 left-2 px-1.5 py-0.5 rounded bg-black/60 backdrop-blur-md text-[9px] font-mono text-slate-200 border border-white/10">
+                  <div className="absolute bottom-2 left-2 z-20 px-1.5 py-0.5 rounded bg-white/90 backdrop-blur-md text-[9px] font-mono font-bold text-slate-600 border border-slate-200/70">
                     #{vehicle.stockId}
                   </div>
 
-                  <div className="absolute bottom-2 right-2 px-1.5 py-0.5 rounded bg-white/95 text-[9px] font-bold text-slate-900">
+                  <div className="absolute bottom-2 right-2 z-20 px-1.5 py-0.5 rounded bg-slate-900/90 text-[9px] font-bold text-white shadow-2xs">
                     {vehicle.fuelType}
                   </div>
 
                   {!isAvailable && (
-                    <div className="absolute inset-0 bg-slate-950/60 backdrop-blur-xs flex items-center justify-center">
+                    <div className="absolute inset-0 z-30 bg-slate-950/60 backdrop-blur-xs flex items-center justify-center rounded-2xl">
                       <span className="px-2.5 py-1 rounded-full bg-slate-900/90 border border-white/15 text-white font-bold text-[10px] flex items-center gap-1">
                         <Lock className="w-3 h-3 text-rose-400" />
                         <span>Reserved</span>

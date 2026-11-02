@@ -1,19 +1,12 @@
 "use client";
 
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { useAuth } from "@/lib/auth-context";
+import React, { Suspense } from "react";
+import DashboardShell from "@/components/layout/DashboardShell";
 import LoginPage from "@/components/login/LoginPage";
+import { useAuth } from "@/lib/auth-context";
 
-export default function AdminIndexPage() {
-  const router = useRouter();
+function AdminPageContent() {
   const { currentUser, isLoading } = useAuth();
-
-  useEffect(() => {
-    if (!isLoading && currentUser) {
-      router.replace("/admin/dashboard");
-    }
-  }, [currentUser, isLoading, router]);
 
   if (isLoading) {
     return (
@@ -27,10 +20,20 @@ export default function AdminIndexPage() {
     return <LoginPage />;
   }
 
+  return <DashboardShell initialTab="menu" portal="admin" />;
+}
+
+export default function AdminIndexPage() {
   return (
-    <div className="min-h-screen bg-[#F8FAFC] flex items-center justify-center">
-      <div className="w-8 h-8 border-2 border-[#E11D48] border-t-transparent rounded-full animate-spin" />
-    </div>
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-[#F8FAFC] flex items-center justify-center">
+          <div className="w-8 h-8 border-2 border-[#E11D48] border-t-transparent rounded-full animate-spin" />
+        </div>
+      }
+    >
+      <AdminPageContent />
+    </Suspense>
   );
 }
 

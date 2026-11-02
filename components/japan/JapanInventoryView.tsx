@@ -175,7 +175,7 @@ export default function JapanInventoryView({
                         <img
                           src={vehicle.images[0]}
                           alt={vehicle.model}
-                          className="w-12 h-9 object-cover rounded-md border border-slate-200 shrink-0"
+                          className="w-12 h-9 object-contain rounded-md border border-slate-200 bg-slate-50 p-0.5 shrink-0"
                         />
                         <div>
                           <div className="font-bold text-slate-900">

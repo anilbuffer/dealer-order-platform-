@@ -58,7 +58,7 @@ interface ProgrammeContextType {
 
 const ProgrammeContext = createContext<ProgrammeContextType | undefined>(undefined);
 
-const STORAGE_KEY = "dealer_platform_programme_state_v1";
+const STORAGE_KEY = "dealer_platform_programme_state_v3";
 
 export function ProgrammeProvider({ children }: { children: React.ReactNode }) {
   const [vehicles, setVehicles] = useState<Vehicle[]>(MOCK_VEHICLES);
@@ -72,16 +72,36 @@ export function ProgrammeProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const timer = setTimeout(() => {
       try {
+        // Clear old stale storage keys with old Unsplash images
+        try {
+          localStorage.removeItem("dealer_platform_programme_state_v1");
+          localStorage.removeItem("dealer_platform_programme_state_v2");
+        } catch (e) {}
+
         const stored = localStorage.getItem(STORAGE_KEY);
         if (stored) {
           const parsed = JSON.parse(stored);
-          if (parsed.vehicles) setVehicles(parsed.vehicles);
+          if (parsed.vehicles && Array.isArray(parsed.vehicles)) {
+            // Always sync images with current MOCK_VEHICLES so transparent PNG cutouts take precedence
+            const syncedVehicles = parsed.vehicles.map((v: Vehicle) => {
+              const mock = MOCK_VEHICLES.find((m) => m.id === v.id);
+              if (mock && mock.images) {
+                return { ...v, images: mock.images };
+              }
+              return v;
+            });
+            setVehicles(syncedVehicles);
+          } else {
+            setVehicles(MOCK_VEHICLES);
+          }
           if (parsed.orders) setOrders(parsed.orders);
           if (parsed.dealers) setDealers(parsed.dealers);
           if (parsed.auditLogs) setAuditLogs(parsed.auditLogs);
           if (parsed.users && Array.isArray(parsed.users) && parsed.users.length > 0) {
             setUsers(parsed.users);
           }
+        } else {
+          setVehicles(MOCK_VEHICLES);
         }
       } catch (e) {
         console.warn("Could not load persisted programme state:", e);

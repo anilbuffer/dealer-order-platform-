@@ -111,7 +111,7 @@ export default function AtomicReservationModal({
               <img
                 src={vehicle.images[0]}
                 alt={vehicle.model}
-                className="w-20 h-14 object-cover rounded-xl border border-slate-200 shrink-0"
+                className="w-20 h-14 object-contain rounded-xl border border-slate-200 bg-white p-1 shrink-0"
               />
               <div className="min-w-0 flex-1 text-xs">
                 <div className="font-bold text-slate-900 truncate">

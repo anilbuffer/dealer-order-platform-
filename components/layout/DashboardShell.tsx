@@ -13,6 +13,8 @@ import JapanInventoryView from "@/components/japan/JapanInventoryView";
 import BatchUploadView from "@/components/japan/BatchUploadView";
 import AddVehicleForm from "@/components/japan/AddVehicleForm";
 import AdminDashboardView from "@/components/admin/AdminDashboardView";
+import AdminMenuPortalView from "@/components/admin/AdminMenuPortalView";
+import AdminReservationsView from "@/components/admin/AdminReservationsView";
 import DealerApprovalsView from "@/components/admin/DealerApprovalsView";
 import AdminInventoryControllerView from "@/components/admin/AdminInventoryControllerView";
 import AllocationMilestonesView from "@/components/admin/AllocationMilestonesView";
@@ -65,12 +67,16 @@ export default function DashboardShell({
     if (pathname === "/dealer/terms" || pathname === "/dealer/commercial-boundary" || initialTab === "terms" || initialTab === "dealer-terms") return "dealer-terms";
 
     // Admin routes
-    if (pathname === "/admin/dashboard" || pathname === "/admin" || initialTab === "dashboard" || initialTab === "admin-dashboard") return "admin-dashboard";
+    if (pathname === "/admin" || initialTab === "menu" || initialTab === "admin-menu") return "admin-menu";
+    if (pathname === "/admin/dashboard" || initialTab === "dashboard" || initialTab === "admin-dashboard") return "admin-dashboard";
+    if (pathname === "/admin/catalogue" || pathname === "/admin/catalog" || initialTab === "catalogue" || initialTab === "catalog" || initialTab === "admin-catalogue") return "admin-catalogue";
+    if (pathname === "/admin/orders" || initialTab === "orders" || initialTab === "admin-orders") return "admin-orders";
+    if (pathname === "/admin/reservations" || pathname === "/admin/holds" || initialTab === "reservations" || initialTab === "admin-reservations") return "admin-reservations";
+    if (pathname === "/admin/dealers" || pathname === "/admin/approvals" || initialTab === "dealers" || initialTab === "admin-dealers" || initialTab === "approvals" || initialTab === "admin-approvals") return "admin-dealers";
+    if (pathname === "/admin/inventory" || pathname === "/admin/stock" || initialTab === "inventory" || initialTab === "admin-inventory" || initialTab === "stock" || initialTab === "admin-stock") return "admin-inventory";
     if (pathname === "/admin/users" || initialTab === "users" || initialTab === "admin-users") return "admin-users";
     if (pathname === "/admin/roles" || initialTab === "roles" || initialTab === "admin-roles") return "admin-roles";
-    if (pathname === "/admin/approvals" || initialTab === "approvals" || initialTab === "admin-approvals") return "admin-approvals";
-    if (pathname === "/admin/stock" || pathname === "/admin/inventory" || initialTab === "stock" || initialTab === "admin-stock") return "admin-stock";
-    if (pathname === "/admin/milestones" || pathname === "/admin/allocations" || initialTab === "milestones" || initialTab === "admin-milestones") return "admin-milestones";
+    if (pathname === "/admin/milestones" || pathname === "/admin/allocations" || initialTab === "milestones" || initialTab === "admin-milestones") return "admin-orders";
     if (pathname === "/admin/audit" || initialTab === "audit" || initialTab === "admin-audit") return "admin-audit";
 
     // Japan routes
@@ -102,25 +108,44 @@ export default function DashboardShell({
       case "dealer-terms":
       case "terms":
         return "/dealer/terms";
+      case "admin-menu":
+      case "menu":
+        return "/admin";
       case "admin-dashboard":
       case "dashboard":
         return "/admin/dashboard";
+      case "admin-catalogue":
+      case "admin-catalog":
+      case "catalogue":
+      case "catalog":
+        return "/admin/catalogue";
+      case "admin-orders":
+      case "orders":
+        return "/admin/orders";
+      case "admin-reservations":
+      case "reservations":
+      case "holds":
+        return "/admin/reservations";
+      case "admin-dealers":
+      case "dealers":
+      case "approvals":
+      case "admin-approvals":
+        return "/admin/dealers";
+      case "admin-inventory":
+      case "inventory":
+      case "stock":
+      case "admin-stock":
+        return "/admin/inventory";
       case "admin-users":
       case "users":
         return "/admin/users";
       case "admin-roles":
       case "roles":
         return "/admin/roles";
-      case "admin-approvals":
-      case "approvals":
-        return "/admin/approvals";
-      case "admin-stock":
-      case "inventory":
-        return "/admin/stock";
       case "admin-milestones":
       case "milestones":
       case "allocations":
-        return "/admin/milestones";
+        return "/admin/orders";
       case "admin-audit":
       case "audit":
         return "/admin/audit";
@@ -246,8 +271,21 @@ export default function DashboardShell({
       portal === "admin"
     ) {
       switch (activeTab) {
+        case "admin-menu":
+          return <AdminMenuPortalView onNavigateTab={handleTabChange} />;
         case "admin-dashboard":
           return <AdminDashboardView onNavigateTab={handleTabChange} />;
+        case "admin-catalogue":
+          return <DealerStockCatalog onSelectVehicle={handleSelectVehicle} />;
+        case "admin-orders":
+          return <AllocationMilestonesView />;
+        case "admin-reservations":
+          return <AdminReservationsView onNavigateTab={handleTabChange} />;
+        case "admin-dealers":
+          return <DealerApprovalsView />;
+        case "admin-inventory":
+          return <AdminInventoryControllerView />;
+        // legacy aliases
         case "admin-users":
           return <UserManagementView />;
         case "admin-roles":
@@ -261,7 +299,7 @@ export default function DashboardShell({
         case "admin-audit":
           return <AuditExportView />;
         default:
-          return <AdminDashboardView onNavigateTab={handleTabChange} />;
+          return <AdminMenuPortalView onNavigateTab={handleTabChange} />;
       }
     }
 

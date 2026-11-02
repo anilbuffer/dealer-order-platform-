@@ -124,7 +124,7 @@ export default function DealerOrdersView() {
                     <img
                       src={order.vehicle.images[0]}
                       alt={order.vehicle.model}
-                      className="w-14 h-10 object-cover rounded-lg border border-slate-200 shrink-0"
+                      className="w-14 h-10 object-contain rounded-lg border border-slate-200 bg-slate-50 p-0.5 shrink-0"
                     />
                     <div className="min-w-0 flex-1 text-xs">
                       <div className="font-semibold text-slate-900 truncate">

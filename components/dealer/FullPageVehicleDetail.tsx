@@ -51,11 +51,18 @@ export default function FullPageVehicleDetail({
   const dealerZone = currentDealer?.pricingZoneId || "ZONE_1";
 
   // Find vehicle from live programme context
-  const vehicle =
+  const rawVehicle =
     vehicleData ||
     vehicles.find((v) => v.id === vehicleId) ||
     vehicles[0] ||
     MOCK_VEHICLES[0];
+
+  // Guarantee transparent studio PNG cutouts from MOCK_VEHICLES always take precedence
+  const mockMatch = MOCK_VEHICLES.find((m) => m.id === rawVehicle.id);
+  const vehicle = {
+    ...rawVehicle,
+    images: mockMatch?.images || rawVehicle.images,
+  };
 
   const [activeImageIdx, setActiveImageIdx] = useState(0);
   const [isReserveModalOpen, setIsReserveModalOpen] = useState(false);
@@ -87,39 +94,6 @@ export default function FullPageVehicleDetail({
   const retailEstimateNZD = Math.round(price.totalBuyPriceNZD * 1.28);
   const dealerMarginNZD = retailEstimateNZD - price.totalBuyPriceNZD;
   const marginPercentage = ((dealerMarginNZD / price.totalBuyPriceNZD) * 100).toFixed(1);
-
-  const costBreakdownItems = [
-    {
-      label: "FOB Export Acquisition",
-      amount: price.fobNZD,
-      sublabel: `¥${vehicle.fobPriceJPY.toLocaleString()} JPY Converted`,
-      percentage: Math.round((price.fobNZD / price.totalBuyPriceNZD) * 100),
-      color: "bg-slate-900",
-    },
-    {
-      label: "RoRo Ocean Freight & Transit",
-      amount: price.oceanFreightNZD,
-      sublabel: "Yokohama to Ports of Auckland",
-      percentage: Math.round((price.oceanFreightNZD / price.totalBuyPriceNZD) * 100),
-      color: "bg-blue-600",
-    },
-    {
-      label: "NZ Customs Clearance & 15% GST",
-      amount: price.customsProcessingNZD + price.gstNZD,
-      sublabel: "Cleared border biosecurity entry",
-      percentage: Math.round(((price.customsProcessingNZD + price.gstNZD) / price.totalBuyPriceNZD) * 100),
-      color: "bg-emerald-600",
-    },
-    {
-      label: "MR2A Compliance & Towing",
-      amount: price.complianceInspectionNZD + price.zoneDeliveryNZD + price.programmeFeeNZD,
-      sublabel: `${dealerZone} delivery + MR2A entry pass`,
-      percentage: Math.round(
-        ((price.complianceInspectionNZD + price.zoneDeliveryNZD + price.programmeFeeNZD) / price.totalBuyPriceNZD) * 100
-      ),
-      color: "bg-[#E11D48]",
-    },
-  ];
 
   return (
     <div className="space-y-6 animate-in fade-in duration-300">
@@ -189,29 +163,33 @@ export default function FullPageVehicleDetail({
         {/* ───────────────────────────────────────────────────────── */}
         <div className="lg:col-span-7 space-y-3.5">
           {/* Main Vehicle Studio Showcase */}
-          <div className="relative aspect-[16/10] w-full rounded-3xl overflow-hidden bg-slate-900 border border-slate-200/80 shadow-md group">
+          <div className="relative aspect-[16/10] w-full rounded-3xl overflow-hidden bg-gradient-to-b from-slate-50 via-white to-slate-100/70 border border-slate-200/80 shadow-md group flex items-center justify-center p-6">
+            {/* Realistic studio floor contact shadow directly beneath tires */}
+            <div className="absolute bottom-6 w-4/5 h-6 bg-black/15 rounded-[50%] blur-lg pointer-events-none transform scale-y-50" />
+
             <img
               src={vehicle.images[activeImageIdx] || vehicle.images[0]}
               alt={`${vehicle.make} ${vehicle.model}`}
-              className="w-full h-full object-cover select-none transition-all duration-300"
+              className={`w-full h-full select-none transition-all duration-300 relative z-10 ${
+                (vehicle.images[activeImageIdx] || vehicle.images[0]).endsWith('.png')
+                  ? "object-contain filter drop-shadow-[0_16px_22px_rgba(0,0,0,0.16)] group-hover:scale-105"
+                  : "object-cover rounded-2xl"
+              }`}
             />
 
-            {/* Subtle Gradient Overlay */}
-            <div className="absolute inset-0 bg-gradient-to-t from-slate-950/40 via-transparent to-slate-950/20 pointer-events-none" />
-
             {/* Top-Left: Auction Grade Pill */}
-            <div className="absolute top-4 left-4 px-3 py-1 rounded-full bg-slate-950/85 backdrop-blur-md text-amber-300 font-mono text-xs font-bold border border-white/10 shadow-xs flex items-center gap-1.5">
-              <span>★</span>
+            <div className="absolute top-4 left-4 z-20 px-3 py-1 rounded-full bg-white/90 backdrop-blur-md text-slate-800 font-mono text-xs font-bold border border-slate-200/80 shadow-xs flex items-center gap-1.5">
+              <span className="text-amber-500 font-bold">★</span>
               <span>Grade {vehicle.auctionGrade} / {vehicle.interiorGrade}</span>
             </div>
 
             {/* Top-Right: Photo Index Counter */}
-            <div className="absolute top-4 right-4 px-2.5 py-1 rounded-full bg-slate-950/85 backdrop-blur-md text-white/90 font-mono text-[11px] font-medium border border-white/10 shadow-xs">
+            <div className="absolute top-4 right-4 z-20 px-2.5 py-1 rounded-full bg-white/90 backdrop-blur-md text-slate-700 font-mono text-[11px] font-bold border border-slate-200/80 shadow-xs">
               {activeImageIdx + 1} / {Math.min(vehicle.images.length, 5)} Photos
             </div>
 
             {vehicle.status !== "AVAILABLE" && (
-              <div className="absolute inset-0 bg-slate-950/65 backdrop-blur-xs flex items-center justify-center">
+              <div className="absolute inset-0 z-30 bg-slate-950/65 backdrop-blur-xs flex items-center justify-center">
                 <div className="px-5 py-2.5 rounded-2xl bg-slate-900 text-white font-bold text-xs shadow-xl flex items-center gap-2 border border-slate-700">
                   <Lock className="w-4 h-4 text-rose-400" />
                   <span>24-Hour Atomic Hold Active</span>
@@ -240,9 +218,9 @@ export default function FullPageVehicleDetail({
             </div>
           </div>
 
-          {/* Clean Thumbnails Carousel Strip */}
-          <div className="flex items-center gap-2.5 pt-1">
-            {vehicle.images.slice(0, 5).map((img, idx) => (
+          {/* Clean Compact Thumbnails Strip */}
+          <div className="flex items-center gap-2 pt-1">
+            {vehicle.images.slice(0, 8).map((img, idx) => (
               <button
                 key={idx}
                 type="button"
@@ -250,12 +228,16 @@ export default function FullPageVehicleDetail({
                   audio.playSubtleClick();
                   setActiveImageIdx(idx);
                 }}
-                className={`relative flex-1 aspect-[16/10] rounded-xl overflow-hidden border-2 transition-all cursor-pointer ${activeImageIdx === idx
-                    ? "border-[#E11D48] ring-2 ring-[#E11D48]/20 shadow-xs"
-                    : "border-slate-200 hover:border-slate-300 opacity-75 hover:opacity-100"
+                className={`relative w-16 h-11 sm:w-20 sm:h-14 rounded-xl overflow-hidden border-2 transition-all cursor-pointer bg-slate-50 flex items-center justify-center p-1 shrink-0 ${activeImageIdx === idx
+                    ? "border-[#E11D48] ring-2 ring-[#E11D48]/20 shadow-xs bg-white"
+                    : "border-slate-200 hover:border-slate-300 opacity-70 hover:opacity-100"
                   }`}
               >
-                <img src={img} alt="Angle preview" className="w-full h-full object-cover" />
+                <img
+                  src={img}
+                  alt={`Angle preview ${idx + 1}`}
+                  className={`w-full h-full ${img.endsWith('.png') ? 'object-contain filter drop-shadow-xs' : 'object-cover rounded-md'}`}
+                />
               </button>
             ))}
           </div>
@@ -386,19 +368,47 @@ export default function FullPageVehicleDetail({
       </div>
 
       {/* ─────────────────────────────────────────────────────────── */}
-      {/* 3. Bottom Stage: Specifications Accordion + Cost Structure */}
-      {/* (NO AVG PRICE CHART AS EXPLICITLY INSTRUCTED!)              */}
+      {/* 3. Bottom Stage: Specifications & Verification Documents   */}
       {/* ─────────────────────────────────────────────────────────── */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-        {/* ───────────────────────────────────────────────────────── */}
-        {/* LEFT COLUMN: Specifications (Interactive Clean Accordions) */}
-        {/* ───────────────────────────────────────────────────────── */}
-        <div className="lg:col-span-7 bg-white rounded-3xl border border-slate-200/90 p-6 sm:p-8 shadow-xs space-y-4">
-          <h2 className="text-xl font-black text-slate-900 tracking-tight">
-            Specifications
-          </h2>
+      <div className="bg-white rounded-3xl border border-slate-200/90 p-6 sm:p-8 shadow-xs space-y-5">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-100 gap-4">
+          <div>
+            <h2 className="text-xl font-black text-slate-900 tracking-tight">
+              Vehicle Specifications
+            </h2>
+            <p className="text-xs text-slate-500 mt-0.5">
+              Comprehensive factory technical data, auction evaluation, and pre-export certification.
+            </p>
+          </div>
 
-          <div className="divide-y divide-slate-100">
+          {/* Official Verification Document Action Buttons */}
+          <div className="flex items-center gap-2 shrink-0">
+            <button
+              type="button"
+              onClick={() => {
+                audio.playSubtleClick();
+                alert("Opening Japan Auction Sheet PDF for " + vehicle.stockId);
+              }}
+              className="px-3.5 py-2 rounded-xl border border-slate-200 hover:border-slate-300 bg-slate-50 hover:bg-slate-100 text-slate-700 text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer shadow-2xs"
+            >
+              <Download className="w-3.5 h-3.5 text-slate-400" />
+              <span>Auction Sheet (PDF)</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                audio.playSubtleClick();
+                alert("Opening JEVIC Odometer Certificate for " + vehicle.stockId);
+              }}
+              className="px-3.5 py-2 rounded-xl border border-slate-200 hover:border-slate-300 bg-slate-50 hover:bg-slate-100 text-slate-700 text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer shadow-2xs"
+            >
+              <FileCheck2 className="w-3.5 h-3.5 text-emerald-600" />
+              <span>JEVIC Certificate</span>
+            </button>
+          </div>
+        </div>
+
+        <div className="divide-y divide-slate-100">
             {/* ACCORDION 1: PERFORMANCE (Open by default) */}
             <div className="py-3.5">
               <button
@@ -665,124 +675,6 @@ export default function FullPageVehicleDetail({
             </div>
           </div>
         </div>
-
-        {/* ───────────────────────────────────────────────────────── */}
-        {/* RIGHT COLUMN: Itemized Landed Cost Structure               */}
-        {/* (NO AVG PRICE CHART AS EXPLICITLY INSTRUCTED BY USER!)     */}
-        {/* ───────────────────────────────────────────────────────── */}
-        <div className="lg:col-span-5 bg-white rounded-3xl border border-slate-200/90 p-6 sm:p-8 shadow-xs space-y-6">
-          <div>
-            <div className="flex items-center justify-between">
-              <h2 className="text-xl font-black text-slate-900 tracking-tight">
-                Itemized Landed Cost Structure
-              </h2>
-              <span className="px-2.5 py-0.5 rounded-full bg-slate-100 font-mono font-bold text-[10px] text-slate-700 border border-slate-200">
-                100% Fixed Cap
-              </span>
-            </div>
-            <p className="text-xs text-slate-500 mt-1">
-              Guaranteed landed cost breakdown for {dealerZone}. Fixed under Nissan NZ programme terms.
-            </p>
-          </div>
-
-          {/* Proportional Segmented Progress Bar */}
-          <div className="space-y-1.5">
-            <div className="h-2 w-full rounded-full bg-slate-100 overflow-hidden flex">
-              <div style={{ width: `${costBreakdownItems[0].percentage}%` }} className="bg-slate-900 h-full" title="FOB Export" />
-              <div style={{ width: `${costBreakdownItems[1].percentage}%` }} className="bg-blue-600 h-full" title="RoRo Ocean Freight" />
-              <div style={{ width: `${costBreakdownItems[2].percentage}%` }} className="bg-emerald-600 h-full" title="NZ Customs & GST" />
-              <div style={{ width: `${costBreakdownItems[3].percentage}%` }} className="bg-[#E11D48] h-full" title="MR2A Compliance & Towing" />
-            </div>
-            <div className="flex justify-between text-[10px] text-slate-400 font-mono">
-              <span>FOB ({costBreakdownItems[0].percentage}%)</span>
-              <span>Freight ({costBreakdownItems[1].percentage}%)</span>
-              <span>Customs &amp; GST ({costBreakdownItems[2].percentage}%)</span>
-              <span>MR2A ({costBreakdownItems[3].percentage}%)</span>
-            </div>
-          </div>
-
-          {/* Clean Itemized Cost List */}
-          <div className="space-y-2.5 pt-1 text-xs">
-            {costBreakdownItems.map((item, idx) => (
-              <div key={idx} className="flex items-center justify-between p-3 rounded-xl bg-slate-50/80 border border-slate-100">
-                <div className="flex items-center gap-2.5 min-w-0 pr-2">
-                  <span className={`w-2.5 h-2.5 rounded-full shrink-0 ${item.color}`} />
-                  <div>
-                    <span className="text-slate-800 font-semibold block text-xs">{item.label}</span>
-                    <span className="text-[10px] text-slate-400 block">{item.sublabel}</span>
-                  </div>
-                </div>
-                <div className="text-right shrink-0">
-                  <span className="font-mono font-black text-slate-900 text-sm block">
-                    ${item.amount.toLocaleString()} NZD
-                  </span>
-                  <span className="text-[10px] font-mono text-slate-400 block">{item.percentage}% of total</span>
-                </div>
-              </div>
-            ))}
-
-            {/* Total Guaranteed Landed Buy Price Banner */}
-            <div className="flex items-center justify-between p-4 rounded-2xl bg-slate-900 text-white mt-3">
-              <div>
-                <span className="text-[10px] uppercase font-bold tracking-wider text-slate-400 block">
-                  Guaranteed Landed Total ({dealerZone})
-                </span>
-                <span className="text-xs text-slate-300">
-                  Fixed wholesale buy price
-                </span>
-              </div>
-              <div className="text-right">
-                <span className="text-2xl font-black font-mono text-white block">
-                  ${price.totalBuyPriceNZD.toLocaleString()}
-                </span>
-                <span className="text-[10px] text-slate-400 font-normal">NZD Final</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Commercial Cost Boundary Guarantee Card */}
-          <div className="p-4 rounded-2xl bg-emerald-50/60 border border-emerald-200/80 space-y-1.5 text-xs">
-            <div className="flex items-center gap-2 font-bold text-emerald-800">
-              <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
-              <span>Autohub Commercial Boundary Policy</span>
-            </div>
-            <p className="text-slate-600 text-[11px] leading-relaxed">
-              Standard entry compliance (MR2A), ocean transit, and biosecurity clearance are 100% fixed within the guaranteed price. Any unexpected structural repairs or specialized testing will be evidenced with photographic documentation and approved separately by the dealership before work commences.
-            </p>
-          </div>
-
-          {/* Official Document Downloads */}
-          <div className="space-y-2 pt-1">
-            <span className="text-[11px] font-bold text-slate-700 uppercase tracking-wider block">
-              Official Verification Documents:
-            </span>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs font-semibold">
-              <button
-                type="button"
-                onClick={() => {
-                  audio.playSubtleClick();
-                  alert("Opening Japan Auction Sheet PDF for " + vehicle.stockId);
-                }}
-                className="p-2.5 rounded-xl border border-slate-200 hover:border-slate-300 bg-white hover:bg-slate-50 text-slate-700 flex items-center justify-center gap-1.5 transition-colors cursor-pointer shadow-2xs"
-              >
-                <Download className="w-3.5 h-3.5 text-slate-400" />
-                <span>Auction Sheet (PDF)</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  audio.playSubtleClick();
-                  alert("Opening JEVIC Odometer Certificate for " + vehicle.stockId);
-                }}
-                className="p-2.5 rounded-xl border border-slate-200 hover:border-slate-300 bg-white hover:bg-slate-50 text-slate-700 flex items-center justify-center gap-1.5 transition-colors cursor-pointer shadow-2xs"
-              >
-                <FileCheck2 className="w-3.5 h-3.5 text-emerald-600" />
-                <span>JEVIC Certificate</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
 
       {/* Atomic Reservation Modal */}
       <AtomicReservationModal

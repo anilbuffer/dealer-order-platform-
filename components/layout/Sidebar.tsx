@@ -25,6 +25,9 @@ import {
   MapPin,
   Settings,
   ChevronUp,
+  LayoutDashboard,
+  ShoppingBag,
+  Building2,
 } from "lucide-react";
 
 interface NavItem {
@@ -110,57 +113,53 @@ export default function Sidebar({
       ];
     }
 
-    if (currentUser?.role === "AUTOHUB_ADMIN") {
+    if (pathname.startsWith("/admin") || currentUser?.role === "AUTOHUB_ADMIN") {
       return [
         {
           id: "admin-dashboard",
-          label: "Overview",
-          icon: Shield,
+          label: "Dashboard",
+          icon: LayoutDashboard,
           href: "/admin/dashboard",
         },
         {
-          id: "admin-users",
-          label: "Users Listing",
-          icon: Users,
-          href: "/admin/users",
-          badge: activeUsersCount > 0 ? activeUsersCount : undefined,
-          badgeColor: "bg-white/10 text-slate-200 border-white/10",
-        },
-        {
-          id: "admin-roles",
-          label: "Roles & RBAC",
-          icon: KeyRound,
-          href: "/admin/roles",
-        },
-        {
-          id: "admin-approvals",
-          label: "Approvals",
-          icon: UserCheck,
-          href: "/admin/approvals",
-          badge: pendingApprovalsCount > 0 ? pendingApprovalsCount : undefined,
-          badgeColor: "bg-amber-500/20 text-amber-300 border-amber-500/30",
-        },
-        {
-          id: "admin-stock",
-          label: "Inventory",
-          icon: Layers,
-          href: "/admin/stock",
+          id: "admin-catalogue",
+          label: "Vehicle Catalogue",
+          icon: Car,
+          href: "/admin/catalogue",
           badge: availableStockCount > 0 ? availableStockCount : undefined,
           badgeColor: "bg-white/10 text-slate-200 border-white/10",
         },
         {
-          id: "admin-milestones",
-          label: "Allocations",
-          icon: Clock,
-          href: "/admin/milestones",
-          badge: reservedAllocationsCount > 0 ? reservedAllocationsCount : undefined,
+          id: "admin-orders",
+          label: "Orders",
+          icon: ShoppingBag,
+          href: "/admin/orders",
+          badge: orders.length > 0 ? orders.length : undefined,
           badgeColor: "bg-white/10 text-slate-200 border-white/10",
         },
         {
-          id: "admin-audit",
-          label: "Audit Log",
-          icon: Download,
-          href: "/admin/audit",
+          id: "admin-reservations",
+          label: "Reservations",
+          icon: Clock,
+          href: "/admin/reservations",
+          badge: reservedAllocationsCount > 0 ? reservedAllocationsCount : undefined,
+          badgeColor: "bg-amber-500/20 text-amber-300 border-amber-500/30",
+        },
+        {
+          id: "admin-dealers",
+          label: "Dealers",
+          icon: Building2,
+          href: "/admin/dealers",
+          badge: pendingApprovalsCount > 0 ? pendingApprovalsCount : undefined,
+          badgeColor: "bg-amber-500/20 text-amber-300 border-amber-500/30",
+        },
+        {
+          id: "admin-inventory",
+          label: "Inventory",
+          icon: Layers,
+          href: "/admin/inventory",
+          badge: vehicles.length > 0 ? vehicles.length : undefined,
+          badgeColor: "bg-white/10 text-slate-200 border-white/10",
         },
       ];
     }
@@ -193,20 +192,20 @@ export default function Sidebar({
   const navItems = getNavItems();
 
   const getPanelInfo = () => {
+    if (pathname.startsWith("/admin") || currentUser?.role === "AUTOHUB_ADMIN") {
+      return {
+        section: "ADMIN PORTAL",
+        badge: "AUTOHUB OPERATIONS",
+        badgeColor: "bg-blue-500/15 text-blue-400 border-blue-500/30",
+        roleDesc: "Autohub NZ Operations",
+      };
+    }
     if (currentUser?.role === "DEALER_USER" || currentUser?.role === "DEALER_ADMIN") {
       return {
         section: "DEALER PORTAL",
         badge: "AUCKLAND NISSAN",
         badgeColor: "bg-emerald-500/15 text-emerald-400 border-emerald-500/30",
         roleDesc: currentDealer?.legalTradingName || "Auckland Nissan City",
-      };
-    }
-    if (currentUser?.role === "AUTOHUB_ADMIN") {
-      return {
-        section: "ADMIN PORTAL",
-        badge: "AUTOHUB OPERATIONS",
-        badgeColor: "bg-blue-500/15 text-blue-400 border-blue-500/30",
-        roleDesc: "Autohub NZ Operations",
       };
     }
     return {
