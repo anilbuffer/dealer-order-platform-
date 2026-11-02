@@ -60,19 +60,22 @@ export function ProgrammeProvider({ children }: { children: React.ReactNode }) {
 
   // Hydrate from localStorage on client mount
   useEffect(() => {
-    try {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        if (parsed.vehicles) setVehicles(parsed.vehicles);
-        if (parsed.orders) setOrders(parsed.orders);
-        if (parsed.dealers) setDealers(parsed.dealers);
-        if (parsed.auditLogs) setAuditLogs(parsed.auditLogs);
+    const timer = setTimeout(() => {
+      try {
+        const stored = localStorage.getItem(STORAGE_KEY);
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          if (parsed.vehicles) setVehicles(parsed.vehicles);
+          if (parsed.orders) setOrders(parsed.orders);
+          if (parsed.dealers) setDealers(parsed.dealers);
+          if (parsed.auditLogs) setAuditLogs(parsed.auditLogs);
+        }
+      } catch (e) {
+        console.warn("Could not load persisted programme state:", e);
       }
-    } catch (e) {
-      console.warn("Could not load persisted programme state:", e);
-    }
-    setIsHydrated(true);
+      setIsHydrated(true);
+    }, 0);
+    return () => clearTimeout(timer);
   }, []);
 
   // Save to localStorage whenever state changes

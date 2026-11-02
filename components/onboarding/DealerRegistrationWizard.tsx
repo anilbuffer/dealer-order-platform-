@@ -88,7 +88,7 @@ export default function DealerRegistrationWizard() {
 
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const updateField = (field: keyof FormData, value: any) => {
+  const updateField = (field: keyof FormData, value: FormData[keyof FormData]) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
     if (errors[field]) {
       setErrors((prev) => {
@@ -424,8 +424,8 @@ export default function DealerRegistrationWizard() {
                         <option value="Central North Island (Zone 2 - Waikato, Bay of Plenty, Rotorua, Taupō)">
                           Zone 2: Central North Island (Waikato, Bay of Plenty, Rotorua, Taupō)
                         </option>
-                        <option value="Lower North Island (Zone 3 - Taranaki, Hawke's Bay, Gisborne, Manawatū, Wellington)">
-                          Zone 3: Lower North Island (Taranaki, Hawke's Bay, Gisborne, Manawatū, Wellington)
+                        <option value="Lower North Island (Zone 3 - Taranaki, Hawke&apos;s Bay, Gisborne, Manawatū, Wellington)">
+                          Zone 3: Lower North Island (Taranaki, Hawke&apos;s Bay, Gisborne, Manawatū, Wellington)
                         </option>
                         <option value="Upper South Island (Zone 4 - Nelson, Marlborough, Canterbury)">
                           Zone 4: Upper South Island (Nelson, Marlborough, Canterbury)

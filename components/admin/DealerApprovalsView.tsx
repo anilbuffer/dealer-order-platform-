@@ -196,11 +196,11 @@ export default function DealerApprovalsView() {
                   </div>
 
                   {/* Action Buttons */}
-                  <div className="flex items-center justify-end gap-3 pt-1">
+                  <div className="flex items-center justify-end gap-3 pt-2">
                     <button
                       type="button"
                       onClick={() => handleReject(dealer.id)}
-                      className="px-4 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-100 text-slate-600 text-xs font-semibold transition-colors cursor-pointer"
+                      className="px-4 py-2.5 rounded-xl border border-slate-200/90 bg-white hover:bg-rose-50 hover:border-rose-200 hover:text-rose-600 text-slate-700 text-xs font-extrabold transition-all cursor-pointer shadow-2xs active:scale-[0.98]"
                     >
                       Decline Application
                     </button>
@@ -208,10 +208,10 @@ export default function DealerApprovalsView() {
                     <button
                       type="button"
                       onClick={() => handleApprove(dealer.id)}
-                      className="px-6 py-2 rounded-xl bg-[#E11D48] hover:bg-[#BE123C] text-white text-xs font-bold transition-all shadow-xs cursor-pointer flex items-center gap-1.5"
+                      className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-white text-xs font-extrabold transition-all shadow-[0_3px_12px_rgba(5,150,105,0.25)] hover:shadow-[0_4px_16px_rgba(5,150,105,0.35)] cursor-pointer flex items-center gap-2 active:scale-[0.98]"
                     >
-                      <CheckCircle2 className="w-3.5 h-3.5" />
-                      <span>Approve Franchise &amp; Grant Access</span>
+                      <CheckCircle2 className="w-4 h-4" />
+                      <span>Authorize Franchise &amp; Assign Zone</span>
                     </button>
                   </div>
                 </div>

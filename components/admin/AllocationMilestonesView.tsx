@@ -208,9 +208,9 @@ export default function AllocationMilestonesView() {
                   <button
                     type="button"
                     onClick={() => setSelectedOrderForCost(order)}
-                    className="px-3.5 py-2 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 font-semibold transition-colors cursor-pointer flex items-center gap-1.5"
+                    className="px-3.5 py-2 rounded-xl border border-rose-200/90 bg-rose-50/70 hover:bg-rose-100 text-rose-900 font-bold transition-all shadow-2xs cursor-pointer flex items-center gap-1.5 active:scale-[0.98]"
                   >
-                    <PlusCircle className="w-3.5 h-3.5 text-amber-600" />
+                    <PlusCircle className="w-3.5 h-3.5 text-rose-600" />
                     <span>Attach Variation</span>
                   </button>
 
@@ -220,7 +220,7 @@ export default function AllocationMilestonesView() {
                       audio.playSubtleClick();
                       setEditingMilestoneOrderId(isEditingThis ? null : order.id);
                     }}
-                    className="px-4 py-2 rounded-xl bg-[#E11D48] hover:bg-[#BE123C] text-white font-bold transition-all shadow-xs cursor-pointer flex items-center gap-1.5"
+                    className="px-4 py-2 rounded-xl bg-gradient-to-r from-[#E11D48] to-[#BE123C] hover:from-[#BE123C] hover:to-[#9F1239] text-white font-extrabold transition-all shadow-[0_2px_8px_rgba(225,29,72,0.25)] hover:shadow-[0_4px_14px_rgba(225,29,72,0.35)] cursor-pointer flex items-center gap-1.5 active:scale-[0.98]"
                   >
                     <span>Advance Milestone</span>
                     <ArrowRight className="w-3.5 h-3.5" />
@@ -242,7 +242,7 @@ export default function AllocationMilestonesView() {
                       </label>
                       <select
                         value={nextMilestoneKey}
-                        onChange={(e) => setNextMilestoneKey(e.target.value as any)}
+                        onChange={(e) => setNextMilestoneKey(e.target.value as OrderMilestone)}
                         className="w-full px-3 py-2 bg-white rounded-xl border border-slate-300 font-medium text-slate-800 focus:outline-none focus:ring-1 focus:ring-slate-900"
                       >
                         <option value="NZ_BORDER_PROCESSING">NZ Border Processing</option>
@@ -269,14 +269,14 @@ export default function AllocationMilestonesView() {
                     <button
                       type="button"
                       onClick={() => setEditingMilestoneOrderId(null)}
-                      className="px-3 py-1.5 rounded-lg text-slate-500 hover:text-slate-800"
+                      className="px-3.5 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-100 text-slate-700 font-bold transition-all cursor-pointer shadow-2xs active:scale-[0.98]"
                     >
                       Cancel
                     </button>
                     <button
                       type="button"
                       onClick={() => handleAdvanceMilestone(order.id)}
-                      className="px-4 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-white font-bold"
+                      className="px-4 py-2 rounded-xl bg-gradient-to-r from-slate-900 to-slate-800 hover:from-black hover:to-slate-900 text-white font-bold transition-all shadow-xs hover:shadow cursor-pointer active:scale-[0.98]"
                     >
                       Confirm Milestone Advance
                     </button>

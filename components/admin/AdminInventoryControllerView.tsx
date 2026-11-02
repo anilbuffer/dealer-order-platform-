@@ -227,7 +227,7 @@ export default function AdminInventoryControllerView() {
                       <button
                         type="button"
                         onClick={() => router.push(`/vehicles/${vehicle.id}`)}
-                        className="p-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-100 text-slate-700 transition-colors cursor-pointer inline-flex items-center"
+                        className="p-2 rounded-xl border border-slate-200/90 bg-white hover:bg-slate-50 text-slate-700 transition-all cursor-pointer shadow-2xs hover:border-slate-300 inline-flex items-center"
                         title="View Full Page Details"
                       >
                         <ArrowUpRight className="w-3.5 h-3.5" />
@@ -236,10 +236,10 @@ export default function AdminInventoryControllerView() {
                       <button
                         type="button"
                         onClick={() => handleToggleStatus(vehicle.id)}
-                        className={`px-3 py-1 rounded-lg text-xs font-semibold transition-colors cursor-pointer ${
+                        className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer shadow-2xs ${
                           isWithdrawn
-                            ? "bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200"
-                            : "bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200"
+                            ? "bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-white"
+                            : "bg-white hover:bg-rose-50 hover:text-rose-700 hover:border-rose-200 text-slate-700 border border-slate-200/80"
                         }`}
                       >
                         {isWithdrawn ? "Republish" : "Withdraw"}

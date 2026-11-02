@@ -27,16 +27,17 @@ export default function DashboardShell() {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
-  // Automatically sync primary tab on role switch
-  useEffect(() => {
-    if (currentUser?.role === "DEALER_USER" || currentUser?.role === "DEALER_ADMIN") {
-      setActiveTab("dealer-stock");
+  const [prevRole, setPrevRole] = useState(currentUser?.role);
+  if (currentUser?.role !== prevRole) {
+    setPrevRole(currentUser?.role);
+    if (currentUser?.role === "AUTOHUB_ADMIN") {
+      setActiveTab("admin-dashboard");
     } else if (currentUser?.role === "NISSAN_JAPAN") {
       setActiveTab("japan-inventory");
-    } else if (currentUser?.role === "AUTOHUB_ADMIN") {
-      setActiveTab("admin-dashboard");
+    } else {
+      setActiveTab("dealer-stock");
     }
-  }, [currentUser?.role]);
+  }
 
   // Determine what view to render based on role and active tab
   const renderViewContent = () => {

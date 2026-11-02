@@ -22,18 +22,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     // Check localStorage for saved session
-    const savedUserEmail = localStorage.getItem("autohub_session_email");
-    if (savedUserEmail) {
-      const user = MOCK_USERS.find((u) => u.email.toLowerCase() === savedUserEmail.toLowerCase());
-      if (user) {
-        setCurrentUser(user);
-        if (user.dealerId) {
-          const dealer = MOCK_DEALERS.find((d) => d.id === user.dealerId);
-          setCurrentDealer(dealer || null);
+    const timer = setTimeout(() => {
+      const savedUserEmail = localStorage.getItem("autohub_session_email");
+      if (savedUserEmail) {
+        const user = MOCK_USERS.find((u) => u.email.toLowerCase() === savedUserEmail.toLowerCase());
+        if (user) {
+          setCurrentUser(user);
+          if (user.dealerId) {
+            const dealer = MOCK_DEALERS.find((d) => d.id === user.dealerId);
+            setCurrentDealer(dealer || null);
+          }
         }
       }
-    }
-    setIsLoading(false);
+      setIsLoading(false);
+    }, 0);
+    return () => clearTimeout(timer);
   }, []);
 
   const loginAs = (email: string): boolean => {

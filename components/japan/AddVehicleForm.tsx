@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { Vehicle } from "@/lib/types";
 import { useProgramme } from "@/lib/programme-context";
 import { audio } from "@/lib/sound";
 import {
@@ -56,10 +57,10 @@ export default function AddVehicleForm({ onSuccessReturn }: AddVehicleFormProps)
       grade,
       year,
       odometerKm,
-      transmission: transmission as any,
+      transmission: transmission as Vehicle["transmission"],
       color,
-      fuelType: fuelType as any,
-      driveType: driveType as any,
+      fuelType: fuelType as Vehicle["fuelType"],
+      driveType: driveType as Vehicle["driveType"],
       engineCc,
       auctionGrade,
       interiorGrade,

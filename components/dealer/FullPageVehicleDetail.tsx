@@ -149,9 +149,10 @@ export default function FullPageVehicleDetail({
                 audio.playSubtleClick();
                 setIsReserveModalOpen(true);
               }}
-              className="px-5 py-2.5 rounded-xl bg-[#E11D48] hover:bg-[#BE123C] text-white text-xs font-bold transition-all shadow-sm hover:shadow cursor-pointer"
+              className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#E11D48] to-[#BE123C] hover:from-[#BE123C] hover:to-[#9F1239] text-white text-xs font-extrabold transition-all shadow-[0_3px_12px_rgba(225,29,72,0.28)] hover:shadow-[0_4px_16px_rgba(225,29,72,0.38)] active:scale-[0.98] cursor-pointer flex items-center gap-1.5"
             >
-              Reserve Stock
+              <Lock className="w-3.5 h-3.5" />
+              <span>Reserve Stock</span>
             </button>
           </div>
         </div>
@@ -185,11 +186,11 @@ export default function FullPageVehicleDetail({
           {/* ─────────────────────────────────────────────────────── */}
           <div className="lg:col-span-6 space-y-6">
             {/* Main Studio Car Showcase */}
-            <div className="relative aspect-[16/10] w-full flex items-center justify-center p-6 bg-slate-50/50 rounded-3xl border border-slate-100 overflow-hidden">
+            <div className="relative aspect-[16/10] w-full flex items-center justify-center p-6 bg-gradient-to-b from-slate-50/80 via-slate-100/40 to-slate-50/80 rounded-3xl border border-slate-200/80 overflow-hidden studio-pedestal">
               <img
                 src={vehicle.images[activeImageIdx] || vehicle.images[0]}
                 alt={`${vehicle.make} ${vehicle.model}`}
-                className="w-full h-full object-contain drop-shadow-lg select-none transition-all duration-300"
+                className="w-full h-full object-contain studio-car-drop select-none transition-all duration-300"
               />
 
               {vehicle.status !== "AVAILABLE" && (
@@ -235,11 +236,10 @@ export default function FullPageVehicleDetail({
                     audio.playSubtleClick();
                     setActiveImageIdx(idx);
                   }}
-                  className={`relative flex-1 aspect-[16/11] rounded-2xl overflow-hidden border p-1.5 flex items-center justify-center cursor-pointer transition-all ${
-                    activeImageIdx === idx
-                      ? "border-[#E11D48] ring-2 ring-[#E11D48]/20 bg-rose-50/20"
-                      : "border-slate-200 bg-slate-50/60 hover:border-slate-300"
-                  }`}
+                  className={`relative flex-1 aspect-[16/11] rounded-2xl overflow-hidden border p-1.5 flex items-center justify-center cursor-pointer transition-all ${activeImageIdx === idx
+                    ? "border-[#E11D48] ring-2 ring-[#E11D48]/20 bg-rose-50/20"
+                    : "border-slate-200 bg-slate-50/60 hover:border-slate-300"
+                    }`}
                 >
                   <img src={img} alt="Angle preview" className="w-full h-full object-contain" />
                 </button>
@@ -311,11 +311,10 @@ export default function FullPageVehicleDetail({
                       <div
                         key={i}
                         onClick={() => setSelectedCostPart(i)}
-                        className={`p-2.5 rounded-xl border transition-all cursor-pointer text-left ${
-                          selectedCostPart === i
-                            ? "bg-slate-900 text-white border-slate-900 shadow-sm"
-                            : "bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100"
-                        }`}
+                        className={`p-2.5 rounded-xl border transition-all cursor-pointer text-left ${selectedCostPart === i
+                          ? "bg-slate-900 text-white border-slate-900 shadow-sm"
+                          : "bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100"
+                          }`}
                       >
                         <div className="text-[10px] font-semibold truncate opacity-80">{item.label}</div>
                         <div className="font-mono font-bold text-xs mt-0.5">
@@ -334,7 +333,7 @@ export default function FullPageVehicleDetail({
                   audio.playSubtleClick();
                   setIsReserveModalOpen(true);
                 }}
-                className="w-full py-4 px-6 rounded-2xl bg-[#E11D48] hover:bg-[#BE123C] text-white font-bold text-sm transition-all shadow-md hover:shadow-lg cursor-pointer text-center flex items-center justify-center gap-2"
+                className="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-[#E11D48] via-[#BE123C] to-[#9F1239] hover:from-[#BE123C] hover:to-[#881337] text-white font-extrabold text-sm tracking-wide transition-all shadow-[0_6px_22px_rgba(225,29,72,0.35)] hover:shadow-[0_8px_28px_rgba(225,29,72,0.45)] active:scale-[0.99] cursor-pointer text-center flex items-center justify-center gap-2.5"
               >
                 <Lock className="w-4 h-4" />
                 <span>Reserve Vehicle (24h Atomic Lock)</span>
@@ -554,11 +553,10 @@ export default function FullPageVehicleDetail({
                       audio.playSubtleClick();
                       setActiveTimeframe(t);
                     }}
-                    className={`px-3 py-1 rounded-full transition-colors cursor-pointer ${
-                      activeTimeframe === t
-                        ? "bg-[#E11D48] text-white shadow-xs"
-                        : "text-slate-400 hover:text-slate-800"
-                    }`}
+                    className={`px-3 py-1 rounded-full transition-colors cursor-pointer ${activeTimeframe === t
+                      ? "bg-[#E11D48] text-white shadow-xs"
+                      : "text-slate-400 hover:text-slate-800"
+                      }`}
                   >
                     {t}
                   </button>
