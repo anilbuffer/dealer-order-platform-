@@ -10,6 +10,7 @@ import FullPageVehicleDetail from "@/components/dealer/FullPageVehicleDetail";
 import DealerOrdersView from "@/components/dealer/DealerOrdersView";
 import DealershipProfileView from "@/components/dealer/DealershipProfileView";
 import JapanInventoryView from "@/components/japan/JapanInventoryView";
+import JapanInventoryDetailsView from "@/components/japan/JapanInventoryDetailsView";
 import BatchUploadView from "@/components/japan/BatchUploadView";
 import AddVehicleForm from "@/components/japan/AddVehicleForm";
 import AdminDashboardView from "@/components/admin/AdminDashboardView";
@@ -241,6 +242,21 @@ export default function DashboardShell({
   const renderViewContent = () => {
     // 1. Vehicle Detail Full-Page View
     if (viewingVehicleId) {
+      if (
+        portal === "japan" ||
+        currentUser?.role === "NISSAN_JAPAN" ||
+        pathname.startsWith("/japan")
+      ) {
+        return (
+          <JapanInventoryDetailsView
+            vehicleId={viewingVehicleId}
+            onBack={() => {
+              setViewingVehicleId(null);
+              router.push("/japan/inventory");
+            }}
+          />
+        );
+      }
       return (
         <FullPageVehicleDetail
           vehicleId={viewingVehicleId}

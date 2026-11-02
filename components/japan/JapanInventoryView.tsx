@@ -1,10 +1,11 @@
 "use client";
 
 import React, { useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { Vehicle } from "@/lib/types";
 import { useProgramme } from "@/lib/programme-context";
 import { audio } from "@/lib/sound";
-import JapanInventoryDetailsModal from "./JapanInventoryDetailsModal";
+import JapanInventoryDetailsView from "./JapanInventoryDetailsView";
 import {
   Search,
   Plus,
@@ -28,9 +29,33 @@ export default function JapanInventoryView({
   onNavigateBatch,
 }: JapanInventoryViewProps) {
   const { vehicles, toggleVehicleStatus } = useProgramme();
+  const searchParams = useSearchParams();
+  const urlVehicleId = searchParams?.get("id") || searchParams?.get("vehicleId") || searchParams?.get("stockId");
+
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("ALL");
-  const [selectedVehicleForDetails, setSelectedVehicleForDetails] = useState<Vehicle | null>(null);
+  const [selectedVehicleForDetails, setSelectedVehicleForDetails] = useState<Vehicle | null>(() => {
+    if (urlVehicleId) {
+      return vehicles.find((v) => v.id === urlVehicleId || v.stockId === urlVehicleId) || null;
+    }
+    return null;
+  });
+
+  const handleToggleStatus = (vehicleId: string) => {
+    audio.playSubtleClick();
+    toggleVehicleStatus(vehicleId);
+  };
+
+  // If a vehicle is selected, display the full inner details page (Not a modal)
+  if (selectedVehicleForDetails) {
+    return (
+      <JapanInventoryDetailsView
+        vehicleId={selectedVehicleForDetails.id}
+        onBack={() => setSelectedVehicleForDetails(null)}
+        onToggleStatus={handleToggleStatus}
+      />
+    );
+  }
 
   const filteredVehicles = vehicles.filter((v) => {
     if (searchQuery) {
@@ -47,11 +72,6 @@ export default function JapanInventoryView({
 
     return true;
   });
-
-  const handleToggleStatus = (vehicleId: string) => {
-    audio.playSubtleClick();
-    toggleVehicleStatus(vehicleId);
-  };
 
   const availableCount = vehicles.filter((v) => v.status === "AVAILABLE").length;
   const reservedCount = vehicles.filter((v) => v.status === "RESERVED").length;
@@ -250,14 +270,6 @@ export default function JapanInventoryView({
           </table>
         </div>
       </div>
-      {/* Japan Inventory Vehicle Dossier Modal */}
-      {selectedVehicleForDetails && (
-        <JapanInventoryDetailsModal
-          vehicle={selectedVehicleForDetails}
-          onClose={() => setSelectedVehicleForDetails(null)}
-          onToggleStatus={handleToggleStatus}
-        />
-      )}
     </div>
   );
 }
