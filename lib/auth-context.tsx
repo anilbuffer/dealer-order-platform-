@@ -16,9 +16,9 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [currentUser, setCurrentUser] = useState<UserAccount | null>(null);
-  const [currentDealer, setCurrentDealer] = useState<DealerAccount | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [currentUser, setCurrentUser] = useState<UserAccount | null>(MOCK_USERS[0]);
+  const [currentDealer, setCurrentDealer] = useState<DealerAccount | null>(MOCK_DEALERS[0]);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     // Check localStorage for saved session

@@ -1,10 +1,11 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Sidebar from "./Sidebar";
 import Header from "./Header";
 import { useAuth } from "@/lib/auth-context";
 import DealerStockCatalog from "@/components/dealer/DealerStockCatalog";
+import FullPageVehicleDetail from "@/components/dealer/FullPageVehicleDetail";
 import DealerOrdersView from "@/components/dealer/DealerOrdersView";
 import DealershipProfileView from "@/components/dealer/DealershipProfileView";
 import CommercialBoundaryView from "@/components/dealer/CommercialBoundaryView";
@@ -17,35 +18,72 @@ import AdminInventoryControllerView from "@/components/admin/AdminInventoryContr
 import AllocationMilestonesView from "@/components/admin/AllocationMilestonesView";
 import AuditExportView from "@/components/admin/AuditExportView";
 
-export default function DashboardShell() {
+interface DashboardShellProps {
+  initialVehicleId?: string;
+}
+
+export default function DashboardShell({ initialVehicleId }: DashboardShellProps = {}) {
   const { currentUser } = useAuth();
   const [activeTab, setActiveTab] = useState<string>(() => {
     if (currentUser?.role === "AUTOHUB_ADMIN") return "admin-dashboard";
     if (currentUser?.role === "NISSAN_JAPAN") return "japan-inventory";
     return "dealer-stock";
   });
+  const [viewingVehicleId, setViewingVehicleId] = useState<string | null>(initialVehicleId || null);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
 
   const [prevRole, setPrevRole] = useState(currentUser?.role);
-  if (currentUser?.role !== prevRole) {
-    setPrevRole(currentUser?.role);
-    if (currentUser?.role === "AUTOHUB_ADMIN") {
+  if (currentUser?.role && prevRole && currentUser.role !== prevRole) {
+    setPrevRole(currentUser.role);
+    setViewingVehicleId(null);
+    if (currentUser.role === "AUTOHUB_ADMIN") {
       setActiveTab("admin-dashboard");
-    } else if (currentUser?.role === "NISSAN_JAPAN") {
+    } else if (currentUser.role === "NISSAN_JAPAN") {
       setActiveTab("japan-inventory");
     } else {
       setActiveTab("dealer-stock");
     }
   }
 
+  const handleSelectVehicle = (vehicleId: string) => {
+    setViewingVehicleId(vehicleId);
+    if (typeof window !== "undefined") {
+      window.history.pushState(null, "", `/vehicles/${vehicleId}`);
+    }
+  };
+
+  const handleBackFromVehicle = () => {
+    setViewingVehicleId(null);
+    if (typeof window !== "undefined") {
+      window.history.pushState(null, "", "/");
+    }
+  };
+
+  const handleTabChange = (tab: string) => {
+    setViewingVehicleId(null);
+    setActiveTab(tab);
+    if (typeof window !== "undefined") {
+      window.history.pushState(null, "", "/");
+    }
+  };
+
   // Determine what view to render based on role and active tab
   const renderViewContent = () => {
+    // If viewing a vehicle detail, render it as full-page view inside the portal canvas!
+    if (viewingVehicleId) {
+      return (
+        <FullPageVehicleDetail
+          vehicleId={viewingVehicleId}
+          onBack={handleBackFromVehicle}
+        />
+      );
+    }
+
     // 1. DEALER VIEWS
     if (currentUser?.role === "DEALER_USER" || currentUser?.role === "DEALER_ADMIN") {
       switch (activeTab) {
         case "dealer-stock":
-          return <DealerStockCatalog />;
+          return <DealerStockCatalog onSelectVehicle={handleSelectVehicle} />;
         case "dealer-orders":
           return <DealerOrdersView />;
         case "dealer-profile":
@@ -53,7 +91,7 @@ export default function DashboardShell() {
         case "dealer-terms":
           return <CommercialBoundaryView />;
         default:
-          return <DealerStockCatalog />;
+          return <DealerStockCatalog onSelectVehicle={handleSelectVehicle} />;
       }
     }
 
@@ -103,15 +141,15 @@ export default function DashboardShell() {
       }
     }
 
-    return <DealerStockCatalog />;
+    return <DealerStockCatalog onSelectVehicle={handleSelectVehicle} />;
   };
 
   return (
     <div className="flex h-screen w-full bg-[#F8FAFC] overflow-hidden">
       {/* 1. Responsive Collapsible Navy Sidebar (268px ↔ 76px) */}
       <Sidebar
-        activeTab={activeTab}
-        onTabChange={(tab) => setActiveTab(tab)}
+        activeTab={viewingVehicleId ? "dealer-stock" : activeTab}
+        onTabChange={handleTabChange}
         isCollapsed={isSidebarCollapsed}
         onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
       />

@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Vehicle, LandedPriceBreakdown } from "@/lib/types";
 import { useProgramme } from "@/lib/programme-context";
@@ -20,7 +19,8 @@ import {
   Lock,
   User,
   ShieldCheck,
-  FileCheck2,
+  CheckCircle2,
+  Car,
 } from "lucide-react";
 
 interface FullPageVehicleDetailProps {
@@ -87,103 +87,80 @@ export default function FullPageVehicleDetail({
   ];
 
   return (
-    <div className="min-h-screen bg-white text-slate-900 flex flex-col font-sans">
+    <div className="space-y-6 animate-in fade-in duration-300">
       {/* ─────────────────────────────────────────────────────────── */}
-      {/* 1. Full-Width Clean Header (Nissan Brand Identity)        */}
+      {/* 1. Internal Portal Navigation Bar                           */}
       {/* ─────────────────────────────────────────────────────────── */}
-      <header className="w-full border-b border-slate-200/90 bg-white sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
-          {/* Logo & Back button */}
-          <div className="flex items-center gap-6">
-            <button
-              onClick={handleBack}
-              className="flex items-center gap-2 group cursor-pointer text-left"
-            >
-              <div className="w-9 h-9 rounded-xl bg-[#E11D48] flex items-center justify-center text-white font-extrabold text-base shadow-sm group-hover:bg-[#BE123C] transition-colors">
-                D
-              </div>
-              <div>
-                <span className="font-extrabold text-lg text-slate-900 tracking-tight leading-none block">
-                  Dealer<span className="text-[#E11D48]">Order</span>
-                </span>
-                <span className="text-[10px] text-slate-500 font-medium block leading-tight">
-                  Nissan Used Vehicle Programme · New Zealand
-                </span>
-              </div>
-            </button>
+      <div className="bg-white rounded-2xl border border-slate-200/90 p-4 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        {/* Left: Back button & Breadcrumb */}
+        <div className="flex items-center gap-3 flex-wrap">
+          <button
+            type="button"
+            onClick={handleBack}
+            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-slate-200/90 bg-slate-50 hover:bg-slate-100 text-slate-800 text-xs font-bold transition-all cursor-pointer shadow-2xs active:scale-[0.98]"
+          >
+            <ArrowLeft className="w-3.5 h-3.5" />
+            <span>Back to Stock</span>
+          </button>
 
+          <div className="h-4 w-px bg-slate-200 hidden sm:block" />
+
+          <div className="flex items-center gap-1.5 text-xs text-slate-500 font-medium">
             <button
+              type="button"
               onClick={handleBack}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold transition-colors cursor-pointer"
+              className="hover:text-slate-900 transition-colors cursor-pointer"
             >
-              <ArrowLeft className="w-3.5 h-3.5" />
-              <span>Back to Stock</span>
+              Stock Catalog
             </button>
+            <span>/</span>
+            <span className="text-slate-900 font-semibold">{vehicle.model}</span>
+            <span>/</span>
+            <span className="font-mono text-slate-700 bg-slate-100 px-2 py-0.5 rounded text-[11px] font-bold">
+              {vehicle.stockId}
+            </span>
+          </div>
+        </div>
+
+        {/* Right: Pricing Tier Badge & Quick Reserve */}
+        <div className="flex items-center gap-3">
+          <div className="hidden sm:flex items-center gap-2 text-xs">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+              Pricing Tier:
+            </span>
+            <span className="font-bold text-slate-800 bg-slate-100 px-2.5 py-1 rounded-lg border border-slate-200/80">
+              {dealerZone} Landed
+            </span>
           </div>
 
-          {/* Navigation Links */}
-          <nav className="hidden md:flex items-center gap-8 text-xs font-semibold text-slate-600">
-            <button onClick={handleBack} className="text-slate-900 font-bold hover:text-[#E11D48] transition-colors cursor-pointer">
-              All Listings
-            </button>
-            <button onClick={handleBack} className="hover:text-[#E11D48] transition-colors cursor-pointer">
-              Nissan Stock
-            </button>
-            <button onClick={handleBack} className="hover:text-[#E11D48] transition-colors cursor-pointer">
-              Pricing Schedule
-            </button>
-            <button onClick={handleBack} className="hover:text-[#E11D48] transition-colors cursor-pointer">
-              Terms of Trade
-            </button>
-          </nav>
-
-          {/* Dealer Badge & Action */}
-          <div className="flex items-center gap-3">
-            <div className="text-right hidden sm:block">
-              <span className="text-xs font-bold text-slate-900 block leading-tight">Auckland Nissan</span>
-              <span className="text-[10px] text-[#E11D48] font-semibold block leading-tight">Zone 1 · Franchise Dealer</span>
-            </div>
-
+          {vehicle.status === "AVAILABLE" ? (
             <button
+              type="button"
               onClick={() => {
                 audio.playSubtleClick();
                 setIsReserveModalOpen(true);
               }}
-              className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#E11D48] to-[#BE123C] hover:from-[#BE123C] hover:to-[#9F1239] text-white text-xs font-extrabold transition-all shadow-[0_3px_12px_rgba(225,29,72,0.28)] hover:shadow-[0_4px_16px_rgba(225,29,72,0.38)] active:scale-[0.98] cursor-pointer flex items-center gap-1.5"
+              className="px-5 py-2 rounded-xl bg-gradient-to-r from-[#E11D48] to-[#BE123C] hover:from-[#BE123C] hover:to-[#9F1239] text-white text-xs font-extrabold transition-all shadow-[0_3px_12px_rgba(225,29,72,0.28)] hover:shadow-[0_4px_16px_rgba(225,29,72,0.38)] active:scale-[0.98] cursor-pointer flex items-center gap-1.5"
             >
               <Lock className="w-3.5 h-3.5" />
-              <span>Reserve Stock</span>
+              <span>Reserve (24h Hold)</span>
             </button>
-          </div>
+          ) : (
+            <span className="px-4 py-2 rounded-xl bg-slate-100 text-slate-500 text-xs font-bold border border-slate-200 flex items-center gap-1.5">
+              <Lock className="w-3.5 h-3.5 text-amber-500" />
+              <span>Currently Reserved</span>
+            </span>
+          )}
         </div>
-      </header>
+      </div>
 
       {/* ─────────────────────────────────────────────────────────── */}
-      {/* 2. Full Page Body (FindAuto Layout with Nissan Brand Info) */}
+      {/* 2. Main Vehicle Details Canvas (FindAuto Layout)            */}
       {/* ─────────────────────────────────────────────────────────── */}
-      <main className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8 space-y-10">
-        {/* Breadcrumb Strip */}
-        <div className="flex items-center gap-2 text-xs text-slate-400 font-medium">
-          <button onClick={handleBack} className="hover:text-slate-800 transition-colors cursor-pointer">
-            Home
-          </button>
-          <span>/</span>
-          <span>Nissan</span>
-          <span>/</span>
-          <span>{vehicle.model}</span>
-          <span>/</span>
-          <span className="bg-slate-100 px-3 py-1 rounded-full text-slate-700 font-mono text-[11px] font-semibold">
-            {vehicle.year} {vehicle.make} {vehicle.model} {vehicle.grade}
-          </span>
-        </div>
-
-        {/* ───────────────────────────────────────────────────────── */}
-        {/* TOP SECTION: Hero Car Left + Landed Cost Options Right    */}
-        {/* ───────────────────────────────────────────────────────── */}
+      <div className="bg-white rounded-3xl border border-slate-200/90 p-6 sm:p-8 lg:p-10 shadow-xs space-y-10">
+        {/* TOP SECTION: Hero Car Left + Landed Cost Options Right */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
-          {/* ─────────────────────────────────────────────────────── */}
-          {/* LEFT COLUMN: Large Studio Car + Spec Row + Thumbnails   */}
-          {/* ─────────────────────────────────────────────────────── */}
+          {/* LEFT COLUMN: Large Studio Car + Spec Row + Thumbnails */}
           <div className="lg:col-span-6 space-y-6">
             {/* Main Studio Car Showcase */}
             <div className="relative aspect-[16/10] w-full flex items-center justify-center p-6 bg-gradient-to-b from-slate-50/80 via-slate-100/40 to-slate-50/80 rounded-3xl border border-slate-200/80 overflow-hidden studio-pedestal">
@@ -193,11 +170,17 @@ export default function FullPageVehicleDetail({
                 className="w-full h-full object-contain studio-car-drop select-none transition-all duration-300"
               />
 
+              {/* Auction Grade badge on image */}
+              <div className="absolute top-4 right-4 px-3 py-1 rounded-full bg-slate-900 text-white font-mono text-xs font-bold shadow-md flex items-center gap-1">
+                <span>★</span>
+                <span>Grade {vehicle.auctionGrade}</span>
+              </div>
+
               {vehicle.status !== "AVAILABLE" && (
-                <div className="absolute inset-0 bg-white/80 backdrop-blur-xs flex items-center justify-center">
+                <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center">
                   <span className="px-4 py-2 rounded-full bg-slate-900 text-white font-bold text-xs shadow-md flex items-center gap-2">
                     <Lock className="w-4 h-4 text-rose-400" />
-                    Vehicle Held / Reserved
+                    Vehicle Held / Reserved (24h Lock)
                   </span>
                 </div>
               )}
@@ -236,10 +219,11 @@ export default function FullPageVehicleDetail({
                     audio.playSubtleClick();
                     setActiveImageIdx(idx);
                   }}
-                  className={`relative flex-1 aspect-[16/11] rounded-2xl overflow-hidden border p-1.5 flex items-center justify-center cursor-pointer transition-all ${activeImageIdx === idx
-                    ? "border-[#E11D48] ring-2 ring-[#E11D48]/20 bg-rose-50/20"
-                    : "border-slate-200 bg-slate-50/60 hover:border-slate-300"
-                    }`}
+                  className={`relative flex-1 aspect-[16/11] rounded-2xl overflow-hidden border p-1.5 flex items-center justify-center cursor-pointer transition-all ${
+                    activeImageIdx === idx
+                      ? "border-[#E11D48] ring-2 ring-[#E11D48]/20 bg-rose-50/20"
+                      : "border-slate-200 bg-slate-50/60 hover:border-slate-300"
+                  }`}
                 >
                   <img src={img} alt="Angle preview" className="w-full h-full object-contain" />
                 </button>
@@ -247,9 +231,7 @@ export default function FullPageVehicleDetail({
             </div>
           </div>
 
-          {/* ─────────────────────────────────────────────────────── */}
-          {/* RIGHT COLUMN: Title, Landed Price, Cost Card & CTA     */}
-          {/* ─────────────────────────────────────────────────────── */}
+          {/* RIGHT COLUMN: Title, Landed Price, Cost Card & CTA */}
           <div className="lg:col-span-6 space-y-6">
             {/* Title & Subtitle */}
             <div className="space-y-1.5">
@@ -267,14 +249,14 @@ export default function FullPageVehicleDetail({
                 ${price.totalBuyPriceNZD.toLocaleString()}
               </span>
               <span className="text-xs sm:text-sm text-slate-500 font-medium">
-                for guaranteed landed price (Zone 1 Auckland Delivery Included)
+                for guaranteed landed price ({dealerZone} Delivery Included)
               </span>
             </div>
 
             {/* Finance Options / Landed Cost Breakdown Card (Nissan Brand Style) */}
             <div className="p-6 rounded-3xl border border-slate-200/90 bg-white shadow-sm space-y-5">
               <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider">
-                Finance & Landed Cost Schedule
+                Finance &amp; Landed Cost Schedule
               </h3>
 
               <div className="grid grid-cols-1 sm:grid-cols-12 gap-6 items-center">
@@ -287,7 +269,7 @@ export default function FullPageVehicleDetail({
                   {/* Brand Rose Gradient Wedge Shape */}
                   <div className="relative w-full h-24 rounded-2xl bg-gradient-to-tr from-rose-100/70 via-rose-200/80 to-rose-300/90 border border-rose-300 flex flex-col justify-end p-3 overflow-hidden">
                     <div className="absolute top-2 right-2.5 text-[10px] font-mono text-rose-950 font-bold">
-                      Zone 1 Fixed
+                      {dealerZone} Fixed
                     </div>
                     <div>
                       <span className="text-sm font-extrabold text-rose-950 font-mono block">
@@ -311,10 +293,11 @@ export default function FullPageVehicleDetail({
                       <div
                         key={i}
                         onClick={() => setSelectedCostPart(i)}
-                        className={`p-2.5 rounded-xl border transition-all cursor-pointer text-left ${selectedCostPart === i
-                          ? "bg-slate-900 text-white border-slate-900 shadow-sm"
-                          : "bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100"
-                          }`}
+                        className={`p-2.5 rounded-xl border transition-all cursor-pointer text-left ${
+                          selectedCostPart === i
+                            ? "bg-slate-900 text-white border-slate-900 shadow-sm"
+                            : "bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100"
+                        }`}
                       >
                         <div className="text-[10px] font-semibold truncate opacity-80">{item.label}</div>
                         <div className="font-mono font-bold text-xs mt-0.5">
@@ -342,13 +325,9 @@ export default function FullPageVehicleDetail({
           </div>
         </div>
 
-        {/* ───────────────────────────────────────────────────────── */}
-        {/* BOTTOM SECTION: Specifications Accordion + Avg Price Chart*/}
-        {/* ───────────────────────────────────────────────────────── */}
+        {/* BOTTOM SECTION: Specifications Accordion + Avg Price Chart */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start pt-8 border-t border-slate-100">
-          {/* ─────────────────────────────────────────────────────── */}
-          {/* LEFT COLUMN: Specifications Accordion List              */}
-          {/* ─────────────────────────────────────────────────────── */}
+          {/* LEFT COLUMN: Specifications Accordion List */}
           <div className="lg:col-span-6 space-y-4">
             <h2 className="text-xl font-bold text-slate-900 tracking-tight">
               Specifications
@@ -411,7 +390,7 @@ export default function FullPageVehicleDetail({
                 onClick={() => toggleSection("exterior")}
                 className="w-full flex items-center justify-between text-xs font-bold uppercase tracking-wider text-slate-800 py-2 cursor-pointer"
               >
-                <span>Exterior Features & Inspection</span>
+                <span>Exterior Features &amp; Inspection</span>
                 {openSections.exterior ? (
                   <ChevronUp className="w-4 h-4 text-slate-400" />
                 ) : (
@@ -444,7 +423,7 @@ export default function FullPageVehicleDetail({
                 onClick={() => toggleSection("safety")}
                 className="w-full flex items-center justify-between text-xs font-bold uppercase tracking-wider text-slate-800 py-2 cursor-pointer"
               >
-                <span>Safety & ADAS</span>
+                <span>Safety &amp; ADAS</span>
                 {openSections.safety ? (
                   <ChevronUp className="w-4 h-4 text-slate-400" />
                 ) : (
@@ -454,10 +433,10 @@ export default function FullPageVehicleDetail({
 
               {openSections.safety && (
                 <div className="pt-2 text-xs text-slate-600 space-y-1">
-                  <p>• Nissan Emergency Braking & Forward Collision Warning</p>
-                  <p>• ProPILOT Autonomous Lane Keep & Radar Adaptive Cruise</p>
+                  <p>• Nissan Emergency Braking &amp; Forward Collision Warning</p>
+                  <p>• ProPILOT Autonomous Lane Keep &amp; Radar Adaptive Cruise</p>
                   <p>• Around View 360 Camera with Moving Object Detection</p>
-                  <p>• Front & Curtain SRS Airbags</p>
+                  <p>• Front &amp; Curtain SRS Airbags</p>
                 </div>
               )}
             </div>
@@ -469,7 +448,7 @@ export default function FullPageVehicleDetail({
                 onClick={() => toggleSection("technical")}
                 className="w-full flex items-center justify-between text-xs font-bold uppercase tracking-wider text-slate-800 py-2 cursor-pointer"
               >
-                <span>Technical & MR2A Entry Compliance</span>
+                <span>Technical &amp; MR2A Entry Compliance</span>
                 {openSections.technical ? (
                   <ChevronUp className="w-4 h-4 text-slate-400" />
                 ) : (
@@ -518,7 +497,7 @@ export default function FullPageVehicleDetail({
                 onClick={() => toggleSection("dimensions")}
                 className="w-full flex items-center justify-between text-xs font-bold uppercase tracking-wider text-slate-800 py-2 cursor-pointer"
               >
-                <span>Dimensions & Weight</span>
+                <span>Dimensions &amp; Weight</span>
                 {openSections.dimensions ? (
                   <ChevronUp className="w-4 h-4 text-slate-400" />
                 ) : (
@@ -534,9 +513,7 @@ export default function FullPageVehicleDetail({
             </div>
           </div>
 
-          {/* ─────────────────────────────────────────────────────── */}
-          {/* RIGHT COLUMN: Avg Price Range Chart (Brand Identity)    */}
-          {/* ─────────────────────────────────────────────────────── */}
+          {/* RIGHT COLUMN: Avg Price Range Chart (Brand Identity) */}
           <div className="lg:col-span-6 space-y-4">
             <div className="flex items-center justify-between">
               <h3 className="text-lg font-bold text-slate-900 tracking-tight">
@@ -553,10 +530,11 @@ export default function FullPageVehicleDetail({
                       audio.playSubtleClick();
                       setActiveTimeframe(t);
                     }}
-                    className={`px-3 py-1 rounded-full transition-colors cursor-pointer ${activeTimeframe === t
-                      ? "bg-[#E11D48] text-white shadow-xs"
-                      : "text-slate-400 hover:text-slate-800"
-                      }`}
+                    className={`px-3 py-1 rounded-full transition-colors cursor-pointer ${
+                      activeTimeframe === t
+                        ? "bg-[#E11D48] text-white shadow-xs"
+                        : "text-slate-400 hover:text-slate-800"
+                    }`}
                   >
                     {t}
                   </button>
@@ -597,7 +575,7 @@ export default function FullPageVehicleDetail({
                   <line x1="210" y1="20" x2="210" y2="155" stroke="#1E293B" strokeWidth="1" strokeDasharray="3 3" />
                 </svg>
 
-                {/* Black Marker Tag: $33,800 */}
+                {/* Black Marker Tag */}
                 <div className="absolute top-12 left-[62%] -translate-x-1/2 px-2.5 py-1 rounded-md bg-slate-900 text-white font-mono text-[10px] font-bold shadow-md">
                   ${retailEstimateNZD.toLocaleString()}
                 </div>
@@ -630,7 +608,7 @@ export default function FullPageVehicleDetail({
             </div>
           </div>
         </div>
-      </main>
+      </div>
 
       {/* Atomic Reservation Modal */}
       <AtomicReservationModal
