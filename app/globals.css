@@ -1,26 +1,45 @@
 @import "tailwindcss";
 
+@theme {
+  --color-crimson-50: #fff1f2;
+  --color-crimson-100: #ffe4e6;
+  --color-crimson-200: #fecdd3;
+  --color-crimson-300: #fda4af;
+  --color-crimson-400: #fb7185;
+  --color-crimson-500: #f43f5e;
+  --color-crimson-600: #e11d48;
+  --color-crimson-700: #be123c;
+  --color-crimson-800: #9f1239;
+  --color-crimson-900: #881337;
+  --color-crimson-950: #4c0519;
+
+  --color-navy-950: #070d18;
+  --color-navy-900: #0a1322;
+  --color-navy-850: #0f1b2e;
+  --color-navy-800: #142239;
+  --color-navy-700: #1b2a42;
+  --color-navy-600: #253957;
+
+  --color-canvas-bg: #f8fafc;
+  --color-card-bg: #ffffff;
+  --color-card-border: #e2e8f0;
+  --color-card-border-subtle: #cbd5e1;
+
+  --shadow-soft: 0 1px 3px 0 rgba(10, 19, 34, 0.04), 0 1px 2px -1px rgba(10, 19, 34, 0.04);
+  --shadow-soft-md: 0 4px 8px -2px rgba(10, 19, 34, 0.06), 0 2px 4px -2px rgba(10, 19, 34, 0.04);
+  --shadow-soft-lg: 0 12px 20px -4px rgba(10, 19, 34, 0.08), 0 4px 6px -2px rgba(10, 19, 34, 0.03);
+  --shadow-hover: 0 20px 25px -5px rgba(10, 19, 34, 0.1), 0 8px 10px -6px rgba(10, 19, 34, 0.05);
+}
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --background: #f8fafc;
+  --foreground: #0a1322;
 }
 
 body {
-  background: var(--background);
+  background-color: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
