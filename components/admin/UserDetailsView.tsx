@@ -195,11 +195,10 @@ export default function UserDetailsView({ userId, onBack }: UserDetailsViewProps
 
           <button
             onClick={handleToggleStatus}
-            className={`px-3 py-1.5 rounded-xl border text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer shadow-2xs ${
-              user.active
-                ? "border-rose-200 bg-rose-50 hover:bg-rose-100 text-[#E11D48]"
-                : "border-emerald-200 bg-emerald-50 hover:bg-emerald-100 text-emerald-700"
-            }`}
+            className={`px-3 py-1.5 rounded-xl border text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer shadow-2xs ${user.active
+              ? "border-rose-200 bg-rose-50 hover:bg-rose-100 text-[#E11D48]"
+              : "border-emerald-200 bg-emerald-50 hover:bg-emerald-100 text-emerald-700"
+              }`}
           >
             {user.active ? (
               <>
@@ -240,9 +239,8 @@ export default function UserDetailsView({ userId, onBack }: UserDetailsViewProps
                 className="w-18 h-18 sm:w-20 sm:h-20 rounded-2xl object-cover border-2 border-slate-100 shadow-sm"
               />
               <span
-                className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 border-white ${
-                  user.active ? "bg-emerald-500" : "bg-rose-500"
-                }`}
+                className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 border-white ${user.active ? "bg-emerald-500" : "bg-rose-500"
+                  }`}
               ></span>
             </div>
 
@@ -256,11 +254,10 @@ export default function UserDetailsView({ userId, onBack }: UserDetailsViewProps
                   <span>{roleInfo.label}</span>
                 </span>
                 <span
-                  className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
-                    user.active
-                      ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
-                      : "bg-rose-50 text-[#E11D48] border border-rose-200"
-                  }`}
+                  className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${user.active
+                    ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                    : "bg-rose-50 text-[#E11D48] border border-rose-200"
+                    }`}
                 >
                   {user.active ? "Active Platform Member" : "Account Suspended"}
                 </span>
