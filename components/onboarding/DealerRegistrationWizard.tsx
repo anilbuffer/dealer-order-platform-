@@ -20,6 +20,7 @@ import {
   ChevronRight,
   HelpCircle,
   Sparkles,
+  Download,
 } from "lucide-react";
 
 interface FormData {
@@ -270,52 +271,54 @@ export default function DealerRegistrationWizard() {
   return (
     <div className="min-h-screen w-full flex flex-col lg:flex-row bg-[#F8FAFC]">
       {/* ─────────────────────────────────────────────────────────── */}
-      {/* LEFT SIDEBAR: Full Height Luxury Navy Canvas with Step Tabs */}
+      {/* LEFT SIDEBAR: Pinned Desktop Canvas (Fixed Height & Sticky)  */}
       {/* ─────────────────────────────────────────────────────────── */}
-      <aside className="relative overflow-hidden w-full lg:w-[390px] xl:w-[420px] bg-[#070D18] border-b lg:border-b-0 lg:border-r border-slate-800/80 text-white flex flex-col justify-between p-6 sm:p-8 lg:p-10 shrink-0">
+      <aside className="relative overflow-hidden w-full lg:w-[350px] xl:w-[380px] lg:sticky lg:top-0 lg:h-screen lg:overflow-y-auto bg-[#070D18] border-b lg:border-b-0 lg:border-r border-[#1B2A42] text-white flex flex-col justify-between p-6 sm:p-8 lg:p-8 shrink-0">
         {/* Subtle background ambient glow */}
         <div className="pointer-events-none absolute -top-24 -left-24 w-96 h-96 bg-rose-600/10 rounded-full blur-3xl" />
         <div className="pointer-events-none absolute bottom-0 right-0 w-80 h-80 bg-blue-600/5 rounded-full blur-3xl" />
 
-        <div className="relative z-10 space-y-8">
+        <div className="relative z-10 space-y-6">
           {/* Brand Header */}
-          <div className="flex items-center gap-3.5">
-            <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-[#E11D48] via-[#BE123C] to-[#881337] flex items-center justify-center font-black text-xl text-white shadow-[0_4px_20px_rgba(225,29,72,0.4)] ring-1 ring-white/20">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#E11D48] via-[#BE123C] to-[#881337] flex items-center justify-center font-black text-lg text-white shadow-soft shadow-crimson-600/30 ring-1 ring-white/20">
               D
             </div>
             <div>
+              <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400 block leading-tight">
+                Nissan New Zealand
+              </span>
               <h1 className="font-bold text-base text-white tracking-tight leading-tight">
-                Dealer Order Platform
+                Dealer Onboarding
               </h1>
-              <p className="text-[11px] font-medium text-slate-400">
-                Nissan Used Vehicle Programme · NZ
-              </p>
             </div>
           </div>
 
-          {/* Progress Overview Bar */}
-          <div className="p-4 rounded-2xl bg-[#0D1829]/90 border border-slate-800/90 backdrop-blur-md shadow-[0_4px_20px_rgba(0,0,0,0.2)] space-y-3">
+          {/* Micro Status Pill */}
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-[11px] text-slate-300 backdrop-blur-sm">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+            <span className="font-medium tracking-wide">Franchise Application</span>
+          </div>
+
+          {/* Minimal Progress Bar */}
+          <div className="p-3.5 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md space-y-2">
             <div className="flex items-center justify-between text-xs">
-              <span className="font-semibold text-slate-300">Application Progress</span>
-              <span className="font-mono text-rose-400 font-bold px-2 py-0.5 rounded-full bg-rose-500/10 border border-rose-500/20 text-[11px]">
+              <span className="font-medium text-slate-300">Progress</span>
+              <span className="font-mono text-rose-400 font-bold px-2 py-0.5 rounded-full bg-rose-500/15 border border-rose-500/30 text-[11px]">
                 {progressPercent}%
               </span>
             </div>
-            <div className="w-full h-2 bg-slate-800/80 rounded-full overflow-hidden p-0.5">
+            <div className="w-full h-1.5 bg-slate-800/90 rounded-full overflow-hidden">
               <div
-                className="h-full bg-gradient-to-r from-[#E11D48] via-[#F43F5E] to-[#FB7185] transition-all duration-500 rounded-full shadow-[0_0_12px_rgba(225,29,72,0.6)]"
+                className="h-full bg-gradient-to-r from-[#E11D48] via-[#F43F5E] to-[#FB7185] transition-all duration-500 rounded-full shadow-[0_0_10px_rgba(225,29,72,0.6)]"
                 style={{ width: `${Math.max(progressPercent, 10)}%` }}
               />
             </div>
-            <p className="text-[11px] text-slate-400 leading-snug">
-              Step {currentStep} of {STEPS.length}: {STEPS[currentStep - 1].title}
-            </p>
           </div>
 
-          {/* Vertical Step Tabs */}
-          <nav aria-label="Registration Steps" className="space-y-2.5">
+          {/* Clean Step Indicators (Less text, clean executive styling) */}
+          <nav aria-label="Registration Steps" className="space-y-1.5">
             {STEPS.map((step) => {
-              const Icon = step.icon;
               const isActive = currentStep === step.id;
               const isPassed = currentStep > step.id || isSubmitted;
 
@@ -325,63 +328,50 @@ export default function DealerRegistrationWizard() {
                   type="button"
                   onClick={() => handleStepClick(step.id)}
                   disabled={step.id > currentStep}
-                  className={`w-full flex items-start gap-3.5 p-3.5 rounded-2xl transition-all duration-200 text-left group relative ${isActive
-                      ? "bg-gradient-to-r from-white/[0.12] to-white/[0.04] text-white shadow-[0_4px_20px_rgba(0,0,0,0.3)] border border-white/20 backdrop-blur-md ring-1 ring-white/10"
+                  className={`w-full flex items-center gap-3 p-2.5 sm:p-3 rounded-xl transition-all duration-200 text-left cursor-pointer ${
+                    isActive
+                      ? "bg-white/10 text-white shadow-xs border border-white/15 backdrop-blur-md font-bold"
                       : isPassed
-                        ? "text-slate-300 hover:text-white hover:bg-white/[0.06] cursor-pointer border border-transparent hover:border-white/10"
-                        : "text-slate-500 cursor-not-allowed opacity-50 border border-transparent"
-                    }`}
+                      ? "text-slate-300 hover:text-white hover:bg-white/5 border border-transparent"
+                      : "text-slate-500 cursor-not-allowed opacity-40 border border-transparent"
+                  }`}
                 >
-                  {/* Step Number Badge */}
                   <div
-                    className={`w-9 h-9 rounded-xl flex items-center justify-center font-bold text-xs shrink-0 transition-all duration-200 ${isActive
-                        ? "bg-gradient-to-br from-[#E11D48] to-[#BE123C] text-white shadow-[0_0_16px_rgba(225,29,72,0.5)] ring-2 ring-white/20"
+                    className={`w-7 h-7 rounded-lg flex items-center justify-center font-bold text-xs shrink-0 transition-all ${
+                      isActive
+                        ? "bg-[#E11D48] text-white shadow-xs"
                         : isPassed
-                          ? "bg-emerald-500/15 text-emerald-400 border border-emerald-500/30"
-                          : "bg-[#111C2E] text-slate-500 border border-slate-800"
-                      }`}
+                        ? "bg-emerald-500/15 text-emerald-400 border border-emerald-500/30"
+                        : "bg-slate-800 text-slate-500"
+                    }`}
                   >
                     {isPassed && !isActive ? <CheckCircle2 className="w-4 h-4" /> : step.id}
                   </div>
 
-                  <div className="min-w-0 flex-1">
-                    <div className="font-semibold text-xs text-white flex items-center justify-between">
-                      <span className={isActive ? "text-white font-bold" : "text-slate-300"}>
-                        {step.title}
-                      </span>
-                      {isActive && (
-                        <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/40 tracking-wider">
-                          Active
-                        </span>
-                      )}
-                    </div>
-                    <p className="text-[11px] text-slate-400 mt-1 leading-snug">
-                      {step.subtitle}
-                    </p>
-                  </div>
+                  <span className="text-xs truncate flex-1">
+                    {step.title}
+                  </span>
+
+                  {isActive && (
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#E11D48] shrink-0" />
+                  )}
                 </button>
               );
             })}
           </nav>
         </div>
 
-        {/* Bottom Help & Navigation Card */}
-        <div className="relative z-10 pt-6 border-t border-slate-800/80 space-y-4">
-          <div className="flex items-center gap-2 text-[11px] text-slate-400 bg-[#0D1829]/60 px-3 py-2 rounded-xl border border-slate-800/60">
-            <Lock className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-            <span>256-bit Encrypted Programme Verification</span>
-          </div>
-
-          <div className="flex items-center justify-between">
-            <Link
-              href="/"
-              className="inline-flex items-center gap-1.5 text-xs text-slate-400 hover:text-white transition-colors"
-            >
-              <ArrowLeft className="w-3.5 h-3.5" />
-              <span>Back to Sign In</span>
-            </Link>
-
-            <span className="text-[10px] text-slate-400 font-mono">v2026.1 Brief</span>
+        {/* Bottom Help & Navigation */}
+        <div className="relative z-10 pt-4 border-t border-white/10 space-y-2.5">
+          <Link
+            href="/"
+            className="inline-flex items-center gap-2 px-3 py-2 rounded-xl border border-white/10 hover:border-white/20 bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white text-xs font-semibold transition-all w-full justify-center shadow-2xs"
+          >
+            <ArrowLeft className="w-3.5 h-3.5" />
+            <span>Back to Sign In</span>
+          </Link>
+          <div className="text-center text-[10px] text-slate-500 font-mono">
+            256-bit Encrypted · Nissan NZ v2026.2
           </div>
         </div>
       </aside>
@@ -389,7 +379,7 @@ export default function DealerRegistrationWizard() {
       {/* ─────────────────────────────────────────────────────────── */}
       {/* RIGHT SIDE: Step Form Cards (Clean & Simple Light Canvas)  */}
       {/* ─────────────────────────────────────────────────────────── */}
-      <main className="relative flex-1 flex flex-col justify-between p-6 sm:p-10 lg:p-14 overflow-y-auto bg-gradient-to-br from-slate-50 via-[#F8FAFC] to-slate-100/60">
+      <main className="relative flex-1 flex flex-col justify-center p-4 sm:p-6 lg:p-8 xl:p-10 overflow-y-auto bg-gradient-to-br from-slate-50 via-[#F8FAFC] to-slate-100/60 min-h-screen">
         {/* Subtle background ambient glow */}
         <div className="pointer-events-none absolute top-0 right-0 w-[500px] h-[500px] bg-rose-100/30 rounded-full blur-3xl -z-0" />
         <div className="pointer-events-none absolute bottom-0 left-10 w-[400px] h-[400px] bg-slate-200/40 rounded-full blur-3xl -z-0" />
@@ -438,17 +428,25 @@ export default function DealerRegistrationWizard() {
               <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-3">
                 <button
                   type="button"
-                  onClick={() => router.push("/")}
-                  className="w-full sm:w-auto px-7 py-3 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs transition-all shadow-soft cursor-pointer active:scale-[0.99]"
+                  onClick={() => {
+                    audio.playSubtleClick();
+                    router.push("/");
+                  }}
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3 rounded-xl bg-gradient-to-r from-[#E11D48] via-[#BE123C] to-[#9F1239] hover:from-[#BE123C] hover:to-[#881337] text-white text-xs font-bold transition-all shadow-[0_4px_18px_rgba(225,29,72,0.35)] hover:shadow-[0_6px_22px_rgba(225,29,72,0.45)] cursor-pointer active:scale-[0.99]"
                 >
-                  Return to Sign In Portal
+                  <ArrowLeft className="w-3.5 h-3.5" />
+                  <span>Return to Sign In Portal</span>
                 </button>
                 <button
                   type="button"
-                  onClick={() => alert("Application PDF receipt generated with UTC timestamp and terms hash.")}
-                  className="w-full sm:w-auto px-6 py-3 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-semibold text-xs transition-all cursor-pointer active:scale-[0.99]"
+                  onClick={() => {
+                    audio.playSuccessChime();
+                    alert("Application PDF receipt generated with UTC timestamp and terms hash.");
+                  }}
+                  className="w-full sm:w-auto btn-outline text-xs py-3 px-6"
                 >
-                  Download Application Copy
+                  <Download className="w-3.5 h-3.5 text-slate-500" />
+                  <span>Download Application Copy</span>
                 </button>
               </div>
             </div>
@@ -716,7 +714,7 @@ export default function DealerRegistrationWizard() {
                           </div>
                           <span>Included in Total Buy Price (Guaranteed Fixed Landed):</span>
                         </div>
-                        <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px] text-slate-600 pt-1">
+                        <ul className="grid grid-cols-1 gap-2 text-[11px] text-slate-600 pt-1">
                           <li className="flex items-start gap-2 bg-emerald-50/40 hover:bg-emerald-50/70 transition-colors p-2.5 rounded-xl border border-emerald-100/80">
                             <span className="text-emerald-600 font-bold shrink-0">✓</span>
                             <span>Vehicle FOB acquisition cost (Japan JPY to NZD)</span>
@@ -752,7 +750,7 @@ export default function DealerRegistrationWizard() {
                           </div>
                           <span>Potential Additional Costs (Requires Prior Dealership Approval):</span>
                         </div>
-                        <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px] text-slate-600 pt-1">
+                        <ul className="grid grid-cols-1 gap-2 text-[11px] text-slate-600 pt-1">
                           <li className="flex items-start gap-2 bg-amber-50/40 hover:bg-amber-50/70 transition-colors p-2.5 rounded-xl border border-amber-100/80">
                             <span className="text-amber-600 font-bold shrink-0">•</span>
                             <span>Non-standard structural or mechanical compliance repairs</span>
@@ -907,12 +905,12 @@ export default function DealerRegistrationWizard() {
               )}
 
               {/* Navigation Controls Footer */}
-              <div className="mt-8 pt-6 border-t border-slate-100 flex items-center justify-between">
+              <div className="mt-5 pt-4 border-t border-slate-100 flex items-center justify-between">
                 {currentStep > 1 ? (
                   <button
                     type="button"
                     onClick={handleBack}
-                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 hover:border-slate-300 text-slate-700 text-xs font-semibold transition-all shadow-xs active:scale-[0.99] cursor-pointer"
+                    className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-slate-200/90 hover:border-slate-300 bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold transition-all shadow-2xs hover:shadow-xs active:scale-[0.98] cursor-pointer"
                   >
                     <ArrowLeft className="w-4 h-4" />
                     <span>Previous Step</span>
@@ -920,9 +918,9 @@ export default function DealerRegistrationWizard() {
                 ) : (
                   <Link
                     href="/"
-                    className="inline-flex items-center gap-1.5 text-xs text-slate-500 hover:text-slate-800 transition-colors font-medium"
+                    className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-slate-200/90 hover:border-slate-300 bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold transition-all shadow-2xs hover:shadow-xs active:scale-[0.98] cursor-pointer"
                   >
-                    <ArrowLeft className="w-3.5 h-3.5" />
+                    <ArrowLeft className="w-3.5 h-3.5 text-slate-400" />
                     <span>Cancel Application</span>
                   </Link>
                 )}

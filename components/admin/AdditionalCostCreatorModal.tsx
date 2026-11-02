@@ -153,7 +153,7 @@ export default function AdditionalCostCreatorModal({
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 rounded-xl text-slate-600 hover:text-slate-900 transition-colors cursor-pointer"
+              className="px-4 py-2 rounded-xl border border-slate-200/90 hover:border-slate-300 bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold shadow-2xs hover:shadow-xs active:scale-[0.98] transition-all cursor-pointer"
             >
               Cancel
             </button>

@@ -86,7 +86,7 @@ Functional Semantics
 | [Search bar with '/' shortcut]                  [Sound] [Notifications] [RoleSwitcher]  |
 +---------------------+-------------------------------------------------------------------+
 | Sidebar:            | Main Scrollable View Area (#F8FAFC)                               |
-| 268px full          |                                                                   |
+| 240px full          |                                                                   |
 | (or 76px mini)      | [Dynamic Page Content]                                            |
 | Deep Navy #0A1322   | - Stock Catalogue Grid / Order Stepper / Admin Console            |
 | Active glow lines   |                                                                   |
@@ -99,7 +99,7 @@ Functional Semantics
    - Interactive notification popover with real-time badges.
    - Sound toggle button (`Sound On` / `Sound Off`).
    - `RoleSwitcher.tsx` component allowing instantaneous persona switching.
-2. **Responsive Collapsible Sidebar (268px $\leftrightarrow$ 76px):**
+2. **Responsive Collapsible Sidebar (240px $\leftrightarrow$ 76px):**
    - Smooth cubic-bezier width collapse toggle (`[<]` / `[>]`).
    - Floating animated tooltips when in 76px mini mode.
    - Active glow line (`.nav-active-glow`) with Crimson Rose `#E11D48` vertical accent.

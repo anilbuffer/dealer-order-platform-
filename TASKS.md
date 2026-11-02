@@ -29,7 +29,7 @@
 - [x] **Split-Screen Sign-In Screen:** Minimal luxury dark canvas on the left with clean brand tagline; light canvas on the right with one-click demo presets.
 - [x] **Dealer Onboarding Modal:** Registration form capturing dealer code, NZBN, and mandatory unticked commercial checkboxes (US-01, US-02).
 - [x] **68px Top Header Bar:** Aligned header with global search shortcut (`/`), real-time notifications drawer, and sound toggle.
-- [x] **268px ↔ 76px Navy Sidebar:** Responsive collapsible sidebar with cubic-bezier easing and mini-mode hover tooltips.
+- [x] **240px ↔ 76px Navy Sidebar:** Responsive collapsible sidebar with cubic-bezier easing and mini-mode hover tooltips.
 - [x] **Role Switcher (`RoleSwitcher.tsx`):** Instant persona switcher supporting Dealer, Autohub Admin, and Nissan Japan.
 
 ---

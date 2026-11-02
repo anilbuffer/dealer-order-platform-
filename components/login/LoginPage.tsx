@@ -73,7 +73,7 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen w-full flex flex-col lg:flex-row bg-[#F8FAFC]">
       {/* LEFT HALF: Minimal & Clean Dark Brand Canvas */}
-      <div className="relative w-full lg:w-1/2 bg-[#0A1322] flex flex-col justify-between p-6 sm:p-10 lg:p-16 overflow-hidden text-white border-b lg:border-b-0 lg:border-r border-[#1B2A42]">
+      <div className="relative w-full lg:w-1/2 bg-[#070D18] flex flex-col justify-between p-6 sm:p-10 lg:p-16 overflow-hidden text-white border-b lg:border-b-0 lg:border-r border-[#1B2A42]">
         {/* Subtle background ambient glow */}
         <div className="absolute -top-32 -left-32 w-96 h-96 bg-crimson-600/10 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute -bottom-32 -right-32 w-96 h-96 bg-blue-600/10 rounded-full blur-3xl pointer-events-none" />
@@ -84,56 +84,53 @@ export default function LoginPage() {
             D
           </div>
           <div>
-            <h1 className="font-bold text-lg tracking-tight text-white leading-tight">
+            <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400 block leading-tight">
+              Nissan New Zealand
+            </span>
+            <h1 className="font-bold text-base tracking-tight text-white leading-tight">
               Dealer Order Platform
             </h1>
-            <p className="text-[11px] font-medium tracking-wide text-slate-400">
-              Nissan Used Vehicle Programme
-            </p>
           </div>
         </div>
 
-        {/* Center: Clean & Minimal Hero (Less text as requested) */}
-        <div className="relative z-10 my-10 lg:my-0 space-y-5 max-w-lg">
+        {/* Center: Clean & Minimal Hero (Short, Ultra-Premium Style) */}
+        <div className="relative z-10 my-10 lg:my-0 space-y-4 max-w-md">
           {/* Subtle live indicator badge */}
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#0F1B2E] border border-[#1B2A42] text-xs text-slate-300">
-            <span className="flex h-2 w-2 relative">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-crimson-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-crimson-500"></span>
-            </span>
-            <span>Japan Direct Allocation · NZ Programme</span>
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-[11px] text-slate-300 backdrop-blur-sm">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+            <span className="font-medium tracking-wide">Direct Japan Wholesale Channel</span>
           </div>
 
           {/* Main Headline */}
-          <h2 className="text-3xl sm:text-4xl lg:text-[42px] font-extrabold tracking-tight text-white leading-[1.15]">
-            Source smarter from{" "}
+          <h2 className="text-3xl sm:text-4xl lg:text-[42px] font-black tracking-tight text-white leading-[1.12]">
+            Direct Japan Stock.<br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#E11D48] via-[#FB7185] to-[#FDA4AF]">
-              Japan to New Zealand.
+              Landed &amp; Protected.
             </span>
           </h2>
 
-          {/* Short, focused single line */}
-          <p className="text-sm text-slate-300 leading-relaxed max-w-md">
-            Direct self-service vehicle ordering channel for approved Nissan dealers with guaranteed landed pricing.
+          {/* Concise 1-liner description */}
+          <p className="text-xs sm:text-sm text-slate-400 leading-relaxed max-w-sm">
+            Guaranteed landed pricing and 24-hour atomic exclusivity locks for authorized Nissan New Zealand franchise dealers.
           </p>
 
-          {/* 3 Minimal Inline Tags */}
-          <div className="pt-2 flex flex-wrap gap-2 text-xs text-slate-300">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#0F1B2E] border border-[#1B2A42]">
-              <span className="text-emerald-400 font-bold">✓</span> Certified Japan Stock
+          {/* 2 Clean Glass Spec Pills */}
+          <div className="pt-2 flex flex-wrap gap-2.5 text-xs text-slate-300">
+            <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-white/5 border border-white/10 backdrop-blur-md">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)]" />
+              <span className="font-medium">JEVIC Certified</span>
             </span>
-            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#0F1B2E] border border-[#1B2A42]">
-              <span className="text-crimson-400 font-bold">✓</span> Atomic Reservation
-            </span>
-            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#0F1B2E] border border-[#1B2A42]">
-              <span className="text-blue-400 font-bold">✓</span> Door-to-Door Tracking
+            <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-white/5 border border-white/10 backdrop-blur-md">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#E11D48] shadow-[0_0_8px_rgba(225,29,72,0.8)]" />
+              <span className="font-medium">24h Atomic Exclusivity</span>
             </span>
           </div>
         </div>
 
         {/* Minimal Footer */}
-        <div className="relative z-10 text-xs text-slate-500 pt-4 border-t border-[#1B2A42]">
-          <span>© 2026 Dealer Order Platform · Nissan Used Vehicle Programme</span>
+        <div className="relative z-10 flex items-center justify-between text-[11px] text-slate-500 pt-4 border-t border-white/10 font-mono">
+          <span>Nissan NZ Used Vehicle Programme</span>
+          <span>© 2026</span>
         </div>
       </div>
 
@@ -283,17 +280,18 @@ export default function LoginPage() {
             </div>
           </div>
 
-          {/* Dealer Registration Link (US-01 / AC-01) */}
-          <div className="pt-3 border-t border-slate-200/80 text-center">
-            <p className="text-xs text-slate-500">
-              New Nissan NZ Dealership?{" "}
-              <Link
-                href="/register"
-                className="font-semibold text-crimson-600 hover:text-crimson-700 hover:underline cursor-pointer"
-              >
-                Register Dealership Application →
-              </Link>
-            </p>
+          {/* Dealer Registration Action (US-01 / AC-01) - Outline with Soft Shadow */}
+          <div className="pt-4 border-t border-slate-100 space-y-2.5 text-center">
+            <span className="text-xs text-slate-400 block font-medium">
+              New Nissan NZ Dealership or Franchisee?
+            </span>
+            <Link
+              href="/register"
+              className="w-full py-2.5 px-4 rounded-xl border border-slate-200/90 hover:border-slate-300 bg-white hover:bg-slate-50/80 text-slate-800 text-xs font-bold transition-all flex items-center justify-center gap-2 shadow-2xs hover:shadow-xs active:scale-[0.99] group cursor-pointer"
+            >
+              <span>Register Dealership Application</span>
+              <ArrowRight className="w-3.5 h-3.5 text-[#E11D48] transition-transform duration-200 group-hover:translate-x-1" />
+            </Link>
           </div>
         </div>
       </div>

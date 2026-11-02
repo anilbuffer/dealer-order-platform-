@@ -510,7 +510,7 @@ export default function Sidebar({
     <>
       {/* 1. Desktop & Laptop Persistent Sidebar (Hidden on <1024px) */}
       <aside
-        className={`hidden lg:flex relative h-full bg-[#070D18] border-r border-slate-800/80 flex-col justify-between transition-sidebar z-30 select-none overflow-hidden shrink-0 ${isCollapsed ? "w-[76px]" : "w-[268px]"
+        className={`hidden lg:flex relative h-full bg-[#070D18] border-r border-slate-800/80 flex-col justify-between transition-sidebar z-30 select-none overflow-hidden shrink-0 ${isCollapsed ? "w-[76px]" : "w-[248px]"
           }`}
         aria-label="Platform Sidebar Navigation"
       >

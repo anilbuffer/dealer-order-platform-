@@ -399,7 +399,10 @@ export const MOCK_VEHICLES: Vehicle[] = [
     location: "Yokohama Yard (Bay 4)",
     images: [
       "/images/cars/note.png",
-      "https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1200&q=80",
+      "/images/cars/angles/note-side.jpg",
+      "/images/cars/angles/note-rear-quarter.jpg",
+      "/images/cars/angles/note-interior.jpg",
+      "/images/cars/angles/note-front.jpg",
     ],
     conditionReportUrl: "https://example.com/reports/NIS-2026-9041.pdf",
     knownDefects: ["Minor stone chip on lower front bumper (A1)", "Factory alloys in immaculate condition"],

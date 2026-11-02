@@ -520,190 +520,91 @@ export default function DealerStockCatalog({
         </div>
       ) : viewMode === "GRID" ? (
         /* ───────────────────────────────────────────────────────── */
-        /* 4A. GRID LAYOUT: Executive Automotive Cards (Reference Styled) */
+        /* 4A. GRID LAYOUT: Ultra-Clean Luxury Automotive Showcase   */
+        /* (Names Full-Width, Hero Studio Car, Price Left & Action Button Right) */
         /* ───────────────────────────────────────────────────────── */
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 min-[2200px]:grid-cols-5 gap-4 sm:gap-6 animate-in fade-in duration-300">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-3 3xl:grid-cols-4 min-[2200px]:grid-cols-5 gap-5 sm:gap-6 animate-in fade-in duration-300">
           {filteredVehicles.map((vehicle) => {
             const price = calculateLandedPrice(vehicle.fobPriceJPY, dealerZone);
             const isAvailable = vehicle.status === "AVAILABLE";
             const isFav = !!favorites[vehicle.id];
 
-            // Retail Estimate & Gross Margin
-            const retailEstimate = Math.round(price.totalBuyPriceNZD * 1.28);
-            const grossMargin = retailEstimate - price.totalBuyPriceNZD;
-
             return (
               <div
                 key={vehicle.id}
                 onClick={() => handleOpenFullPageDetails(vehicle.id)}
-                className="bg-white rounded-[24px] sm:rounded-[28px] border border-slate-200/80 hover:border-slate-300 shadow-[0_4px_24px_rgba(0,0,0,0.03)] hover:shadow-[0_16px_36px_rgba(0,0,0,0.08)] hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between group cursor-pointer overflow-hidden p-4 sm:p-6"
+                className="bg-white rounded-[28px] border border-slate-200/80 hover:border-slate-300 shadow-[0_4px_24px_rgba(0,0,0,0.03)] hover:shadow-[0_20px_40px_rgba(0,0,0,0.08)] hover:-translate-y-1.5 transition-all duration-300 flex flex-col justify-between group cursor-pointer p-6 sm:p-7 relative overflow-hidden"
               >
                 <div>
-                  {/* Card Top Row: Title + Specs on Left, Price + Circular Arrow on Right */}
-                  <div className="flex items-start justify-between gap-2.5 sm:gap-3">
+                  {/* Card Top Row: Full Width Name + Model, with Arrow & Favorite on Right */}
+                  <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0 flex-1">
-                      <h3 className="text-sm sm:text-base lg:text-lg font-black text-slate-900 group-hover:text-[#E11D48] transition-colors leading-snug truncate">
-                        {vehicle.make} {vehicle.model}
+                      <h3 className="text-base sm:text-lg font-black text-slate-900 group-hover:text-[#E11D48] transition-colors leading-snug">
+                        {vehicle.make} - {vehicle.model}
                       </h3>
-                      <p className="text-[11px] sm:text-xs text-slate-400 font-medium mt-0.5 truncate">
-                        {vehicle.year} · {vehicle.fuelType} · {vehicle.transmission}
+                      <p className="text-xs text-slate-400 font-medium mt-1">
+                        {vehicle.year} · {vehicle.fuelType} · Grade {vehicle.auctionGrade}
                       </p>
                     </div>
 
-                    <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
-                      <div className="text-right">
-                        <span className="text-sm sm:text-base lg:text-lg font-black text-slate-900 font-mono tracking-tight block leading-tight">
-                          ${price.totalBuyPriceNZD.toLocaleString()}
-                        </span>
-                        <span className="text-[9px] sm:text-[10px] text-slate-400 font-medium block">
-                          {isAdminView ? `FOB ¥${vehicle.fobPriceJPY.toLocaleString()}` : "NZD Landed"}
-                        </span>
-                      </div>
-                      <div
-                        className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-slate-100 group-hover:bg-[#E11D48] text-slate-600 group-hover:text-white flex items-center justify-center transition-all duration-200 shadow-2xs shrink-0"
-                        title="View Full Vehicle Details"
-                      >
-                        <ArrowUpRight className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Card Center: Vehicle Image Presentation with studio styling */}
-                  <div className="relative w-full h-44 sm:h-52 my-3 rounded-2xl overflow-hidden bg-gradient-to-b from-slate-50/60 via-slate-100/30 to-slate-100/70 p-3 flex items-center justify-center border border-slate-100">
-                    {/* Realistic studio floor contact shadow directly beneath tires */}
-                    <div className="absolute bottom-3 w-4/5 h-3.5 bg-black/15 rounded-[50%] blur-md pointer-events-none transform scale-y-60" />
-
-                    <img
-                      src={vehicle.images?.[0] || "/images/cars/kicks.png"}
-                      alt={`${vehicle.make} ${vehicle.model}`}
-                      className="relative z-10 w-full h-full object-contain filter drop-shadow-[0_12px_14px_rgba(0,0,0,0.14)] group-hover:scale-105 group-hover:-translate-y-1 transition-all duration-300 ease-out select-none"
-                    />
-
-                    {/* Top-Left: Availability / Hold Status Badge + Auction Grade */}
-                    <div className="absolute top-3 left-3 z-20 flex items-center gap-1.5">
-                      {isAvailable ? (
-                        <div className="px-2.5 py-0.5 rounded-full bg-emerald-500 text-white text-[10px] font-bold flex items-center gap-1.5 shadow-sm">
-                          <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
-                          <span>Available for Hold</span>
-                        </div>
-                      ) : (
-                        <div className="px-2.5 py-0.5 rounded-full bg-amber-500 text-white text-[10px] font-bold flex items-center gap-1 shadow-sm font-mono">
-                          <Lock className="w-3 h-3 text-white" />
-                          <span>On Exclusivity Hold</span>
-                        </div>
-                      )}
-                      <div className="px-2 py-0.5 rounded-full bg-white/90 backdrop-blur-md text-[10px] font-mono font-bold text-slate-800 border border-slate-200/80 shadow-2xs">
-                        Grade {vehicle.auctionGrade}
-                      </div>
-                    </div>
-
-                    {/* Top-Right: Favorite Button */}
-                    <div className="absolute top-3 right-3 z-20">
+                    <div className="flex items-center gap-1.5 shrink-0">
                       <button
                         type="button"
                         onClick={(e) => toggleFavorite(e, vehicle.id)}
                         aria-label="Add to favorites"
-                        className={`p-1.5 rounded-full backdrop-blur-md transition-all cursor-pointer ${isFav
-                          ? "bg-[#E11D48] text-white shadow-xs"
-                          : "bg-white/90 text-slate-400 hover:text-[#E11D48] hover:bg-white border border-slate-200/80 shadow-2xs"
+                        className={`p-2 rounded-full transition-all cursor-pointer ${isFav
+                            ? "text-[#E11D48] bg-[#E11D48]/10"
+                            : "text-slate-300 hover:text-[#E11D48] hover:bg-slate-50"
                           }`}
                       >
-                        <Heart className={`w-3.5 h-3.5 ${isFav ? "fill-white" : ""}`} />
+                        <Heart className={`w-4 h-4 ${isFav ? "fill-[#E11D48]" : ""}`} />
                       </button>
+                      <div
+                        className="w-8 h-8 rounded-full bg-slate-100 group-hover:bg-[#E11D48] text-slate-600 group-hover:text-white flex items-center justify-center transition-all duration-200 shadow-2xs shrink-0"
+                        title="View Full Vehicle Details"
+                      >
+                        <ArrowUpRight className="w-3.5 h-3.5" />
+                      </div>
                     </div>
+                  </div>
 
-                    {/* Bottom-Left: Stock ID */}
-                    <div className="absolute bottom-2.5 left-3 z-20 px-2 py-0.5 rounded-md bg-white/90 backdrop-blur-md text-[10px] font-mono font-bold text-slate-600 border border-slate-200/70 shadow-2xs">
-                      #{vehicle.stockId}
-                    </div>
+                  {/* Card Center: Floating Studio Car with Realistic Floor Shadow */}
+                  <div className="relative w-full h-44 sm:h-52 my-3 flex items-center justify-center">
+                    <div className="absolute bottom-2.5 w-4/5 h-3.5 bg-black/15 rounded-[50%] blur-md pointer-events-none transform scale-y-50" />
 
-                    {/* Bottom-Right: Fuel/Powertrain Pill */}
-                    <div className="absolute bottom-2.5 right-3 z-20 px-2 py-0.5 rounded-md bg-slate-900/90 backdrop-blur-md text-[10px] font-bold text-white shadow-2xs">
-                      {vehicle.fuelType}
-                    </div>
+                    <img
+                      src={vehicle.images?.[0] || "/images/cars/kicks.png"}
+                      alt={`${vehicle.make} ${vehicle.model}`}
+                      className="relative z-10 w-full h-full object-contain filter drop-shadow-[0_12px_16px_rgba(0,0,0,0.12)] group-hover:scale-105 group-hover:-translate-y-1 transition-all duration-300 ease-out select-none"
+                    />
 
-                    {/* Reserved / 24h Hold Overlay */}
                     {!isAvailable && (
-                      <div className="absolute inset-0 z-30 bg-slate-950/45 backdrop-blur-[1.5px] flex items-center justify-center rounded-2xl p-4 text-center">
-                        {isAdminView ? (
-                          <div className="space-y-1 bg-slate-900/95 border border-amber-500/40 px-3.5 py-2 rounded-xl text-white shadow-xl backdrop-blur-md">
-                            <div className="flex items-center justify-center gap-1.5 text-xs font-bold text-amber-300">
-                              <Lock className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-                              <span>{vehicle.reservedByDealerId === "DEALER_002" ? "Held by BOP Nissan" : "Held by Auckland Nissan"}</span>
-                            </div>
-                            <div className="text-[10px] text-slate-300 font-mono">
-                              24h Exclusivity Lock Active
-                            </div>
-                          </div>
-                        ) : vehicle.reservedByDealerId === currentDealer?.id ? (
-                          <div className="space-y-1 bg-slate-900/95 border border-emerald-500/40 px-3.5 py-2 rounded-xl text-white shadow-xl backdrop-blur-md">
-                            <div className="flex items-center justify-center gap-1.5 text-xs font-bold text-emerald-300">
-                              <Lock className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                              <span>Your Dealership Active Hold</span>
-                            </div>
-                            <div className="text-[10px] text-slate-300 font-mono">
-                              18h Remaining to Confirm
-                            </div>
-                          </div>
-                        ) : (
-                          <div className="space-y-1 bg-slate-900/95 border border-slate-700 px-3.5 py-2 rounded-xl text-white shadow-xl backdrop-blur-md">
-                            <div className="flex items-center justify-center gap-1.5 text-xs font-bold text-rose-300">
-                              <Lock className="w-3.5 h-3.5 text-rose-400 shrink-0" />
-                              <span>Locked by Another Dealer</span>
-                            </div>
-                            <div className="text-[10px] text-slate-400 font-mono">
-                              Exclusivity Hold Active
-                            </div>
-                          </div>
-                        )}
+                      <div className="absolute bottom-1 z-20 flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-900/90 backdrop-blur-md text-amber-300 border border-amber-500/30 shadow-lg text-[11px] font-mono font-bold animate-in fade-in">
+                        <Lock className="w-3 h-3 text-amber-400 shrink-0" />
+                        <span>
+                          {isAdminView
+                            ? (vehicle.reservedByDealerId === "DEALER_002" ? "Held by BOP Nissan" : "Held by Auckland Nissan")
+                            : vehicle.reservedByDealerId === currentDealer?.id
+                              ? "Your Active Hold (18h left)"
+                              : "24h Exclusivity Lock Active"}
+                        </span>
                       </div>
                     )}
                   </div>
-
-                  {/* Bottom Specification Strip (3 columns with vertical dividers) */}
-                  <div className="grid grid-cols-3 divide-x divide-slate-100 border-t border-slate-100 pt-3 sm:pt-3.5 text-center">
-                    {/* Col 1: Odometer */}
-                    <div className="px-0.5 sm:px-1">
-                      <span className="text-xs sm:text-sm font-black text-slate-900 font-mono block truncate">
-                        {vehicle.odometerKm.toLocaleString()} km
-                      </span>
-                      <span className="text-[9px] sm:text-[10px] font-semibold text-slate-400 uppercase tracking-wider block mt-0.5 truncate">
-                        Odometer
-                      </span>
-                    </div>
-
-                    {/* Col 2: Auction Grade */}
-                    <div className="px-0.5 sm:px-1">
-                      <span className="text-xs sm:text-sm font-black text-slate-900 block truncate">
-                        ★ {vehicle.auctionGrade} / {vehicle.interiorGrade}
-                      </span>
-                      <span className="text-[9px] sm:text-[10px] font-semibold text-slate-400 uppercase tracking-wider block mt-0.5 truncate">
-                        Auction Grade
-                      </span>
-                    </div>
-
-                    {/* Col 3: Est. Margin */}
-                    <div className="px-0.5 sm:px-1">
-                      <span className="text-xs sm:text-sm font-black text-emerald-600 font-mono block truncate">
-                        +${grossMargin.toLocaleString()}
-                      </span>
-                      <span className="text-[9px] sm:text-[10px] font-semibold text-slate-400 uppercase tracking-wider block mt-0.5 truncate">
-                        Est. Margin
-                      </span>
-                    </div>
-                  </div>
                 </div>
 
-                {/* Card Actions Footer */}
-                <div className="pt-3.5 mt-3 border-t border-slate-100 flex items-center justify-between gap-2">
-                  <div className="flex items-center gap-1.5 text-[11px] text-slate-400 font-medium truncate">
-                    <MapPin className="w-3 h-3 text-slate-400 shrink-0" />
-                    <span className="truncate">
-                      {(vehicle.location ? vehicle.location.split("(")[0]?.trim() : "Yokohama Yard")} · {dealerZone}
+                {/* Card Bottom: Price on Left, Action Button on Right */}
+                <div className="pt-3.5 mt-2 border-t border-slate-100 flex items-center justify-between gap-3">
+                  <div>
+                    <span className="text-xl sm:text-2xl font-black text-slate-900 font-mono tracking-tight block leading-tight">
+                      ${price.totalBuyPriceNZD.toLocaleString()}
+                    </span>
+                    <span className="text-[10px] text-slate-400 font-medium block mt-0.5">
+                      {isAdminView ? `FOB ¥${vehicle.fobPriceJPY.toLocaleString()}` : "NZD Landed"}
                     </span>
                   </div>
 
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 shrink-0">
                     {isAdminView ? (
                       isAvailable ? (
                         <button
@@ -712,7 +613,7 @@ export default function DealerStockCatalog({
                             e.stopPropagation();
                             handleOpenFullPageDetails(vehicle.id);
                           }}
-                          className="py-1.5 px-3.5 rounded-xl bg-slate-900 hover:bg-black text-white text-xs font-bold transition-all shadow-xs flex items-center gap-1.5 cursor-pointer"
+                          className="py-2 px-4 rounded-xl bg-slate-900 hover:bg-black text-white text-xs font-bold transition-all shadow-2xs flex items-center gap-1.5 cursor-pointer"
                         >
                           <Eye className="w-3.5 h-3.5" />
                           <span>Inspect</span>
@@ -724,7 +625,7 @@ export default function DealerStockCatalog({
                             e.stopPropagation();
                             router.push("/admin/reservations");
                           }}
-                          className="py-1.5 px-3.5 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 text-xs font-bold font-mono flex items-center gap-1.5 shadow-2xs cursor-pointer"
+                          className="btn-outline py-2 px-3.5 rounded-xl text-amber-900 text-xs font-bold font-mono flex items-center gap-1.5 cursor-pointer"
                         >
                           <Lock className="w-3.5 h-3.5 text-amber-600" />
                           <span>Inspect Hold</span>
@@ -738,7 +639,7 @@ export default function DealerStockCatalog({
                           audio.playSubtleClick();
                           setReserveVehicle(vehicle);
                         }}
-                        className="py-1.5 px-3.5 rounded-xl bg-[#E11D48] hover:bg-[#BE123C] text-white text-xs font-bold transition-all shadow-xs hover:shadow-md active:scale-[0.98] cursor-pointer flex items-center gap-1.5"
+                        className="py-2.5 px-4 rounded-xl bg-[#E11D48] hover:bg-[#BE123C] text-white text-xs font-bold transition-all shadow-2xs hover:shadow-xs active:scale-[0.98] cursor-pointer flex items-center gap-1.5"
                       >
                         <Lock className="w-3.5 h-3.5" />
                         <span>Hold (24h)</span>
@@ -750,13 +651,13 @@ export default function DealerStockCatalog({
                           e.stopPropagation();
                           router.push("/dealer/orders");
                         }}
-                        className="py-1.5 px-3.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 text-xs font-bold font-mono flex items-center gap-1.5 shadow-2xs cursor-pointer"
+                        className="py-2.5 px-4 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 text-xs font-bold font-mono flex items-center gap-1.5 shadow-2xs cursor-pointer"
                       >
                         <Lock className="w-3.5 h-3.5 text-emerald-600" />
                         <span>My Active Hold</span>
                       </button>
                     ) : (
-                      <span className="py-1.5 px-3 rounded-xl bg-slate-100 border border-slate-200 text-slate-400 text-xs font-semibold flex items-center gap-1.5 cursor-not-allowed">
+                      <span className="py-2.5 px-4 rounded-xl bg-slate-100 border border-slate-200/80 text-slate-400 text-xs font-semibold flex items-center gap-1.5 cursor-not-allowed">
                         <Lock className="w-3.5 h-3.5 text-slate-400" />
                         <span>Unavailable</span>
                       </span>
@@ -768,10 +669,9 @@ export default function DealerStockCatalog({
           })}
         </div>
       ) : (
-        /* ───────────────────────────────────────────────────────── */
         /* 4B. LIST LAYOUT: Clean Luxury Automotive Rows             */
         /* ───────────────────────────────────────────────────────── */
-        <div className="space-y-3.5 animate-in fade-in duration-300">
+        <div className="space-y-4 animate-in fade-in duration-300">
           {filteredVehicles.map((vehicle) => {
             const price = calculateLandedPrice(vehicle.fobPriceJPY, dealerZone);
             const isAvailable = vehicle.status === "AVAILABLE";
@@ -783,109 +683,75 @@ export default function DealerStockCatalog({
               <div
                 key={vehicle.id}
                 onClick={() => handleOpenFullPageDetails(vehicle.id)}
-                className="bg-white rounded-2xl border border-slate-200/90 hover:border-slate-300 shadow-2xs hover:shadow-md transition-all duration-300 p-4 flex flex-col md:flex-row items-stretch md:items-center gap-4 group cursor-pointer"
+                className="bg-white rounded-[24px] border border-slate-200/80 hover:border-slate-300 shadow-[0_4px_20px_rgba(0,0,0,0.03)] hover:shadow-[0_12px_28px_rgba(0,0,0,0.07)] transition-all duration-300 p-5 sm:p-6 flex flex-col md:flex-row items-stretch md:items-center gap-6 group cursor-pointer"
               >
-                {/* Left: Thumbnail with Studio Styling */}
-                <div className="relative w-full md:w-56 h-36 rounded-2xl overflow-hidden bg-gradient-to-b from-slate-50 to-slate-100/80 flex items-center justify-center p-3 shrink-0 border border-slate-100">
-                  <div className="absolute bottom-2.5 w-4/5 h-3 bg-black/15 rounded-[50%] blur-sm pointer-events-none transform scale-y-60" />
+                {/* Left: Floating Cutout Thumbnail (No Inner Box) */}
+                <div className="relative w-full md:w-56 h-36 flex items-center justify-center shrink-0">
+                  <div className="absolute bottom-2 w-4/5 h-3 bg-black/15 rounded-[50%] blur-sm pointer-events-none transform scale-y-50" />
                   <img
                     src={vehicle.images?.[0] || "/images/cars/kicks.png"}
                     alt={`${vehicle.make} ${vehicle.model}`}
-                    className="relative z-10 w-full h-full object-contain filter drop-shadow-[0_8px_10px_rgba(0,0,0,0.12)] group-hover:scale-105 transition-transform duration-300 ease-out select-none"
+                    className="relative z-10 w-full h-full object-contain filter drop-shadow-[0_8px_12px_rgba(0,0,0,0.12)] group-hover:scale-105 transition-transform duration-300 ease-out select-none"
                   />
 
-                  {/* Availability / Hold Badges in List View */}
-                  <div className="absolute top-2 left-2 z-20 flex items-center gap-1">
-                    {isAvailable ? (
-                      <span className="px-2 py-0.5 rounded-full bg-emerald-500 text-white text-[9px] font-bold flex items-center gap-1 shadow-2xs">
-                        <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
-                        <span>Available for Hold</span>
-                      </span>
-                    ) : (
-                      <span className="px-2 py-0.5 rounded-full bg-amber-500 text-white text-[9px] font-bold flex items-center gap-1 shadow-2xs font-mono">
-                        <Lock className="w-2.5 h-2.5" />
-                        <span>On Exclusivity Hold</span>
-                      </span>
-                    )}
-                    <div className="px-1.5 py-0.5 rounded-full bg-white/90 backdrop-blur-md text-[9px] font-mono font-bold text-slate-800 border border-slate-200/80">
-                      ★ {vehicle.auctionGrade}
-                    </div>
-                  </div>
-
-                  <div className="absolute bottom-2 left-2 z-20 px-1.5 py-0.5 rounded bg-white/90 backdrop-blur-md text-[9px] font-mono font-bold text-slate-600 border border-slate-200/70">
-                    #{vehicle.stockId}
-                  </div>
-
-                  <div className="absolute bottom-2 right-2 z-20 px-1.5 py-0.5 rounded bg-slate-900/90 text-[9px] font-bold text-white shadow-2xs">
-                    {vehicle.fuelType}
-                  </div>
-
                   {!isAvailable && (
-                    <div className="absolute inset-0 z-30 bg-slate-950/45 backdrop-blur-[1px] flex items-center justify-center rounded-2xl p-2 text-center">
-                      <div className="px-2.5 py-1 rounded-lg bg-slate-900/95 border border-amber-500/40 text-amber-200 font-bold text-[10px] flex items-center gap-1 shadow-md">
-                        <Lock className="w-3 h-3 text-amber-400" />
-                        <span>
-                          {isAdminView
-                            ? (vehicle.reservedByDealerId === "DEALER_002" ? "Held by BOP Nissan" : "Held by Auckland Nissan")
-                            : vehicle.reservedByDealerId === currentDealer?.id
-                              ? "Your Dealership Hold"
-                              : "Locked by Another Dealer"}
-                        </span>
-                      </div>
+                    <div className="absolute bottom-1 z-20 px-2.5 py-0.5 rounded-full bg-slate-900/90 text-amber-300 border border-amber-500/30 font-bold text-[9px] font-mono flex items-center gap-1 shadow-md">
+                      <Lock className="w-2.5 h-2.5 text-amber-400" />
+                      <span>{vehicle.reservedByDealerId === currentDealer?.id ? "Your Hold" : "Locked"}</span>
                     </div>
                   )}
                 </div>
 
-                {/* Middle: Clean Info Block */}
-                <div className="flex-1 min-w-0 space-y-2">
+                {/* Middle: Clean Info Block & 3 Columns */}
+                <div className="flex-1 min-w-0 space-y-3">
                   <div className="flex items-center justify-between text-xs text-slate-400">
-                    <span>{vehicle.year} · {vehicle.grade}</span>
-                    <span className="flex items-center gap-1 text-slate-500 text-[11px]">
+                    <span className="font-medium">{vehicle.year} · {vehicle.fuelType} · #{vehicle.stockId}</span>
+                    <span className="flex items-center gap-1 text-slate-400 text-xs">
                       <MapPin className="w-3 h-3 text-slate-400" />
                       <span>{vehicle.location ? vehicle.location.split("(")[0]?.trim() : "Yokohama Yard"}</span>
                     </span>
                   </div>
 
-                  <h3 className="text-base font-bold text-slate-900 group-hover:text-[#E11D48] transition-colors truncate">
+                  <h3 className="text-base sm:text-lg font-black text-slate-900 group-hover:text-[#E11D48] transition-colors truncate">
                     {vehicle.make} {vehicle.model}
                   </h3>
 
                   {/* 3-Column Specifications in List View */}
-                  <div className="grid grid-cols-3 divide-x divide-slate-100 border-t border-slate-100 pt-2 text-center max-w-sm">
-                    <div className="px-2 text-left">
-                      <span className="text-xs font-mono font-bold text-slate-800 block">
+                  <div className="grid grid-cols-3 gap-4 pt-2 border-t border-slate-100 max-w-md">
+                    <div>
+                      <span className="text-sm font-mono font-black text-slate-900 block leading-tight">
                         {vehicle.odometerKm.toLocaleString()} km
                       </span>
-                      <span className="text-[9px] font-semibold text-slate-400 uppercase tracking-wider block">
+                      <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider block mt-0.5">
                         Odometer
                       </span>
                     </div>
-                    <div className="px-2 text-left">
-                      <span className="text-xs font-bold text-slate-800 block">
-                        Grade {vehicle.auctionGrade}
+                    <div>
+                      <span className="text-sm font-mono font-black text-slate-900 block leading-tight">
+                        ★ {vehicle.auctionGrade} / {vehicle.interiorGrade}
                       </span>
-                      <span className="text-[9px] font-semibold text-slate-400 uppercase tracking-wider block">
-                        Auction
+                      <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider block mt-0.5">
+                        Auction Grade
                       </span>
                     </div>
-                    <div className="px-2 text-left">
-                      <span className="text-xs font-mono font-bold text-emerald-600 block">
+                    <div>
+                      <span className="text-sm font-mono font-black text-emerald-600 block leading-tight">
                         +${grossMargin.toLocaleString()}
                       </span>
-                      <span className="text-[9px] font-semibold text-slate-400 uppercase tracking-wider block">
-                        Margin
+                      <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider block mt-0.5">
+                        Est. Margin
                       </span>
                     </div>
                   </div>
                 </div>
 
                 {/* Right: Landed Price & Quick Actions */}
-                <div className="w-full md:w-56 shrink-0 md:border-l md:border-slate-100 md:pl-4 flex flex-col justify-between space-y-2.5">
-                  <div className="flex items-baseline justify-between md:block">
+                <div className="w-full md:w-56 shrink-0 md:border-l md:border-slate-100 md:pl-6 flex flex-col justify-between space-y-3">
+                  <div>
                     <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 block">
                       Landed Buy ({dealerZone})
                     </span>
-                    <div className="text-lg font-black text-slate-900 font-mono tracking-tight mt-0.5">
+                    <div className="text-xl font-black text-slate-900 font-mono tracking-tight mt-0.5">
                       ${price.totalBuyPriceNZD.toLocaleString()}
                       <span className="text-xs text-slate-500 font-normal ml-1">NZD</span>
                     </div>
@@ -898,10 +764,10 @@ export default function DealerStockCatalog({
                         e.stopPropagation();
                         handleOpenFullPageDetails(vehicle.id);
                       }}
-                      className="flex-1 py-1.5 px-2.5 rounded-lg border border-slate-200 hover:border-slate-300 bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold transition-all text-center flex items-center justify-center gap-1 cursor-pointer"
+                      className="btn-outline flex-1 py-2 px-3 rounded-xl text-slate-700 text-xs font-bold transition-all text-center flex items-center justify-center gap-1 cursor-pointer"
                     >
                       <span>Specs</span>
-                      <ArrowUpRight className="w-3 h-3 text-slate-400" />
+                      <ArrowUpRight className="w-3.5 h-3.5 text-slate-400" />
                     </button>
 
                     {isAdminView ? (
@@ -911,13 +777,13 @@ export default function DealerStockCatalog({
                           e.stopPropagation();
                           handleOpenFullPageDetails(vehicle.id);
                         }}
-                        className={`flex-1 py-1.5 px-2.5 rounded-lg text-xs font-bold transition-all text-center flex items-center justify-center gap-1 cursor-pointer shadow-2xs ${isAvailable
-                          ? "bg-slate-900 hover:bg-black text-white"
-                          : "bg-amber-600 hover:bg-amber-700 text-white"
+                        className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold transition-all text-center flex items-center justify-center gap-1 cursor-pointer shadow-2xs ${isAvailable
+                            ? "bg-slate-900 hover:bg-black text-white"
+                            : "bg-amber-600 hover:bg-amber-700 text-white"
                           }`}
                       >
-                        <Eye className="w-3 h-3" />
-                        <span>{isAvailable ? "Inspect" : "Inspect Hold"}</span>
+                        <Eye className="w-3.5 h-3.5" />
+                        <span>{isAvailable ? "Inspect" : "Hold"}</span>
                       </button>
                     ) : isAvailable ? (
                       <button
@@ -927,10 +793,10 @@ export default function DealerStockCatalog({
                           audio.playSubtleClick();
                           setReserveVehicle(vehicle);
                         }}
-                        className="flex-1 py-1.5 px-2.5 rounded-lg bg-[#E11D48] hover:bg-[#BE123C] text-white text-xs font-bold transition-all text-center flex items-center justify-center gap-1 cursor-pointer shadow-2xs"
+                        className="flex-1 py-2 px-3 rounded-xl bg-[#E11D48] hover:bg-[#BE123C] text-white text-xs font-bold transition-all text-center flex items-center justify-center gap-1 cursor-pointer shadow-2xs"
                       >
-                        <Lock className="w-3 h-3" />
-                        <span>Hold (24h)</span>
+                        <Lock className="w-3.5 h-3.5" />
+                        <span>Hold</span>
                       </button>
                     ) : vehicle.reservedByDealerId === currentDealer?.id ? (
                       <button
@@ -939,19 +805,19 @@ export default function DealerStockCatalog({
                           e.stopPropagation();
                           router.push("/dealer/orders");
                         }}
-                        className="flex-1 py-1.5 px-2.5 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 text-xs font-bold font-mono text-center flex items-center justify-center gap-1 cursor-pointer"
+                        className="flex-1 py-2 px-3 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 text-xs font-bold font-mono text-center flex items-center justify-center gap-1 cursor-pointer"
                       >
-                        <Lock className="w-3 h-3 text-emerald-600" />
+                        <Lock className="w-3.5 h-3.5 text-emerald-600" />
                         <span>My Hold</span>
                       </button>
                     ) : (
                       <button
                         type="button"
                         disabled
-                        className="flex-1 py-1.5 px-2.5 rounded-lg bg-slate-100 border border-slate-200 text-slate-400 text-xs font-semibold cursor-not-allowed text-center flex items-center justify-center gap-1"
+                        className="flex-1 py-2 px-3 rounded-xl bg-slate-100 border border-slate-200/80 text-slate-400 text-xs font-semibold cursor-not-allowed text-center flex items-center justify-center gap-1"
                       >
-                        <Lock className="w-3 h-3 text-slate-400" />
-                        <span>Unavailable</span>
+                        <Lock className="w-3.5 h-3.5 text-slate-400" />
+                        <span>Locked</span>
                       </button>
                     )}
                   </div>
