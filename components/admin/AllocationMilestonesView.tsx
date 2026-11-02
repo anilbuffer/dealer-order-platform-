@@ -17,6 +17,8 @@ import {
   Calendar,
   Anchor,
   FileCheck2,
+  Search,
+  Filter,
 } from "lucide-react";
 
 const MILESTONE_SEQUENCE: { key: OrderMilestone; label: string }[] = [
@@ -37,6 +39,26 @@ export default function AllocationMilestonesView() {
   const [nextMilestoneKey, setNextMilestoneKey] = useState<OrderMilestone>("NZ_BORDER_PROCESSING");
   const [milestoneNotes, setMilestoneNotes] = useState("MPI biosecurity heat treatment and border discharge verified.");
   const [notification, setNotification] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [milestoneFilter, setMilestoneFilter] = useState("ALL");
+
+  const filteredOrders = orders.filter((order) => {
+    const q = searchQuery.toLowerCase().trim();
+    const matchesSearch =
+      !q ||
+      order.orderNumber.toLowerCase().includes(q) ||
+      order.vehicle.vinChassis.toLowerCase().includes(q) ||
+      order.vehicle.model.toLowerCase().includes(q) ||
+      order.dealerName.toLowerCase().includes(q);
+
+    const matchesMilestone =
+      milestoneFilter === "ALL" ||
+      (milestoneFilter === "IN_TRANSIT" && (order.currentMilestone === "IN_TRANSIT" || order.currentMilestone === "BOOKED_FOR_SHIPPING")) ||
+      (milestoneFilter === "BORDER" && (order.currentMilestone === "NZ_BORDER_PROCESSING" || order.currentMilestone === "COMPLIANCE" || order.currentMilestone === "AWAITING_ADDITIONAL_COST")) ||
+      (milestoneFilter === "READY" && (order.currentMilestone === "READY_FOR_DELIVERY" || order.currentMilestone === "DELIVERED"));
+
+    return matchesSearch && matchesMilestone;
+  });
 
   const handleAdvanceMilestone = (orderId: string) => {
     audio.playSuccessChime();
@@ -53,7 +75,7 @@ export default function AllocationMilestonesView() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 max-w-7xl mx-auto animate-in fade-in duration-300">
       {/* ─────────────────────────────────────────────────────────── */}
       {/* 1. Header Banner                                           */}
       {/* ─────────────────────────────────────────────────────────── */}
@@ -61,23 +83,23 @@ export default function AllocationMilestonesView() {
         <div>
           <div className="flex items-center gap-2 mb-1">
             <span className="text-[11px] font-bold uppercase tracking-wider text-[#E11D48]">
-              Logistics Controller
+              Wholesale Logistics Control
             </span>
             <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 border border-slate-200">
-              9-Stage RoRo Progression
+              8-Stage RoRo Progression
             </span>
           </div>
           <h1 className="text-2xl font-bold tracking-tight text-slate-900">
-            Order Allocations &amp; Logistics Manager
+            Orders
           </h1>
           <p className="text-xs text-slate-500 mt-0.5">
-            Advance shipping milestones, update vessel voyage ETAs, and manage compliance variation repairs across the dealer network.
+            Manage wholesale allocations, monitor shipping milestones, and record compliance defect remediation items.
           </p>
         </div>
 
         <div className="flex items-center gap-2 text-xs">
-          <span className="px-3 py-1.5 rounded-xl bg-slate-100 font-mono text-slate-700 font-semibold border border-slate-200">
-            {orders.length} Active Programme Orders
+          <span className="px-3.5 py-1.5 rounded-xl bg-slate-100 font-mono text-slate-700 font-semibold border border-slate-200">
+            {filteredOrders.length} of {orders.length} Orders Displayed
           </span>
         </div>
       </div>
@@ -90,10 +112,56 @@ export default function AllocationMilestonesView() {
       )}
 
       {/* ─────────────────────────────────────────────────────────── */}
-      {/* 2. Order Cards with Interactive Milestones                 */}
+      {/* 2. Filter & Search Controls                                 */}
+      {/* ─────────────────────────────────────────────────────────── */}
+      <div className="bg-white rounded-2xl border border-slate-200/90 p-4 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="relative flex-1 max-w-md">
+          <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search by Order #, VIN, model, or dealer..."
+            className="w-full pl-9 pr-3 py-2 text-xs bg-slate-50 hover:bg-slate-100/60 focus:bg-white rounded-xl border border-slate-200 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-slate-400 transition-all"
+          />
+        </div>
+
+        <div className="flex items-center gap-1.5 p-1 bg-slate-100 rounded-xl border border-slate-200/80 self-start sm:self-auto">
+          {[
+            { id: "ALL", label: "All Orders" },
+            { id: "IN_TRANSIT", label: "On Vessel" },
+            { id: "BORDER", label: "NZ Compliance" },
+            { id: "READY", label: "Ready / Yard" },
+          ].map((chip) => (
+            <button
+              key={chip.id}
+              type="button"
+              onClick={() => {
+                audio.playSubtleClick();
+                setMilestoneFilter(chip.id);
+              }}
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+                milestoneFilter === chip.id
+                  ? "bg-white text-slate-900 shadow-2xs font-bold"
+                  : "text-slate-500 hover:text-slate-800"
+              }`}
+            >
+              {chip.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* ─────────────────────────────────────────────────────────── */}
+      {/* 3. Order Cards with Interactive Milestones                 */}
       {/* ─────────────────────────────────────────────────────────── */}
       <div className="space-y-6">
-        {orders.map((order) => {
+        {filteredOrders.length === 0 ? (
+          <div className="p-12 text-center bg-white rounded-2xl border border-slate-200 text-xs text-slate-400">
+            No orders match your filter criteria.
+          </div>
+        ) : (
+          filteredOrders.map((order) => {
           const isAwaitingVariation = order.currentMilestone === "AWAITING_ADDITIONAL_COST";
           const isEditingThis = editingMilestoneOrderId === order.id;
 
@@ -285,7 +353,7 @@ export default function AllocationMilestonesView() {
               )}
             </div>
           );
-        })}
+        }))}
       </div>
 
       {/* Additional Cost Creator Modal */}

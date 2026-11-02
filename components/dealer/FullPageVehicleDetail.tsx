@@ -48,6 +48,7 @@ export default function FullPageVehicleDetail({
   const router = useRouter();
   const { vehicles, reserveVehicle: atomicReserve } = useProgramme();
   const { currentDealer, currentUser } = useAuth();
+  const isAdmin = currentUser?.role === "AUTOHUB_ADMIN";
   const dealerZone = currentDealer?.pricingZoneId || "ZONE_1";
 
   // Find vehicle from live programme context
@@ -278,9 +279,17 @@ export default function FullPageVehicleDetail({
                   NZD Guaranteed Landed ({dealerZone})
                 </span>
               </div>
-              <p className="text-[11px] text-slate-400 mt-0.5">
-                Fixed commercial landed allocation price. Standard MR2A pass &amp; 15% GST fully covered.
-              </p>
+              {isAdmin ? (
+                <div className="flex items-center gap-2 text-xs font-mono text-slate-500 mt-1">
+                  <span>Japanese FOB Baseline: <strong className="text-slate-800">¥{vehicle.fobPriceJPY.toLocaleString()} JPY</strong></span>
+                  <span>•</span>
+                  <span className="text-emerald-700 font-semibold">Standard Fixed Landed Formula Applied</span>
+                </div>
+              ) : (
+                <p className="text-[11px] text-slate-400 mt-0.5">
+                  Fixed commercial landed allocation price. Standard MR2A pass &amp; 15% GST fully covered.
+                </p>
+              )}
             </div>
 
             {/* Dealership Wholesale Margin Box (Adapted cleanly for B2B) */}

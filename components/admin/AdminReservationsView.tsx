@@ -106,10 +106,10 @@ export default function AdminReservationsView({ onNavigateTab }: AdminReservatio
             </span>
           </div>
           <h1 className="text-2xl font-bold tracking-tight text-slate-900">
-            Reservations &amp; 24-Hour Atomic Holds
+            Reservations
           </h1>
           <p className="text-xs text-slate-500 mt-0.5">
-            Full compliance with Section 5 Minimum Data Model: dealer, vehicle, user, timestamps, status, price &amp; terms snapshot, acknowledgements, and decision audit.
+            Manage 24-hour atomic exclusivity holds, monitor expiry countdowns, and execute wholesale allocation sign-offs.
           </p>
         </div>
 

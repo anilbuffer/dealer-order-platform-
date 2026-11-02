@@ -59,10 +59,10 @@ export default function DealerApprovalsView() {
             </span>
           </div>
           <h1 className="text-2xl font-bold tracking-tight text-slate-900">
-            Dealer Onboarding &amp; Zone Approvals
+            Dealers
           </h1>
           <p className="text-xs text-slate-500 mt-0.5">
-            Verify franchise applicant legal credentials, validate Terms of Trade (v2026.1) agreements, and assign geographic pricing profiles.
+            Franchise dealer onboarding approvals, NZBN legal verification, and geographic pricing zone assignments.
           </p>
         </div>
 

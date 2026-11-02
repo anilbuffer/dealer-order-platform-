@@ -68,10 +68,10 @@ export default function AdminInventoryControllerView() {
             </span>
           </div>
           <h1 className="text-2xl font-bold tracking-tight text-slate-900">
-            Programme Export Inventory
+            Inventory
           </h1>
           <p className="text-xs text-slate-500 mt-0.5">
-            Monitor verified Japan stock, control live publication to NZ franchise dealers, and audit vehicle availability.
+            Central export vehicle repository, Japanese yard staging (Yokohama/Kobe), and franchise dealer publication controls.
           </p>
         </div>
 

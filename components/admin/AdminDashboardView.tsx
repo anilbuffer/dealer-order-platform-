@@ -124,7 +124,7 @@ export default function AdminDashboardView({ onNavigateTab }: AdminDashboardView
             </span>
           </div>
           <h1 className="text-2xl font-bold tracking-tight text-slate-900">
-            Operations Command Dashboard
+            Dashboard
           </h1>
           <p className="text-xs text-slate-500 mt-0.5">
             Real-time action center for dealer onboarding approvals and 24-hour atomic reservation requests.

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useMemo } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { Vehicle } from "@/lib/types";
 import { useProgramme } from "@/lib/programme-context";
 import { useAuth } from "@/lib/auth-context";
@@ -45,6 +45,8 @@ export default function DealerStockCatalog({
   externalSearchQuery,
 }: DealerStockCatalogProps = {}) {
   const router = useRouter();
+  const pathname = usePathname();
+  const isAdminView = pathname?.startsWith("/admin");
   const { currentDealer, currentUser } = useAuth();
   const { vehicles: rawVehicles, reserveVehicle: atomicReserve } = useProgramme();
 
@@ -216,10 +218,12 @@ export default function DealerStockCatalog({
         <div>
           <div className="pb-2">
             <h1 className="text-2xl font-bold tracking-tight text-slate-900">
-              In Stock ({filteredVehicles.length})
+              {isAdminView ? "Vehicle Catalogue" : "Vehicle Stock"} ({filteredVehicles.length})
             </h1>
             <p className="text-xs text-slate-500 mt-0.5">
-              Landed wholesale inventory for {currentDealer?.legalTradingName || "Auckland Nissan City Ltd"} ({dealerZone})
+              {isAdminView
+                ? "Certified Japanese export inventory, condition grades, and landed pricing for New Zealand franchise dealers."
+                : `Landed wholesale inventory for ${currentDealer?.legalTradingName || "Auckland Nissan City Ltd"} (${dealerZone})`}
             </p>
           </div>
         </div>
@@ -480,7 +484,7 @@ export default function DealerStockCatalog({
                           ${price.totalBuyPriceNZD.toLocaleString()}
                         </span>
                         <span className="text-[10px] text-slate-400 font-medium block">
-                          NZD Landed
+                          {isAdminView ? `FOB ¥${vehicle.fobPriceJPY.toLocaleString()}` : "NZD Landed"}
                         </span>
                       </div>
                       <div
@@ -589,7 +593,33 @@ export default function DealerStockCatalog({
                   </div>
 
                   <div className="flex items-center gap-2">
-                    {isAvailable ? (
+                    {isAdminView ? (
+                      isAvailable ? (
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleOpenFullPageDetails(vehicle.id);
+                          }}
+                          className="py-1.5 px-3.5 rounded-xl bg-slate-900 hover:bg-black text-white text-xs font-bold transition-all shadow-xs flex items-center gap-1.5 cursor-pointer"
+                        >
+                          <Eye className="w-3.5 h-3.5" />
+                          <span>Inspect</span>
+                        </button>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            router.push("/admin/reservations");
+                          }}
+                          className="py-1.5 px-3 rounded-xl bg-amber-50 text-amber-800 border border-amber-200 text-xs font-bold font-mono flex items-center gap-1 cursor-pointer"
+                        >
+                          <Lock className="w-3 h-3 text-amber-600" />
+                          <span>Reserved</span>
+                        </button>
+                      )
+                    ) : isAvailable ? (
                       <button
                         type="button"
                         onClick={(e) => {
@@ -602,9 +632,22 @@ export default function DealerStockCatalog({
                         <Lock className="w-3.5 h-3.5" />
                         <span>Hold (24h)</span>
                       </button>
+                    ) : vehicle.reservedByDealerId === currentDealer?.id ? (
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          router.push("/dealer/orders");
+                        }}
+                        className="py-1.5 px-3 rounded-xl bg-amber-50 text-amber-800 border border-amber-200 text-xs font-bold font-mono flex items-center gap-1 cursor-pointer"
+                      >
+                        <Lock className="w-3 h-3 text-amber-600" />
+                        <span>My Hold</span>
+                      </button>
                     ) : (
-                      <span className="py-1.5 px-3 rounded-xl bg-slate-100 text-slate-400 text-xs font-semibold">
-                        Reserved
+                      <span className="py-1.5 px-3 rounded-xl bg-slate-100 text-slate-400 text-xs font-semibold flex items-center gap-1">
+                        <Lock className="w-3 h-3 text-slate-400" />
+                        <span>Reserved</span>
                       </span>
                     )}
                   </div>
@@ -732,7 +775,19 @@ export default function DealerStockCatalog({
                       <ArrowUpRight className="w-3 h-3 text-slate-400" />
                     </button>
 
-                    {isAvailable ? (
+                    {isAdminView ? (
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleOpenFullPageDetails(vehicle.id);
+                        }}
+                        className="flex-1 py-1.5 px-2.5 rounded-lg bg-slate-900 hover:bg-black text-white text-xs font-bold transition-all text-center flex items-center justify-center gap-1 cursor-pointer shadow-2xs"
+                      >
+                        <Eye className="w-3 h-3" />
+                        <span>Inspect</span>
+                      </button>
+                    ) : isAvailable ? (
                       <button
                         type="button"
                         onClick={(e) => {
@@ -744,6 +799,17 @@ export default function DealerStockCatalog({
                       >
                         <Lock className="w-3 h-3" />
                         <span>Reserve</span>
+                      </button>
+                    ) : vehicle.reservedByDealerId === currentDealer?.id ? (
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          router.push("/dealer/orders");
+                        }}
+                        className="flex-1 py-1.5 px-2.5 rounded-lg bg-amber-50 text-amber-800 border border-amber-200 text-xs font-bold font-mono text-center cursor-pointer"
+                      >
+                        My Hold
                       </button>
                     ) : (
                       <button
