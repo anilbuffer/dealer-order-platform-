@@ -91,6 +91,10 @@ export default function FullPageVehicleDetail({
     }
   };
 
+  const images = vehicle.images && vehicle.images.length > 0
+    ? vehicle.images
+    : ["/images/cars/kicks.png"];
+
   const price: LandedPriceBreakdown = calculateLandedPrice(vehicle.fobPriceJPY, dealerZone);
   const retailEstimateNZD = Math.round(price.totalBuyPriceNZD * 1.28);
   const dealerMarginNZD = retailEstimateNZD - price.totalBuyPriceNZD;
@@ -169,10 +173,10 @@ export default function FullPageVehicleDetail({
             <div className="absolute bottom-6 w-4/5 h-6 bg-black/15 rounded-[50%] blur-lg pointer-events-none transform scale-y-50" />
 
             <img
-              src={vehicle.images[activeImageIdx] || vehicle.images[0]}
+              src={images[activeImageIdx] || images[0]}
               alt={`${vehicle.make} ${vehicle.model}`}
               className={`w-full h-full select-none transition-all duration-300 relative z-10 ${
-                (vehicle.images[activeImageIdx] || vehicle.images[0]).endsWith('.png')
+                (images[activeImageIdx] || images[0]).endsWith('.png')
                   ? "object-contain filter drop-shadow-[0_16px_22px_rgba(0,0,0,0.16)] group-hover:scale-105"
                   : "object-cover rounded-2xl"
               }`}
@@ -186,7 +190,7 @@ export default function FullPageVehicleDetail({
 
             {/* Top-Right: Photo Index Counter */}
             <div className="absolute top-4 right-4 z-20 px-2.5 py-1 rounded-full bg-white/90 backdrop-blur-md text-slate-700 font-mono text-[11px] font-bold border border-slate-200/80 shadow-xs">
-              {activeImageIdx + 1} / {Math.min(vehicle.images.length, 5)} Photos
+              {activeImageIdx + 1} / {Math.min(images.length, 5)} Photos
             </div>
 
             {vehicle.status !== "AVAILABLE" && (
@@ -221,7 +225,7 @@ export default function FullPageVehicleDetail({
 
           {/* Clean Compact Thumbnails Strip */}
           <div className="flex items-center gap-2 pt-1">
-            {vehicle.images.slice(0, 8).map((img, idx) => (
+            {images.slice(0, 8).map((img, idx) => (
               <button
                 key={idx}
                 type="button"
@@ -336,9 +340,38 @@ export default function FullPageVehicleDetail({
               </div>
             </div>
 
-            {/* Primary Action Button (24-Hour Atomic Hold) */}
+            {/* Primary Action Button (Role-Aware: Admin vs Dealer) */}
             <div className="space-y-2.5 pt-1">
-              {vehicle.status === "AVAILABLE" ? (
+              {isAdmin ? (
+                <div className="space-y-2">
+                  <div className="p-3 rounded-xl bg-slate-900 text-white flex items-center justify-between text-xs">
+                    <span className="text-slate-400">Administrative Authority:</span>
+                    <span className="font-mono font-bold text-rose-400">Status: {vehicle.status}</span>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        audio.playSubtleClick();
+                        router.push("/admin/inventory");
+                      }}
+                      className="py-3 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs transition-colors cursor-pointer text-center"
+                    >
+                      Inventory Controller
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        audio.playSubtleClick();
+                        router.push("/admin/reservations");
+                      }}
+                      className="py-3 px-3 rounded-xl bg-[#E11D48] hover:bg-[#BE123C] text-white font-bold text-xs transition-colors cursor-pointer text-center shadow-xs"
+                    >
+                      Reservations Queue
+                    </button>
+                  </div>
+                </div>
+              ) : vehicle.status === "AVAILABLE" ? (
                 <button
                   type="button"
                   onClick={() => {

@@ -4,6 +4,9 @@ import React, { useState } from "react";
 import { useProgramme } from "@/lib/programme-context";
 import { calculateLandedPrice } from "@/lib/pricing-calculator";
 import { audio } from "@/lib/sound";
+import DealerDetailsModal from "./DealerDetailsModal";
+import ReservationDetailsModal from "./ReservationDetailsModal";
+import { ReservationRequest, DealerAccount } from "@/lib/types";
 import { ZoneId } from "@/lib/types";
 import {
   Users,
@@ -42,6 +45,8 @@ export default function AdminDashboardView({ onNavigateTab }: AdminDashboardView
   const [notification, setNotification] = useState<string | null>(null);
   const [selectedZone, setSelectedZone] = useState<Record<string, ZoneId>>({});
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [selectedDealerForDetails, setSelectedDealerForDetails] = useState<DealerAccount | null>(null);
+  const [selectedResForDetails, setSelectedResForDetails] = useState<ReservationRequest | null>(null);
 
   // 1. Pending Dealer Onboarding Requests
   const pendingDealers = dealers.filter((d) => d.status === "PENDING_APPROVAL");
@@ -441,6 +446,17 @@ export default function AdminDashboardView({ onNavigateTab }: AdminDashboardView
                     <div className="flex items-center gap-2.5 shrink-0 self-end xl:self-center">
                       <button
                         type="button"
+                        onClick={() => {
+                          audio.playSubtleClick();
+                          const r = reservations.find((res) => res.vehicleId === vehicle.id && res.status === "ACTIVE_HOLD") || reservations[0];
+                          if (r) setSelectedResForDetails(r);
+                        }}
+                        className="px-3.5 py-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-100 text-slate-700 text-xs font-bold transition-colors cursor-pointer"
+                      >
+                        Inspect Dossier
+                      </button>
+                      <button
+                        type="button"
                         onClick={() => handleReleaseReservation(vehicle.id)}
                         className="px-4 py-2.5 rounded-xl border border-slate-200 hover:bg-slate-100 text-slate-700 text-xs font-semibold transition-colors cursor-pointer flex items-center gap-1.5"
                       >
@@ -479,6 +495,25 @@ export default function AdminDashboardView({ onNavigateTab }: AdminDashboardView
           </div>
         </div>
       </div>
+      {/* Dealer Details Dossier Modal */}
+      {selectedDealerForDetails && (
+        <DealerDetailsModal
+          dealer={selectedDealerForDetails}
+          onClose={() => setSelectedDealerForDetails(null)}
+          onApprove={(did, zid) => handleApprove(did, zid)}
+          onReject={handleReject}
+        />
+      )}
+
+      {/* Reservation Details Dossier Modal */}
+      {selectedResForDetails && (
+        <ReservationDetailsModal
+          reservation={selectedResForDetails}
+          onClose={() => setSelectedResForDetails(null)}
+          onConfirmAllocation={(vid) => handleConfirmReservation(vid)}
+          onReleaseHold={(vid) => handleReleaseReservation(vid)}
+        />
+      )}
     </div>
   );
 }

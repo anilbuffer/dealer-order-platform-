@@ -6,6 +6,7 @@ import { Vehicle } from "@/lib/types";
 import { useProgramme } from "@/lib/programme-context";
 import { calculateLandedPrice } from "@/lib/pricing-calculator";
 import { audio } from "@/lib/sound";
+import CatalogueDetailsModal from "./CatalogueDetailsModal";
 import {
   Car,
   Search,
@@ -24,6 +25,7 @@ export default function AdminInventoryControllerView() {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<"ALL" | "AVAILABLE" | "RESERVED" | "WITHDRAWN">("ALL");
   const [modelFilter, setModelFilter] = useState("ALL");
+  const [dossierVehicle, setDossierVehicle] = useState<Vehicle | null>(null);
 
   const filteredVehicles = useMemo(() => {
     return vehicles.filter((v) => {
@@ -225,7 +227,7 @@ export default function AdminInventoryControllerView() {
                     <td className="py-3.5 px-5 text-right space-x-2">
                       <button
                         type="button"
-                        onClick={() => router.push(`/vehicles/${vehicle.id}`)}
+                        onClick={() => { audio.playSubtleClick(); setDossierVehicle(vehicle); }}
                         className="p-2 rounded-xl border border-slate-200/90 bg-white hover:bg-slate-50 text-slate-700 transition-all cursor-pointer shadow-2xs hover:border-slate-300 inline-flex items-center"
                         title="View Full Page Details"
                       >
@@ -250,6 +252,14 @@ export default function AdminInventoryControllerView() {
           </table>
         </div>
       </div>
+      {/* Inventory Vehicle Dossier Modal */}
+      {dossierVehicle && (
+        <CatalogueDetailsModal
+          vehicle={dossierVehicle}
+          onClose={() => setDossierVehicle(null)}
+          onNavigateToReservations={() => router.push("/admin/reservations")}
+        />
+      )}
     </div>
   );
 }

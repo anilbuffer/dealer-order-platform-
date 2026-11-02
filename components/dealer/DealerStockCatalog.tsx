@@ -9,6 +9,7 @@ import { MOCK_VEHICLES } from "@/lib/mock-data";
 import { calculateLandedPrice } from "@/lib/pricing-calculator";
 import { audio } from "@/lib/sound";
 import AtomicReservationModal from "./AtomicReservationModal";
+import CatalogueDetailsModal from "@/components/admin/CatalogueDetailsModal";
 import {
   Search,
   SlidersHorizontal,
@@ -33,6 +34,7 @@ import {
   TrendingUp,
   Ship,
   FileCheck2,
+  Eye,
 } from "lucide-react";
 
 interface DealerStockCatalogProps {
@@ -70,6 +72,8 @@ export default function DealerStockCatalog({
   const [selectedGrade, setSelectedGrade] = useState("ALL");
   const [selectedBudget, setSelectedBudget] = useState("ALL");
   const [sortBy, setSortBy] = useState<"PRICE_ASC" | "PRICE_DESC" | "KM_ASC" | "YEAR_DESC">("PRICE_ASC");
+  const [statusFilter, setStatusFilter] = useState<"AVAILABLE" | "ALL" | "HELD">("AVAILABLE");
+  const [dossierVehicle, setDossierVehicle] = useState<Vehicle | null>(null);
 
   // Layout View Mode (Grid vs List) with Smooth Transition
   const [viewMode, setViewMode] = useState<"GRID" | "LIST">("GRID");
@@ -95,6 +99,7 @@ export default function DealerStockCatalog({
     setSelectedGrade("ALL");
     setSelectedBudget("ALL");
     setSortBy("PRICE_ASC");
+    setStatusFilter("AVAILABLE");
   };
 
   const activeFiltersCount = useMemo(() => {
@@ -144,6 +149,8 @@ export default function DealerStockCatalog({
       .filter((v) => {
         // Hide withdrawn stock from dealer catalog
         if (v.status === "WITHDRAWN") return false;
+        if (statusFilter === "AVAILABLE" && v.status !== "AVAILABLE") return false;
+        if (statusFilter === "HELD" && v.status !== "RESERVED") return false;
 
         if (effectiveSearch) {
           const q = effectiveSearch.toLowerCase();
@@ -187,11 +194,16 @@ export default function DealerStockCatalog({
         if (sortBy === "KM_ASC") return a.odometerKm - b.odometerKm;
         return b.year - a.year;
       });
-  }, [vehicles, searchQuery, selectedModel, selectedFuel, selectedGrade, selectedBudget, sortBy, dealerZone]);
+  }, [vehicles, searchQuery, selectedModel, selectedFuel, selectedGrade, selectedBudget, sortBy, dealerZone, statusFilter]);
 
   // Navigate directly to FULL PAGE Vehicle Details (INSIDE PORTAL)
   const handleOpenFullPageDetails = (vehicleId: string) => {
     audio.playSubtleClick();
+    if (isAdminView) {
+      const veh = vehicles.find((item) => item.id === vehicleId);
+      if (veh) setDossierVehicle(veh);
+      return;
+    }
     if (onSelectVehicle) {
       onSelectVehicle(vehicleId);
     } else {
@@ -238,6 +250,66 @@ export default function DealerStockCatalog({
             <span className="font-extrabold font-mono text-[#0A1322]">{dealerZone}</span>
           </div>
         </div>
+      </div>
+
+      {/* Scope Status Tabs matching Left Menu Counter */}
+      <div className="flex flex-wrap items-center gap-2">
+        <button
+          type="button"
+          onClick={() => {
+            audio.playSubtleClick();
+            setStatusFilter("AVAILABLE");
+          }}
+          className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-2 ${statusFilter === "AVAILABLE"
+              ? "bg-[#0A1322] text-white shadow-xs"
+              : "bg-white hover:bg-slate-100 text-slate-600 border border-slate-200"
+            }`}
+        >
+          <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
+          <span>Available for Hold</span>
+          <span className={`ml-1 px-1.5 py-0.2 rounded-md font-mono text-[10px] ${statusFilter === "AVAILABLE" ? "bg-white/20 text-white" : "bg-emerald-50 text-emerald-800 border border-emerald-200"
+            }`}>
+            {vehicles.filter((v) => v.status === "AVAILABLE").length}
+          </span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => {
+            audio.playSubtleClick();
+            setStatusFilter("ALL");
+          }}
+          className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-2 ${statusFilter === "ALL"
+              ? "bg-[#0A1322] text-white shadow-xs"
+              : "bg-white hover:bg-slate-100 text-slate-600 border border-slate-200"
+            }`}
+        >
+          <Car className="w-3.5 h-3.5" />
+          <span>All Catalogue</span>
+          <span className={`ml-1 px-1.5 py-0.2 rounded-md font-mono text-[10px] ${statusFilter === "ALL" ? "bg-white/20 text-white" : "bg-slate-100 text-slate-700"
+            }`}>
+            {vehicles.filter((v) => v.status !== "WITHDRAWN").length}
+          </span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => {
+            audio.playSubtleClick();
+            setStatusFilter("HELD");
+          }}
+          className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-2 ${statusFilter === "HELD"
+              ? "bg-[#0A1322] text-white shadow-xs"
+              : "bg-white hover:bg-slate-100 text-slate-600 border border-slate-200"
+            }`}
+        >
+          <Lock className="w-3.5 h-3.5 text-amber-500" />
+          <span>On Exclusivity Hold</span>
+          <span className={`ml-1 px-1.5 py-0.2 rounded-md font-mono text-[10px] ${statusFilter === "HELD" ? "bg-white/20 text-white" : "bg-amber-100 text-amber-800"
+            }`}>
+            {vehicles.filter((v) => v.status === "RESERVED").length}
+          </span>
+        </button>
       </div>
 
       {/* ─────────────────────────────────────────────────────────── */}
@@ -502,7 +574,7 @@ export default function DealerStockCatalog({
                     <div className="absolute bottom-3 w-4/5 h-3.5 bg-black/15 rounded-[50%] blur-md pointer-events-none transform scale-y-60" />
 
                     <img
-                      src={vehicle.images[0]}
+                      src={vehicle.images?.[0] || "/images/cars/kicks.png"}
                       alt={`${vehicle.make} ${vehicle.model}`}
                       className="relative z-10 w-full h-full object-contain filter drop-shadow-[0_12px_14px_rgba(0,0,0,0.14)] group-hover:scale-105 group-hover:-translate-y-1 transition-all duration-300 ease-out select-none"
                     />
@@ -678,7 +750,7 @@ export default function DealerStockCatalog({
                 <div className="relative w-full md:w-56 h-36 rounded-2xl overflow-hidden bg-gradient-to-b from-slate-50 to-slate-100/80 flex items-center justify-center p-3 shrink-0 border border-slate-100">
                   <div className="absolute bottom-2.5 w-4/5 h-3 bg-black/15 rounded-[50%] blur-sm pointer-events-none transform scale-y-60" />
                   <img
-                    src={vehicle.images[0]}
+                    src={vehicle.images?.[0] || "/images/cars/kicks.png"}
                     alt={`${vehicle.make} ${vehicle.model}`}
                     className="relative z-10 w-full h-full object-contain filter drop-shadow-[0_8px_10px_rgba(0,0,0,0.12)] group-hover:scale-105 transition-transform duration-300 ease-out select-none"
                   />
@@ -826,6 +898,16 @@ export default function DealerStockCatalog({
             );
           })}
         </div>
+      )}
+
+      {/* Catalogue Details Dossier Modal */}
+      {dossierVehicle && (
+        <CatalogueDetailsModal
+          vehicle={dossierVehicle}
+          onClose={() => setDossierVehicle(null)}
+          onNavigateToReservations={() => router.push("/admin/reservations")}
+          onNavigateToInventory={() => router.push("/admin/inventory")}
+        />
       )}
 
       {/* Atomic Reservation Modal */}

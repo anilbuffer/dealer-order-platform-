@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { useProgramme } from "@/lib/programme-context";
 import { ReservationRequest, ReservationStatus } from "@/lib/types";
 import { audio } from "@/lib/sound";
+import ReservationDetailsModal from "./ReservationDetailsModal";
 import {
   Clock,
   Car,
@@ -33,6 +34,7 @@ export default function AdminReservationsView({ onNavigateTab }: AdminReservatio
   const [activeTab, setActiveTab] = useState<"ACTIVE" | "HISTORY">("ACTIVE");
   const [notification, setNotification] = useState<string | null>(null);
   const [expandedBreakdownId, setExpandedBreakdownId] = useState<string | null>(null);
+  const [selectedResForDetails, setSelectedResForDetails] = useState<ReservationRequest | null>(null);
 
   // Modal dialog state for recording decision & reason (US-14)
   const [actionModal, setActionModal] = useState<{
@@ -547,6 +549,28 @@ export default function AdminReservationsView({ onNavigateTab }: AdminReservatio
             </div>
           </div>
         </div>
+      )}
+      {/* Reservation Details Dossier Modal */}
+      {selectedResForDetails && (
+        <ReservationDetailsModal
+          reservation={selectedResForDetails}
+          onClose={() => setSelectedResForDetails(null)}
+          onConfirmAllocation={(vid, reason) => {
+            confirmAllocation(vid, reason);
+            setNotification("Wholesale allocation confirmed and order issued.");
+            setTimeout(() => setNotification(null), 4000);
+          }}
+          onReleaseHold={(vid, reason) => {
+            releaseHold(vid, reason);
+            setNotification("Exclusivity hold released back to catalogue.");
+            setTimeout(() => setNotification(null), 4000);
+          }}
+          onRejectReservation={(rid, reason) => {
+            rejectReservation(rid, reason);
+            setNotification("Reservation declined with audit reason.");
+            setTimeout(() => setNotification(null), 4000);
+          }}
+        />
       )}
     </div>
   );
