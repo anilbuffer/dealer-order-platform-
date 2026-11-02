@@ -27,9 +27,6 @@ import {
   LayoutDashboard,
   ShoppingBag,
   Building2,
-  Globe2,
-  ChevronDown,
-  Check,
 } from "lucide-react";
 
 interface NavItem {
@@ -56,58 +53,9 @@ export default function Sidebar({
 }: SidebarProps) {
   const router = useRouter();
   const pathname = usePathname();
-  const { currentUser, currentDealer, logout, switchRole } = useAuth();
+  const { currentUser, currentDealer, logout } = useAuth();
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
-  const [isRoleDropdownOpen, setIsRoleDropdownOpen] = useState(false);
-
-  // Role options matching Platform Switcher
-  const ROLE_OPTIONS = [
-    {
-      role: "AUTOHUB_ADMIN" as const,
-      label: "Platform Operations",
-      sublabel: "Sarah Jenkins · Command Admin",
-      badge: "ADMIN",
-      badgeColor: "bg-blue-500/15 text-blue-400 border-blue-500/30",
-      icon: Shield,
-      iconBg: "bg-blue-500/10 text-blue-400",
-    },
-    {
-      role: "DEALER_USER" as const,
-      label: "Auckland Nissan",
-      sublabel: "David Miller · Dealer",
-      badge: "DEALER",
-      badgeColor: "bg-emerald-500/15 text-emerald-400 border-emerald-500/30",
-      icon: Car,
-      iconBg: "bg-emerald-500/10 text-emerald-400",
-    },
-    {
-      role: "NISSAN_JAPAN" as const,
-      label: "Nissan Japan HQ",
-      sublabel: "Kenji Sato · Tokyo Inventory",
-      badge: "JAPAN",
-      badgeColor: "bg-purple-500/15 text-purple-400 border-purple-500/30",
-      icon: Globe2,
-      iconBg: "bg-purple-500/10 text-purple-400",
-    },
-  ];
-
-  const currentRoleOption =
-    ROLE_OPTIONS.find((r) => r.role === currentUser?.role) || ROLE_OPTIONS[0];
-  const CurrentRoleIcon = currentRoleOption.icon;
-
-  const handleSelectRole = (role: typeof ROLE_OPTIONS[0]["role"]) => {
-    audio.playSoftChime();
-    switchRole(role);
-    setIsRoleDropdownOpen(false);
-    if (role === "DEALER_USER") {
-      router.push("/dealer/stocks");
-    } else if (role === "NISSAN_JAPAN") {
-      router.push("/japan/inventory");
-    } else {
-      router.push("/admin/dashboard");
-    }
-  };
 
   // Navigation configurations based on role (clean menu without badge counters)
   const getNavItems = (): NavItem[] => {
@@ -281,107 +229,17 @@ export default function Sidebar({
           </div>
         </div>
 
-        {/* Workspace Switcher Pill Button (Matches Image 1) */}
-        {!isCollapsed ? (
-          <div className="px-3 pt-3 pb-1 relative">
-            <button
-              type="button"
-              onClick={() => {
-                audio.playSubtleClick();
-                setIsRoleDropdownOpen(!isRoleDropdownOpen);
-              }}
-              aria-haspopup="listbox"
-              aria-expanded={isRoleDropdownOpen}
-              aria-label="Switch active workspace role"
-              className="w-full flex items-center justify-between px-3 py-2 rounded-xl bg-[#0F1B2E] hover:bg-[#142239] border border-[#1B2A42] hover:border-slate-600 text-white transition-all text-xs cursor-pointer shadow-soft group"
+        {/* Static Portal Section Header */}
+        {!isCollapsed && (
+          <div className="px-4 pt-4 pb-2 flex items-center justify-between">
+            <span className="text-[11px] font-bold tracking-wider text-slate-400 uppercase">
+              {panelInfo.section}
+            </span>
+            <span
+              className={`text-[9px] font-bold px-2 py-0.5 rounded-full border ${panelInfo.badgeColor}`}
             >
-              <div className="flex items-center gap-2.5 min-w-0">
-                <div className={`p-1.5 rounded-lg ${currentRoleOption.iconBg} shrink-0`}>
-                  <CurrentRoleIcon className="w-3.5 h-3.5" />
-                </div>
-                <div className="text-left min-w-0">
-                  <div className="font-semibold text-white leading-tight flex items-center gap-1.5 truncate">
-                    <span className="truncate">{currentRoleOption.label}</span>
-                    <span
-                      className={`text-[9px] font-bold px-1.5 py-0.2 rounded border shrink-0 ${currentRoleOption.badgeColor}`}
-                    >
-                      {currentRoleOption.badge}
-                    </span>
-                  </div>
-                </div>
-              </div>
-              <ChevronDown
-                className={`w-3.5 h-3.5 text-slate-400 shrink-0 transition-transform duration-200 group-hover:text-white ${isRoleDropdownOpen ? "rotate-180" : ""
-                  }`}
-              />
-            </button>
-
-            {/* Dropdown Options */}
-            {isRoleDropdownOpen && (
-              <>
-                <div
-                  className="fixed inset-0 z-40"
-                  onClick={() => setIsRoleDropdownOpen(false)}
-                />
-                <div
-                  role="listbox"
-                  className="absolute left-3 right-3 top-full mt-1.5 rounded-2xl bg-[#0F1B2E] border border-[#1B2A42] shadow-2xl py-1.5 z-50 text-white backdrop-blur-xl animate-in fade-in slide-in-from-top-2 duration-150"
-                >
-                  <div className="px-3 py-1.5 border-b border-[#1B2A42] mb-1">
-                    <p className="text-[9px] font-bold uppercase tracking-wider text-slate-400">
-                      Switch Workspace View
-                    </p>
-                  </div>
-                  {ROLE_OPTIONS.map((option) => {
-                    const Icon = option.icon;
-                    const isSelected = currentUser?.role === option.role;
-                    return (
-                      <button
-                        key={option.role}
-                        type="button"
-                        onClick={() => handleSelectRole(option.role)}
-                        className={`w-full flex items-center justify-between p-2 rounded-xl transition-all text-left text-xs cursor-pointer ${isSelected
-                            ? "bg-white/10 text-white font-medium border border-white/10"
-                            : "text-slate-300 hover:text-white hover:bg-white/5 border border-transparent"
-                          }`}
-                      >
-                        <div className="flex items-center gap-2.5 min-w-0">
-                          <div className={`p-1.5 rounded-lg ${option.iconBg} shrink-0`}>
-                            <Icon className="w-3.5 h-3.5" />
-                          </div>
-                          <div className="min-w-0">
-                            <div className="font-medium text-white flex items-center gap-1.5 truncate">
-                              <span className="truncate">{option.label}</span>
-                              <span
-                                className={`text-[8px] font-bold px-1.5 py-0.2 rounded border shrink-0 ${option.badgeColor}`}
-                              >
-                                {option.badge}
-                              </span>
-                            </div>
-                            <div className="text-[10px] text-slate-400 truncate">{option.sublabel}</div>
-                          </div>
-                        </div>
-                        {isSelected && <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0 ml-1.5" />}
-                      </button>
-                    );
-                  })}
-                </div>
-              </>
-            )}
-          </div>
-        ) : (
-          <div className="p-2 flex justify-center">
-            <button
-              type="button"
-              onClick={() => {
-                audio.playSubtleClick();
-                setIsRoleDropdownOpen(!isRoleDropdownOpen);
-              }}
-              title={`Switch role (Current: ${currentRoleOption.label})`}
-              className={`p-2 rounded-xl bg-[#0F1B2E] border border-[#1B2A42] hover:border-slate-500 text-white transition-colors cursor-pointer ${currentRoleOption.iconBg}`}
-            >
-              <CurrentRoleIcon className="w-4 h-4" />
-            </button>
+              {panelInfo.badge}
+            </span>
           </div>
         )}
 
