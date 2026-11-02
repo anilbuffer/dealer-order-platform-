@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useRouter, usePathname } from "next/navigation";
 import Sidebar from "./Sidebar";
 import { useAuth } from "@/lib/auth-context";
 import DealerStockCatalog from "@/components/dealer/DealerStockCatalog";
@@ -22,56 +23,142 @@ import PlatformSettingsView from "@/components/settings/PlatformSettingsView";
 
 interface DashboardShellProps {
   initialVehicleId?: string;
+  initialTab?: string;
+  portal?: "dealer" | "admin" | "japan" | "common";
 }
 
-export default function DashboardShell({ initialVehicleId }: DashboardShellProps = {}) {
+export default function DashboardShell({
+  initialVehicleId,
+  initialTab,
+  portal,
+}: DashboardShellProps = {}) {
+  const router = useRouter();
+  const pathname = usePathname();
   const { currentUser } = useAuth();
-  const [activeTab, setActiveTab] = useState<string>(() => {
+
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const [viewingVehicleId, setViewingVehicleId] = useState<string | null>(initialVehicleId || null);
+
+  // Sync viewing vehicle ID when route changes
+  useEffect(() => {
+    if (initialVehicleId) {
+      setViewingVehicleId(initialVehicleId);
+    } else if (pathname.includes("/vehicles/")) {
+      const parts = pathname.split("/vehicles/");
+      if (parts[1]) {
+        setViewingVehicleId(parts[1]);
+      }
+    } else {
+      setViewingVehicleId(null);
+    }
+  }, [initialVehicleId, pathname]);
+
+  // Determine active view tab based on pathname and initialTab
+  const resolveActiveTab = (): string => {
+    if (pathname.includes("/vehicles/")) return "dealer-stock";
+    if (pathname === "/settings" || initialTab === "settings") return "settings";
+
+    // Dealer routes
+    if (pathname === "/dealer/stocks" || pathname === "/dealer/stock" || initialTab === "stocks" || initialTab === "stock" || initialTab === "dealer-stock") return "dealer-stock";
+    if (pathname === "/dealer/orders" || initialTab === "orders" || initialTab === "dealer-orders") return "dealer-orders";
+    if (pathname === "/dealer/profile" || initialTab === "profile" || initialTab === "dealer-profile") return "dealer-profile";
+    if (pathname === "/dealer/terms" || pathname === "/dealer/commercial-boundary" || initialTab === "terms" || initialTab === "dealer-terms") return "dealer-terms";
+
+    // Admin routes
+    if (pathname === "/admin/dashboard" || pathname === "/admin" || initialTab === "dashboard" || initialTab === "admin-dashboard") return "admin-dashboard";
+    if (pathname === "/admin/users" || initialTab === "users" || initialTab === "admin-users") return "admin-users";
+    if (pathname === "/admin/roles" || initialTab === "roles" || initialTab === "admin-roles") return "admin-roles";
+    if (pathname === "/admin/approvals" || initialTab === "approvals" || initialTab === "admin-approvals") return "admin-approvals";
+    if (pathname === "/admin/stock" || pathname === "/admin/inventory" || initialTab === "stock" || initialTab === "admin-stock") return "admin-stock";
+    if (pathname === "/admin/milestones" || pathname === "/admin/allocations" || initialTab === "milestones" || initialTab === "admin-milestones") return "admin-milestones";
+    if (pathname === "/admin/audit" || initialTab === "audit" || initialTab === "admin-audit") return "admin-audit";
+
+    // Japan routes
+    if (pathname === "/japan/inventory" || pathname === "/japan" || initialTab === "inventory" || initialTab === "japan-inventory") return "japan-inventory";
+    if (pathname === "/japan/upload" || pathname === "/japan/batch-upload" || initialTab === "upload" || initialTab === "japan-upload") return "japan-upload";
+    if (pathname === "/japan/add-vehicle" || pathname === "/japan/add-single" || initialTab === "add-vehicle" || initialTab === "japan-add-single") return "japan-add-single";
+
+    // Default by user role if on root or ambiguous
     if (currentUser?.role === "AUTOHUB_ADMIN") return "admin-dashboard";
     if (currentUser?.role === "NISSAN_JAPAN") return "japan-inventory";
     return "dealer-stock";
-  });
-  const [viewingVehicleId, setViewingVehicleId] = useState<string | null>(initialVehicleId || null);
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  };
 
-  const [prevRole, setPrevRole] = useState(currentUser?.role);
-  if (currentUser?.role && prevRole && currentUser.role !== prevRole) {
-    setPrevRole(currentUser.role);
-    setViewingVehicleId(null);
-    if (currentUser.role === "AUTOHUB_ADMIN") {
-      setActiveTab("admin-dashboard");
-    } else if (currentUser.role === "NISSAN_JAPAN") {
-      setActiveTab("japan-inventory");
-    } else {
-      setActiveTab("dealer-stock");
+  const activeTab = resolveActiveTab();
+
+  // Route map for programmatic tab navigation
+  const tabToRoute = (tabId: string): string => {
+    switch (tabId) {
+      case "dealer-stock":
+      case "stocks":
+      case "stock":
+        return "/dealer/stocks";
+      case "dealer-orders":
+      case "orders":
+        return "/dealer/orders";
+      case "dealer-profile":
+      case "profile":
+        return "/dealer/profile";
+      case "dealer-terms":
+      case "terms":
+        return "/dealer/terms";
+      case "admin-dashboard":
+      case "dashboard":
+        return "/admin/dashboard";
+      case "admin-users":
+      case "users":
+        return "/admin/users";
+      case "admin-roles":
+      case "roles":
+        return "/admin/roles";
+      case "admin-approvals":
+      case "approvals":
+        return "/admin/approvals";
+      case "admin-stock":
+      case "inventory":
+        return "/admin/stock";
+      case "admin-milestones":
+      case "milestones":
+      case "allocations":
+        return "/admin/milestones";
+      case "admin-audit":
+      case "audit":
+        return "/admin/audit";
+      case "japan-inventory":
+      case "inventory-japan":
+        return "/japan/inventory";
+      case "japan-upload":
+      case "upload":
+        return "/japan/upload";
+      case "japan-add-single":
+      case "add-vehicle":
+        return "/japan/add-vehicle";
+      case "settings":
+        return "/settings";
+      default:
+        return "/dealer/stocks";
     }
-  }
+  };
+
+  const handleTabChange = (tabId: string) => {
+    setViewingVehicleId(null);
+    const dest = tabToRoute(tabId);
+    router.push(dest);
+  };
 
   const handleSelectVehicle = (vehicleId: string) => {
     setViewingVehicleId(vehicleId);
-    if (typeof window !== "undefined") {
-      window.history.pushState(null, "", `/vehicles/${vehicleId}`);
-    }
+    router.push(`/dealer/vehicles/${vehicleId}`);
   };
 
   const handleBackFromVehicle = () => {
     setViewingVehicleId(null);
-    if (typeof window !== "undefined") {
-      window.history.pushState(null, "", "/");
-    }
+    router.push("/dealer/stocks");
   };
 
-  const handleTabChange = (tab: string) => {
-    setViewingVehicleId(null);
-    setActiveTab(tab);
-    if (typeof window !== "undefined") {
-      window.history.pushState(null, "", "/");
-    }
-  };
-
-  // Determine what view to render based on role and active tab
+  // Determine what view to render based on active tab
   const renderViewContent = () => {
-    // If viewing a vehicle detail, render it as full-page view inside the portal canvas!
+    // 1. Vehicle Detail Full-Page View
     if (viewingVehicleId) {
       return (
         <FullPageVehicleDetail
@@ -81,25 +168,30 @@ export default function DashboardShell({ initialVehicleId }: DashboardShellProps
       );
     }
 
-    // 0. SETTINGS INNER PAGE (Available to all roles)
+    // 2. Settings Inner View
     if (activeTab === "settings") {
       return (
         <PlatformSettingsView
           onBack={() => {
             if (currentUser?.role === "AUTOHUB_ADMIN") {
-              setActiveTab("admin-dashboard");
+              router.push("/admin/dashboard");
             } else if (currentUser?.role === "NISSAN_JAPAN") {
-              setActiveTab("japan-inventory");
+              router.push("/japan/inventory");
             } else {
-              setActiveTab("dealer-stock");
+              router.push("/dealer/stocks");
             }
           }}
         />
       );
     }
 
-    // 1. DEALER VIEWS
-    if (currentUser?.role === "DEALER_USER" || currentUser?.role === "DEALER_ADMIN") {
+    // 3. Dealer Portal Views
+    if (
+      pathname.startsWith("/dealer") ||
+      currentUser?.role === "DEALER_USER" ||
+      currentUser?.role === "DEALER_ADMIN" ||
+      portal === "dealer"
+    ) {
       switch (activeTab) {
         case "dealer-stock":
           return <DealerStockCatalog onSelectVehicle={handleSelectVehicle} />;
@@ -114,39 +206,48 @@ export default function DashboardShell({ initialVehicleId }: DashboardShellProps
       }
     }
 
-    // 2. NISSAN JAPAN VIEWS
-    if (currentUser?.role === "NISSAN_JAPAN") {
+    // 4. Japan Portal Views
+    if (
+      pathname.startsWith("/japan") ||
+      currentUser?.role === "NISSAN_JAPAN" ||
+      portal === "japan"
+    ) {
       switch (activeTab) {
         case "japan-inventory":
           return (
             <JapanInventoryView
-              onNavigateAdd={() => setActiveTab("japan-add-single")}
-              onNavigateBatch={() => setActiveTab("japan-upload")}
+              onNavigateAdd={() => router.push("/japan/add-vehicle")}
+              onNavigateBatch={() => router.push("/japan/upload")}
             />
           );
         case "japan-upload":
           return (
-            <BatchUploadView onSuccessReturn={() => setActiveTab("japan-inventory")} />
+            <BatchUploadView onSuccessReturn={() => router.push("/japan/inventory")} />
           );
         case "japan-add-single":
           return (
-            <AddVehicleForm onSuccessReturn={() => setActiveTab("japan-inventory")} />
+            <AddVehicleForm onSuccessReturn={() => router.push("/japan/inventory")} />
           );
         default:
           return (
             <JapanInventoryView
-              onNavigateAdd={() => setActiveTab("japan-add-single")}
-              onNavigateBatch={() => setActiveTab("japan-upload")}
+              onNavigateAdd={() => router.push("/japan/add-vehicle")}
+              onNavigateBatch={() => router.push("/japan/upload")}
             />
           );
       }
     }
 
-    // 3. AUTOHUB ADMIN VIEWS (Operations Command Center)
-    if (currentUser?.role === "AUTOHUB_ADMIN") {
+    // 5. Admin Portal Views
+    if (
+      pathname.startsWith("/admin") ||
+      currentUser?.role === "AUTOHUB_ADMIN" ||
+      currentUser?.role === "READONLY_AUDITOR" ||
+      portal === "admin"
+    ) {
       switch (activeTab) {
         case "admin-dashboard":
-          return <AdminDashboardView onNavigateTab={(t) => setActiveTab(t)} />;
+          return <AdminDashboardView onNavigateTab={handleTabChange} />;
         case "admin-users":
           return <UserManagementView />;
         case "admin-roles":
@@ -160,7 +261,7 @@ export default function DashboardShell({ initialVehicleId }: DashboardShellProps
         case "admin-audit":
           return <AuditExportView />;
         default:
-          return <AdminDashboardView onNavigateTab={(t) => setActiveTab(t)} />;
+          return <AdminDashboardView onNavigateTab={handleTabChange} />;
       }
     }
 

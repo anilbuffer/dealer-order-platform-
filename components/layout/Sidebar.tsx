@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { useRouter, usePathname } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
 import { useProgramme } from "@/lib/programme-context";
 import { audio } from "@/lib/sound";
@@ -11,6 +12,7 @@ import {
   FileText,
   Shield,
   Users,
+  User,
   UserCheck,
   KeyRound,
   Clock,
@@ -21,7 +23,6 @@ import {
   ChevronRight,
   LogOut,
   MapPin,
-  ExternalLink,
   Settings,
   ChevronUp,
 } from "lucide-react";
@@ -30,6 +31,7 @@ interface NavItem {
   id: string;
   label: string;
   icon: React.ElementType;
+  href: string;
   badge?: string | number;
   badgeColor?: string;
 }
@@ -47,6 +49,8 @@ export default function Sidebar({
   isCollapsed,
   onToggleCollapse,
 }: SidebarProps) {
+  const router = useRouter();
+  const pathname = usePathname();
   const { currentUser, currentDealer, logout } = useAuth();
   const { vehicles, orders, dealers, users } = useProgramme();
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
@@ -79,6 +83,7 @@ export default function Sidebar({
           id: "dealer-stock",
           label: "Stock",
           icon: Car,
+          href: "/dealer/stocks",
           badge: availableStockCount > 0 ? availableStockCount : undefined,
           badgeColor: "bg-white/10 text-slate-200 border-white/10",
         },
@@ -86,6 +91,7 @@ export default function Sidebar({
           id: "dealer-orders",
           label: "Orders",
           icon: Package,
+          href: "/dealer/orders",
           badge: dealerOrdersCount > 0 ? dealerOrdersCount : undefined,
           badgeColor: "bg-crimson-600/20 text-rose-300 border-crimson-500/30",
         },
@@ -93,11 +99,13 @@ export default function Sidebar({
           id: "dealer-profile",
           label: "Dealership",
           icon: MapPin,
+          href: "/dealer/profile",
         },
         {
           id: "dealer-terms",
           label: "Pricing Terms",
           icon: FileText,
+          href: "/dealer/terms",
         },
       ];
     }
@@ -108,11 +116,13 @@ export default function Sidebar({
           id: "admin-dashboard",
           label: "Overview",
           icon: Shield,
+          href: "/admin/dashboard",
         },
         {
           id: "admin-users",
           label: "Users Listing",
           icon: Users,
+          href: "/admin/users",
           badge: activeUsersCount > 0 ? activeUsersCount : undefined,
           badgeColor: "bg-white/10 text-slate-200 border-white/10",
         },
@@ -120,11 +130,13 @@ export default function Sidebar({
           id: "admin-roles",
           label: "Roles & RBAC",
           icon: KeyRound,
+          href: "/admin/roles",
         },
         {
           id: "admin-approvals",
           label: "Approvals",
           icon: UserCheck,
+          href: "/admin/approvals",
           badge: pendingApprovalsCount > 0 ? pendingApprovalsCount : undefined,
           badgeColor: "bg-amber-500/20 text-amber-300 border-amber-500/30",
         },
@@ -132,6 +144,7 @@ export default function Sidebar({
           id: "admin-stock",
           label: "Inventory",
           icon: Layers,
+          href: "/admin/stock",
           badge: availableStockCount > 0 ? availableStockCount : undefined,
           badgeColor: "bg-white/10 text-slate-200 border-white/10",
         },
@@ -139,6 +152,7 @@ export default function Sidebar({
           id: "admin-milestones",
           label: "Allocations",
           icon: Clock,
+          href: "/admin/milestones",
           badge: reservedAllocationsCount > 0 ? reservedAllocationsCount : undefined,
           badgeColor: "bg-white/10 text-slate-200 border-white/10",
         },
@@ -146,6 +160,7 @@ export default function Sidebar({
           id: "admin-audit",
           label: "Audit Log",
           icon: Download,
+          href: "/admin/audit",
         },
       ];
     }
@@ -156,6 +171,7 @@ export default function Sidebar({
         id: "japan-inventory",
         label: "Inventory",
         icon: Car,
+        href: "/japan/inventory",
         badge: vehicles.length > 0 ? vehicles.length : undefined,
         badgeColor: "bg-white/10 text-slate-200 border-white/10",
       },
@@ -163,11 +179,13 @@ export default function Sidebar({
         id: "japan-upload",
         label: "Batch Upload",
         icon: FileSpreadsheet,
+        href: "/japan/upload",
       },
       {
         id: "japan-add-single",
         label: "Add Vehicle",
         icon: PlusCircle,
+        href: "/japan/add-vehicle",
       },
     ];
   };
@@ -177,23 +195,23 @@ export default function Sidebar({
   const getPanelInfo = () => {
     if (currentUser?.role === "DEALER_USER" || currentUser?.role === "DEALER_ADMIN") {
       return {
-        section: "DEALER WORKSPACE",
-        badge: "ZONE 1",
+        section: "DEALER PORTAL",
+        badge: "AUCKLAND NISSAN",
         badgeColor: "bg-emerald-500/15 text-emerald-400 border-emerald-500/30",
         roleDesc: currentDealer?.legalTradingName || "Auckland Nissan City",
       };
     }
     if (currentUser?.role === "AUTOHUB_ADMIN") {
       return {
-        section: "OPERATIONS COMMAND",
-        badge: "ADMIN",
+        section: "ADMIN PORTAL",
+        badge: "AUTOHUB OPERATIONS",
         badgeColor: "bg-blue-500/15 text-blue-400 border-blue-500/30",
         roleDesc: "Autohub NZ Operations",
       };
     }
     return {
-      section: "GLOBAL INVENTORY",
-      badge: "JAPAN HQ",
+      section: "JAPAN PORTAL",
+      badge: "NISSAN JAPAN HQ",
       badgeColor: "bg-purple-500/15 text-purple-400 border-purple-500/30",
       roleDesc: "Yokohama Export Control",
     };
@@ -201,9 +219,19 @@ export default function Sidebar({
 
   const panelInfo = getPanelInfo();
 
-  const handleItemClick = (id: string) => {
+  const handleItemClick = (item: NavItem) => {
     audio.playSubtleClick();
-    onTabChange(id);
+    if (onTabChange) {
+      onTabChange(item.id);
+    }
+    router.push(item.href);
+  };
+
+  const isItemActive = (item: NavItem) => {
+    if (pathname === item.href) return true;
+    if (item.href !== "/" && pathname.startsWith(item.href)) return true;
+    if (activeTab === item.id) return true;
+    return false;
   };
 
   return (
@@ -262,7 +290,7 @@ export default function Sidebar({
         <nav className="p-3 space-y-1.5" aria-label="Main Navigation">
           {navItems.map((item) => {
             const Icon = item.icon;
-            const isActive = activeTab === item.id;
+            const active = isItemActive(item);
 
             return (
               <div
@@ -273,22 +301,22 @@ export default function Sidebar({
               >
                 <button
                   type="button"
-                  onClick={() => handleItemClick(item.id)}
-                  aria-current={isActive ? "page" : undefined}
+                  onClick={() => handleItemClick(item)}
+                  aria-current={active ? "page" : undefined}
                   className={`group relative w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition-all duration-150 cursor-pointer ${
-                    isActive
+                    active
                       ? "bg-gradient-to-r from-white/[0.14] to-white/[0.04] text-white border border-white/15 shadow-[0_2px_12px_rgba(0,0,0,0.25)] ring-1 ring-white/10"
                       : "text-slate-400 hover:text-white hover:bg-white/[0.06] border border-transparent"
                   } ${isCollapsed ? "justify-center px-0" : ""}`}
                 >
                   {/* Glowing left pip on active tab */}
-                  {isActive && !isCollapsed && (
+                  {active && !isCollapsed && (
                     <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 rounded-r-full bg-[#E11D48] shadow-[0_0_8px_rgba(225,29,72,0.8)]" />
                   )}
 
                   <Icon
                     className={`w-4 h-4 shrink-0 transition-transform ${
-                      isActive ? "text-[#E11D48] scale-110" : "text-slate-400 group-hover:text-slate-300"
+                      active ? "text-[#E11D48] scale-110" : "text-slate-400 group-hover:text-slate-300"
                     }`}
                   />
 
@@ -341,7 +369,7 @@ export default function Sidebar({
               }}
               title="Click for Settings & Logout"
               className={`flex items-center justify-between p-2 rounded-2xl transition-all cursor-pointer group ${
-                activeTab === "settings"
+                pathname === "/settings" || activeTab === "settings"
                   ? "bg-gradient-to-r from-white/[0.12] to-white/[0.04] border border-white/15 ring-1 ring-white/10"
                   : isProfileMenuOpen
                   ? "bg-white/10 border border-white/10"
@@ -394,16 +422,17 @@ export default function Sidebar({
                     onClick={() => {
                       audio.playSubtleClick();
                       setIsProfileMenuOpen(false);
-                      onTabChange("settings");
+                      if (onTabChange) onTabChange("settings");
+                      router.push("/settings");
                     }}
                     className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-semibold transition-colors cursor-pointer text-left ${
-                      activeTab === "settings"
+                      pathname === "/settings" || activeTab === "settings"
                         ? "bg-[#E11D48] text-white"
                         : "text-slate-200 hover:text-white hover:bg-white/10"
                     }`}
                   >
-                    <Settings className="w-4 h-4 text-slate-300" />
-                    <span>Settings</span>
+                    <User className="w-4 h-4 text-slate-300" />
+                    <span>My Profile</span>
                   </button>
 
                   <button
@@ -412,6 +441,7 @@ export default function Sidebar({
                       audio.playSubtleClick();
                       setIsProfileMenuOpen(false);
                       logout();
+                      router.push("/");
                     }}
                     className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-semibold text-rose-400 hover:text-rose-300 hover:bg-rose-500/15 transition-colors cursor-pointer text-left"
                   >
@@ -433,7 +463,7 @@ export default function Sidebar({
               title="Click for Settings & Logout"
               aria-label="User account & options"
               className={`relative w-9 h-9 rounded-xl bg-gradient-to-br from-slate-700 via-slate-800 to-slate-900 border border-slate-700 flex items-center justify-center font-bold text-xs text-white transition-all cursor-pointer ${
-                activeTab === "settings"
+                pathname === "/settings" || activeTab === "settings"
                   ? "ring-2 ring-[#E11D48]"
                   : "hover:ring-2 hover:ring-rose-500/50"
               }`}
@@ -449,7 +479,7 @@ export default function Sidebar({
                   className="fixed inset-0 z-40"
                   onClick={() => setIsProfileMenuOpen(false)}
                 />
-                <div className="absolute left-full ml-2 bottom-3 w-44 bg-[#0D1829]/95 border border-slate-800/90 rounded-2xl p-1.5 shadow-[0_12px_36px_rgba(0,0,0,0.5)] backdrop-blur-xl z-50 animate-in fade-in zoom-in-95 duration-150 space-y-0.5">
+                <div className="absolute bottom-full mb-2 left-2 w-48 bg-[#0D1829]/95 border border-slate-800/90 rounded-2xl p-1.5 shadow-[0_12px_36px_rgba(0,0,0,0.5)] backdrop-blur-xl z-50 animate-in fade-in zoom-in-95 duration-150 space-y-0.5">
                   <div className="px-3 py-2 border-b border-slate-800/80 mb-1">
                     <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
                       Signed in as
@@ -464,16 +494,17 @@ export default function Sidebar({
                     onClick={() => {
                       audio.playSubtleClick();
                       setIsProfileMenuOpen(false);
-                      onTabChange("settings");
+                      if (onTabChange) onTabChange("settings");
+                      router.push("/settings");
                     }}
                     className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold transition-colors cursor-pointer text-left ${
-                      activeTab === "settings"
+                      pathname === "/settings" || activeTab === "settings"
                         ? "bg-[#E11D48] text-white"
                         : "text-slate-200 hover:text-white hover:bg-white/10"
                     }`}
                   >
-                    <Settings className="w-4 h-4 text-slate-300" />
-                    <span>Settings</span>
+                    <User className="w-4 h-4 text-slate-300" />
+                    <span>My Profile</span>
                   </button>
 
                   <button
@@ -482,6 +513,7 @@ export default function Sidebar({
                       audio.playSubtleClick();
                       setIsProfileMenuOpen(false);
                       logout();
+                      router.push("/");
                     }}
                     className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-rose-400 hover:text-rose-300 hover:bg-rose-500/15 transition-colors cursor-pointer text-left"
                   >
@@ -497,4 +529,3 @@ export default function Sidebar({
     </aside>
   );
 }
-

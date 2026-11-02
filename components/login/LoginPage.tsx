@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   Car,
   Shield,
@@ -18,6 +19,7 @@ import DealerRegistrationModal from "@/components/onboarding/DealerRegistrationM
 type ActiveTab = "DEALER" | "ADMIN" | "JAPAN";
 
 export default function LoginPage() {
+  const router = useRouter();
   const { loginAs } = useAuth();
 
   const [activeTab, setActiveTab] = useState<ActiveTab>("DEALER");
@@ -47,7 +49,15 @@ export default function LoginPage() {
 
     setTimeout(() => {
       const success = loginAs(email);
-      if (!success) {
+      if (success) {
+        if (activeTab === "DEALER") {
+          router.push("/dealer/stocks");
+        } else if (activeTab === "ADMIN") {
+          router.push("/admin/dashboard");
+        } else {
+          router.push("/japan/inventory");
+        }
+      } else {
         setErrorMsg("Unrecognized email address. Click 'Auto-fill demo' to use pre-configured test account.");
       }
       setIsSubmitting(false);
