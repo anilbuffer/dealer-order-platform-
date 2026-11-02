@@ -51,26 +51,26 @@ export default function Sidebar({
       return [
         {
           id: "dealer-stock",
-          label: "Browse Japan Stock",
+          label: "Stock",
           icon: Car,
           badge: "28",
-          badgeColor: "bg-emerald-500/20 text-emerald-300 border-emerald-500/30",
+          badgeColor: "bg-white/10 text-slate-200 border-white/10",
         },
         {
           id: "dealer-orders",
-          label: "My Orders & Tracking",
+          label: "Orders",
           icon: Package,
           badge: "3",
-          badgeColor: "bg-crimson-600/30 text-rose-300 border-crimson-500/40",
+          badgeColor: "bg-crimson-600/20 text-rose-300 border-crimson-500/30",
         },
         {
           id: "dealer-profile",
-          label: "Dealership & Zone",
+          label: "Dealership",
           icon: MapPin,
         },
         {
           id: "dealer-terms",
-          label: "Commercial Boundary",
+          label: "Pricing Terms",
           icon: FileText,
         },
       ];
@@ -80,33 +80,33 @@ export default function Sidebar({
       return [
         {
           id: "admin-dashboard",
-          label: "Operations Command",
+          label: "Overview",
           icon: Shield,
         },
         {
           id: "admin-approvals",
-          label: "Dealer Approvals",
+          label: "Approvals",
           icon: Users,
-          badge: "1 Pending",
+          badge: "1",
           badgeColor: "bg-amber-500/20 text-amber-300 border-amber-500/30",
         },
         {
           id: "admin-stock",
-          label: "Stock & Pricing",
+          label: "Inventory",
           icon: Layers,
           badge: "28",
-          badgeColor: "bg-blue-500/20 text-blue-300 border-blue-500/30",
+          badgeColor: "bg-white/10 text-slate-200 border-white/10",
         },
         {
           id: "admin-milestones",
-          label: "Allocations & Milestones",
+          label: "Allocations",
           icon: Clock,
-          badge: "6 Active",
-          badgeColor: "bg-emerald-500/20 text-emerald-300 border-emerald-500/30",
+          badge: "6",
+          badgeColor: "bg-white/10 text-slate-200 border-white/10",
         },
         {
           id: "admin-audit",
-          label: "Audit Trail & Exports",
+          label: "Audit Log",
           icon: Download,
         },
       ];
@@ -116,21 +116,19 @@ export default function Sidebar({
     return [
       {
         id: "japan-inventory",
-        label: "Japan Export Stock",
+        label: "Inventory",
         icon: Car,
         badge: "28",
-        badgeColor: "bg-purple-500/20 text-purple-300 border-purple-500/30",
+        badgeColor: "bg-white/10 text-slate-200 border-white/10",
       },
       {
         id: "japan-upload",
-        label: "Batch CSV Upload",
+        label: "Batch Upload",
         icon: FileSpreadsheet,
-        badge: "Batch",
-        badgeColor: "bg-blue-500/20 text-blue-300 border-blue-500/30",
       },
       {
         id: "japan-add-single",
-        label: "Add Single Vehicle",
+        label: "Add Vehicle",
         icon: PlusCircle,
       },
     ];
