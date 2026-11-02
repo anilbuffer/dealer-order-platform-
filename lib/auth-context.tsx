@@ -16,27 +16,16 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [currentUser, setCurrentUser] = useState<UserAccount | null>(MOCK_USERS[0]);
-  const [currentDealer, setCurrentDealer] = useState<DealerAccount | null>(MOCK_DEALERS[0]);
+  const [currentUser, setCurrentUser] = useState<UserAccount | null>(null);
+  const [currentDealer, setCurrentDealer] = useState<DealerAccount | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    // Check localStorage for saved session
-    const timer = setTimeout(() => {
-      const savedUserEmail = localStorage.getItem("autohub_session_email");
-      if (savedUserEmail) {
-        const user = MOCK_USERS.find((u) => u.email.toLowerCase() === savedUserEmail.toLowerCase());
-        if (user) {
-          setCurrentUser(user);
-          if (user.dealerId) {
-            const dealer = MOCK_DEALERS.find((d) => d.id === user.dealerId);
-            setCurrentDealer(dealer || null);
-          }
-        }
-      }
-      setIsLoading(false);
-    }, 0);
-    return () => clearTimeout(timer);
+    // Clear persistent auto-session so the Login Page opens by default on fresh visit
+    try {
+      localStorage.removeItem("autohub_session_email");
+    } catch (e) { }
+    setIsLoading(false);
   }, []);
 
   const loginAs = (email: string): boolean => {

@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { useAuth } from "@/lib/auth-context";
+import { useProgramme } from "@/lib/programme-context";
 import { audio } from "@/lib/sound";
 import {
   Car,
@@ -45,7 +46,27 @@ export default function Sidebar({
   onToggleCollapse,
 }: SidebarProps) {
   const { currentUser, currentDealer, logout } = useAuth();
+  const { vehicles, orders, dealers, users } = useProgramme();
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
+
+  // Dynamic live synced counts
+  const dealerOrdersCount = orders.filter(
+    (o) => !currentDealer?.id || o.dealerId === currentDealer.id
+  ).length;
+
+  const availableStockCount = vehicles.filter(
+    (v) => v.status === "AVAILABLE"
+  ).length;
+
+  const pendingApprovalsCount = dealers.filter(
+    (d) => d.status === "PENDING_APPROVAL"
+  ).length;
+
+  const reservedAllocationsCount = vehicles.filter(
+    (v) => v.status === "RESERVED"
+  ).length;
+
+  const activeUsersCount = users.filter((u) => u.active).length;
 
   // Navigation configurations based on role
   const getNavItems = (): NavItem[] => {
@@ -55,14 +76,14 @@ export default function Sidebar({
           id: "dealer-stock",
           label: "Stock",
           icon: Car,
-          badge: "28",
+          badge: availableStockCount > 0 ? availableStockCount : undefined,
           badgeColor: "bg-white/10 text-slate-200 border-white/10",
         },
         {
           id: "dealer-orders",
           label: "Orders",
           icon: Package,
-          badge: "3",
+          badge: dealerOrdersCount > 0 ? dealerOrdersCount : undefined,
           badgeColor: "bg-crimson-600/20 text-rose-300 border-crimson-500/30",
         },
         {
@@ -89,7 +110,7 @@ export default function Sidebar({
           id: "admin-users",
           label: "Users Listing",
           icon: Users,
-          badge: "10",
+          badge: activeUsersCount > 0 ? activeUsersCount : undefined,
           badgeColor: "bg-white/10 text-slate-200 border-white/10",
         },
         {
@@ -101,21 +122,21 @@ export default function Sidebar({
           id: "admin-approvals",
           label: "Approvals",
           icon: UserCheck,
-          badge: "1",
+          badge: pendingApprovalsCount > 0 ? pendingApprovalsCount : undefined,
           badgeColor: "bg-amber-500/20 text-amber-300 border-amber-500/30",
         },
         {
           id: "admin-stock",
           label: "Inventory",
           icon: Layers,
-          badge: "28",
+          badge: availableStockCount > 0 ? availableStockCount : undefined,
           badgeColor: "bg-white/10 text-slate-200 border-white/10",
         },
         {
           id: "admin-milestones",
           label: "Allocations",
           icon: Clock,
-          badge: "6",
+          badge: reservedAllocationsCount > 0 ? reservedAllocationsCount : undefined,
           badgeColor: "bg-white/10 text-slate-200 border-white/10",
         },
         {
@@ -132,7 +153,7 @@ export default function Sidebar({
         id: "japan-inventory",
         label: "Inventory",
         icon: Car,
-        badge: "28",
+        badge: vehicles.length > 0 ? vehicles.length : undefined,
         badgeColor: "bg-white/10 text-slate-200 border-white/10",
       },
       {

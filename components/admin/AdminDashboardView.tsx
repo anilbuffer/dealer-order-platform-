@@ -313,11 +313,10 @@ export default function AdminDashboardView({ onNavigateTab }: AdminDashboardView
 
                   <div className="flex items-center gap-3">
                     <span
-                      className={`px-3 py-1 rounded-full text-xs font-bold font-mono ${
-                        o.currentMilestone === "AWAITING_ADDITIONAL_COST"
+                      className={`px-3 py-1 rounded-full text-xs font-bold font-mono ${o.currentMilestone === "AWAITING_ADDITIONAL_COST"
                           ? "bg-rose-100 text-rose-800 border border-rose-200"
                           : "bg-blue-100 text-blue-800 border border-blue-200"
-                      }`}
+                        }`}
                     >
                       {o.currentMilestone === "AWAITING_ADDITIONAL_COST"
                         ? "Variation Review ($480)"
@@ -396,39 +395,6 @@ export default function AdminDashboardView({ onNavigateTab }: AdminDashboardView
             <div className="p-3 rounded-xl bg-slate-100 text-[11px] text-slate-600 leading-relaxed">
               Delivery amounts cover transport from arrival port to dealership yard plus 2 metro compliance tow moves.
             </div>
-          </div>
-
-          {/* Quick System Links */}
-          <div className="p-4 rounded-2xl bg-[#0A1322] text-white space-y-3">
-            <div className="flex items-center gap-2">
-              <ShieldCheck className="w-4 h-4 text-[#E11D48]" />
-              <span className="text-xs font-bold text-white uppercase tracking-wider">
-                Audited Commercial Operations
-              </span>
-            </div>
-            <p className="text-[11px] text-slate-300 leading-relaxed">
-              Every dealer onboarding, pricing assignment, atomic lock, and milestone step is immutably logged for commercial verification.
-            </p>
-            <div className="grid grid-cols-2 gap-2 pt-1">
-              <button
-                onClick={() => onNavigateTab("admin-users")}
-                className="py-2 px-3 rounded-xl bg-[#E11D48] hover:bg-[#BE123C] text-white text-xs font-semibold transition-colors cursor-pointer text-center"
-              >
-                Users Directory
-              </button>
-              <button
-                onClick={() => onNavigateTab("admin-roles")}
-                className="py-2 px-3 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-semibold transition-colors cursor-pointer text-center"
-              >
-                Roles & RBAC
-              </button>
-            </div>
-            <button
-              onClick={() => onNavigateTab("admin-audit")}
-              className="w-full py-1.5 px-3 rounded-xl text-slate-400 hover:text-white text-[11px] font-medium transition-colors cursor-pointer text-center"
-            >
-              View Full Audit Log →
-            </button>
           </div>
         </div>
       </div>
