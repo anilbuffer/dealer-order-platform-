@@ -44,11 +44,20 @@ Currently, vehicle sourcing, landed cost estimation, and order status inquiries 
 
 ---
 
-## 3. Commercial Price Boundary
+## 3. Commercial Price Boundary & Geographic Pricing Zones
 
-To eliminate billing disputes, the platform enforces strict transparency regarding what is covered in the **Total Buy Price** versus what may incur additional charges:
+### 3.1 Official Geographic Pricing Zones
+In accordance with programme logistics planning, five geographic zones dictate the domestic transport and delivery cost basis:
 
-| Included in Total Buy Price (Fixed Landed) | Potential Separately Chargeable Items |
+| Zone | Proposed Coverage | Major Locations Covered | Standard Delivery Profile |
+|:---:|---|---|---|
+| **Zone 1** | Upper North Island | Auckland, Northland | Direct Auckland port clearance & 2 metro carrier movements ($650 NZD) |
+| **Zone 2** | Central North Island | Waikato, Bay of Plenty, Rotorua, Taupō | Auckland/Tauranga arrival + Central arterial transport ($850 NZD) |
+| **Zone 3** | Lower North Island | Taranaki, Hawke's Bay, Gisborne, Manawatū, Wellington | Inter-regional linehaul transport to dealership depot ($1,150 NZD) |
+| **Zone 4** | Upper South Island | Nelson, Marlborough, Canterbury | Lyttelton port arrival / Cook Strait coastal carrier ($1,450 NZD) |
+| **Zone 5** | Lower South Island | West Coast, Otago, Southland | Long-haul lower South Island transport to regional hubs ($1,750 NZD) |
+
+### 3.2 Fixed Landed Inclusions vs Separately Chargeable Items
 |---|---|
 | • Vehicle FOB acquisition cost (Japan) | • Non-standard compliance repairs (e.g. rust, seatbelt retractors) |
 | • Standard RoRo marine freight & port charges | • Engineering certification & specialized LVVTA evidence |

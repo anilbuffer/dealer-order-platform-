@@ -7,12 +7,35 @@ export type UserRole =
 
 export type DealerStatus = "PENDING_APPROVAL" | "APPROVED" | "REJECTED" | "SUSPENDED";
 
+export type ZoneId = "ZONE_1" | "ZONE_2" | "ZONE_3" | "ZONE_4" | "ZONE_5";
+
 export interface GeographicPricingZone {
-  zoneId: string;
+  zoneId: ZoneId;
   zoneName: string;
-  region: string;
-  deliveryCostNZD: number; // Standard 2-movement delivery cost
+  coverage: string;
+  majorLocations: string[];
+  deliveryCostNZD: number; // 2 standard domestic delivery movements
+  oceanFreightNZD: number; // RoRo marine transit
+  complianceInspectionNZD: number; // Standard MR2A compliance entry inspection
+  customsProcessingNZD: number; // Customs clearance & biosecurity
+  programmeFeeNZD: number; // Nissan programme fee
+  effectiveDate: string;
   notes?: string;
+}
+
+export interface LandedPriceBreakdown {
+  fobJPY: number;
+  exchangeRateJPYtoNZD: number;
+  fobNZD: number;
+  oceanFreightNZD: number;
+  customsProcessingNZD: number;
+  gstNZD: number;
+  complianceInspectionNZD: number;
+  zoneDeliveryNZD: number;
+  programmeFeeNZD: number;
+  totalBuyPriceNZD: number;
+  zoneId: ZoneId;
+  zoneName: string;
 }
 
 export interface DealerAccount {
@@ -22,7 +45,7 @@ export interface DealerAccount {
   nzbn: string;
   address: string;
   region: string;
-  pricingZoneId: string;
+  pricingZoneId: ZoneId;
   status: DealerStatus;
   primaryContactName: string;
   primaryContactEmail: string;
@@ -37,7 +60,7 @@ export interface UserAccount {
   name: string;
   email: string;
   role: UserRole;
-  dealerId?: string; // If dealer user/admin
+  dealerId?: string;
   dealershipName?: string;
   avatar?: string;
   active: boolean;
@@ -60,26 +83,19 @@ export interface Vehicle {
   grade: string;
   year: number;
   odometerKm: number;
-  transmission: "Automatic" | "Manual" | "e-Power" | "CVT";
+  transmission: "Automatic" | "CVT" | "e-Power Drive" | "Manual";
   color: string;
-  fuelType: "Petrol" | "Hybrid" | "e-Power" | "EV";
+  fuelType: "Petrol" | "Hybrid" | "e-Power" | "100% Electric";
+  driveType: "2WD" | "4WD" | "e-4ORCE AWD";
   engineCc: number;
   auctionGrade: string; // e.g. "4.5", "4.0", "RA"
-  interiorGrade: string; // e.g. "A", "B"
-  exteriorGrade: string; // e.g. "A", "B"
-  location: string; // e.g. "Yokohama Yard, Japan"
+  interiorGrade: string; // "A", "B", "C"
+  exteriorGrade: string; // "A", "B", "C"
+  location: string;
   images: string[];
   conditionReportUrl?: string;
   knownDefects: string[];
   fobPriceJPY: number;
-  // Breakdown
-  basePriceNZD: number;
-  shippingNZD: number;
-  gstNZD: number;
-  complianceInspectionNZD: number;
-  deliveryMovementsNZD: number;
-  nissanProgrammeFeeNZD: number;
-  totalBuyPriceNZD: number;
   status: VehicleStatus;
   reservedByDealerId?: string;
   reservedAt?: string;
@@ -104,6 +120,7 @@ export interface MilestoneStep {
   completedAt?: string;
   notes?: string;
   updatedBy?: string;
+  eta?: string;
 }
 
 export interface AdditionalCostItem {
@@ -125,15 +142,18 @@ export interface Order {
   vehicle: Vehicle;
   dealerId: string;
   dealerName: string;
+  pricingZoneId: ZoneId;
   orderedByUserId: string;
   orderedByUserName: string;
   orderedAt: string;
-  totalAgreedPriceNZD: number;
+  priceBreakdown: LandedPriceBreakdown;
   currentMilestone: OrderMilestone;
   milestones: MilestoneStep[];
   additionalCosts: AdditionalCostItem[];
   etaDeliveryDate?: string;
   deliveryAddress: string;
+  vesselName?: string;
+  voyageNumber?: string;
 }
 
 export interface AuditEvent {
@@ -148,4 +168,3 @@ export interface AuditEvent {
   details: string;
   timestamp: string;
 }
-

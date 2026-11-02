@@ -11,8 +11,8 @@
 | Phase | Description | Status |
 |:---:|---|:---:|
 | **Phase 1** | Foundation, Styling Tokens, Layout Shell & Role Switcher | ✅ **COMPLETED** |
-| **Phase 2** | Geographic Pricing Engine & Enriched Vehicle Dataset | 🟡 **READY FOR PRICING CHART** |
-| **Phase 3** | Dealer Portal: Stock Catalogue, Filters & Atomic Reservation | ⏳ **PENDING** |
+| **Phase 2** | Geographic Pricing Engine & Enriched Vehicle Dataset | ✅ **COMPLETED** |
+| **Phase 3** | Dealer Portal: Stock Catalogue, Filters & Atomic Reservation | 🟡 **IN PROGRESS / NEXT** |
 | **Phase 4** | Order Milestones (9 Stages) & Additional Cost Approval | ⏳ **PENDING** |
 | **Phase 5** | Autohub Operations Portal (Approvals, Allocations, Export) | ⏳ **PENDING** |
 | **Phase 6** | Nissan Japan Portal (Vehicle Entry & Batch CSV Validation) | ⏳ **PENDING** |
@@ -34,16 +34,16 @@
 
 ---
 
-## Phase 2: Geographic Pricing Engine & Enriched Data 🟡
+## Phase 2: Geographic Pricing Engine & Enriched Data ✅
 
-- [ ] **Geographic Pricing Zone Matrix:**
-  - [ ] Implement user's provided Geographic Pricing Zone Chart.
-  - [ ] Map regional postcodes / territories to delivery cost profiles (Zones 1 through 4).
-  - [ ] Formulate automated landed price calculation:  
+- [x] **Geographic Pricing Zone Matrix:**
+  - [x] Implement official 5-zone Geographic Pricing Zone Chart.
+  - [x] Map regional coverage & major locations (Zones 1 through 5).
+  - [x] Formulate automated landed price calculation:  
     $$\text{Total Buy Price} = \text{FOB (JPY to NZD)} + \text{RoRo Freight} + \text{Customs/GST} + \text{MR2A Compliance} + \text{Zone Delivery} + \text{Programme Fee}$$
-- [ ] **Enriched Nissan Stock Dataset:**
-  - [ ] Generate 20+ realistic Nissan Japan vehicles (Note e-Power, X-Trail, Serena e-Power, Leaf EV, Qashqai).
-  - [ ] Include high-res photo galleries, auction grades (`4.5`, `4.0`, `RA`), interior/exterior condition ratings, and inspection certificates.
+- [x] **Enriched Nissan Stock Dataset:**
+  - [x] Created realistic Nissan Japan export vehicles (Note e-Power, X-Trail Hybrid, Serena e-Power, Leaf e+ 62kWh, Ariya EV, Kicks e-Power).
+  - [x] High-res photos, auction grades (`5.0`, `4.5`, `4.0`), interior/exterior ratings, and certified inspection reports.
 
 ---
 

@@ -74,7 +74,7 @@ export default function DealerRegistrationWizard() {
     dealershipName: "",
     dealerCode: "",
     nzbn: "",
-    region: "Auckland",
+    region: "Upper North Island (Zone 1 - Auckland, Northland)",
     physicalAddress: "",
     postalCode: "",
     contactName: "",
@@ -416,13 +416,23 @@ export default function DealerRegistrationWizard() {
                       <select
                         value={formData.region}
                         onChange={(e) => updateField("region", e.target.value)}
-                        className="w-full px-3.5 py-2.5 text-sm bg-white rounded-xl border border-slate-200 text-slate-900 focus:outline-none focus:ring-2 focus:ring-crimson-500/20 focus:border-crimson-600 transition-all"
+                        className="w-full px-3.5 py-2.5 text-sm bg-white rounded-xl border border-slate-200 text-slate-900 focus:outline-none focus:ring-2 focus:ring-crimson-500/20 focus:border-crimson-600 transition-all cursor-pointer"
                       >
-                        <option value="Auckland">Auckland Metro (Zone 1)</option>
-                        <option value="Waikato">Waikato / Bay of Plenty (Zone 2)</option>
-                        <option value="Wellington">Wellington / Lower North Island (Zone 3)</option>
-                        <option value="Canterbury">Canterbury / South Island (Zone 4)</option>
-                        <option value="Otago">Otago / Southland (Zone 4)</option>
+                        <option value="Upper North Island (Zone 1 - Auckland, Northland)">
+                          Zone 1: Upper North Island (Auckland, Northland)
+                        </option>
+                        <option value="Central North Island (Zone 2 - Waikato, Bay of Plenty, Rotorua, Taupō)">
+                          Zone 2: Central North Island (Waikato, Bay of Plenty, Rotorua, Taupō)
+                        </option>
+                        <option value="Lower North Island (Zone 3 - Taranaki, Hawke's Bay, Gisborne, Manawatū, Wellington)">
+                          Zone 3: Lower North Island (Taranaki, Hawke's Bay, Gisborne, Manawatū, Wellington)
+                        </option>
+                        <option value="Upper South Island (Zone 4 - Nelson, Marlborough, Canterbury)">
+                          Zone 4: Upper South Island (Nelson, Marlborough, Canterbury)
+                        </option>
+                        <option value="Lower South Island (Zone 5 - West Coast, Otago, Southland)">
+                          Zone 5: Lower South Island (West Coast, Otago, Southland)
+                        </option>
                       </select>
                     </div>
 
