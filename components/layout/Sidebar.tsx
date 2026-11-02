@@ -3,7 +3,6 @@
 import React, { useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
-import { useProgramme } from "@/lib/programme-context";
 import { audio } from "@/lib/sound";
 import {
   Car,
@@ -58,7 +57,6 @@ export default function Sidebar({
   const router = useRouter();
   const pathname = usePathname();
   const { currentUser, currentDealer, logout, switchRole } = useAuth();
-  const { vehicles, orders, dealers, users } = useProgramme();
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const [isRoleDropdownOpen, setIsRoleDropdownOpen] = useState(false);
@@ -111,26 +109,7 @@ export default function Sidebar({
     }
   };
 
-  // Dynamic live synced counts
-  const dealerOrdersCount = orders.filter(
-    (o) => !currentDealer?.id || o.dealerId === currentDealer.id
-  ).length;
-
-  const availableStockCount = vehicles.filter(
-    (v) => v.status === "AVAILABLE"
-  ).length;
-
-  const pendingApprovalsCount = dealers.filter(
-    (d) => d.status === "PENDING_APPROVAL"
-  ).length;
-
-  const reservedAllocationsCount = vehicles.filter(
-    (v) => v.status === "RESERVED"
-  ).length;
-
-  const activeUsersCount = users.filter((u) => u.active).length;
-
-  // Navigation configurations based on role
+  // Navigation configurations based on role (clean menu without badge counters)
   const getNavItems = (): NavItem[] => {
     if (currentUser?.role === "DEALER_USER" || currentUser?.role === "DEALER_ADMIN") {
       return [
@@ -139,16 +118,12 @@ export default function Sidebar({
           label: "Stock",
           icon: Car,
           href: "/dealer/stocks",
-          badge: availableStockCount > 0 ? availableStockCount : undefined,
-          badgeColor: "bg-white/10 text-slate-200 border-white/10",
         },
         {
           id: "dealer-orders",
           label: "Orders",
           icon: Package,
           href: "/dealer/orders",
-          badge: dealerOrdersCount > 0 ? dealerOrdersCount : undefined,
-          badgeColor: "bg-crimson-600/20 text-rose-300 border-crimson-500/30",
         },
         {
           id: "dealer-profile",
@@ -172,48 +147,36 @@ export default function Sidebar({
           label: "Vehicle Catalogue",
           icon: Car,
           href: "/admin/catalogue",
-          badge: availableStockCount > 0 ? availableStockCount : undefined,
-          badgeColor: "bg-white/10 text-slate-200 border-white/10",
         },
         {
           id: "admin-orders",
           label: "Orders",
           icon: ShoppingBag,
           href: "/admin/orders",
-          badge: orders.length > 0 ? orders.length : undefined,
-          badgeColor: "bg-white/10 text-slate-200 border-white/10",
         },
         {
           id: "admin-reservations",
           label: "Reservations",
           icon: Clock,
           href: "/admin/reservations",
-          badge: reservedAllocationsCount > 0 ? reservedAllocationsCount : undefined,
-          badgeColor: "bg-amber-500/20 text-amber-300 border-amber-500/30",
         },
         {
           id: "admin-dealers",
           label: "Dealers",
           icon: Building2,
           href: "/admin/dealers",
-          badge: pendingApprovalsCount > 0 ? pendingApprovalsCount : undefined,
-          badgeColor: "bg-amber-500/20 text-amber-300 border-amber-500/30",
         },
         {
           id: "admin-inventory",
           label: "Inventory",
           icon: Layers,
           href: "/admin/inventory",
-          badge: vehicles.length > 0 ? vehicles.length : undefined,
-          badgeColor: "bg-white/10 text-slate-200 border-white/10",
         },
         {
           id: "admin-users",
           label: "User Management",
           icon: Users,
           href: "/admin/users",
-          badge: users.length > 0 ? users.length : undefined,
-          badgeColor: "bg-white/10 text-slate-200 border-white/10",
         },
         {
           id: "admin-roles",
@@ -231,8 +194,6 @@ export default function Sidebar({
         label: "Inventory",
         icon: Car,
         href: "/japan/inventory",
-        badge: vehicles.length > 0 ? vehicles.length : undefined,
-        badgeColor: "bg-white/10 text-slate-200 border-white/10",
       },
       {
         id: "japan-upload",
@@ -457,16 +418,8 @@ export default function Sidebar({
                   />
 
                   {!isCollapsed && (
-                    <div className="flex-1 flex items-center justify-between truncate text-left">
+                    <div className="flex-1 truncate text-left">
                       <span className="truncate">{item.label}</span>
-                      {item.badge && (
-                        <span
-                          className={`text-[10px] font-bold px-2 py-0.5 rounded-full border shadow-2xs ${item.badgeColor || "bg-white/10 text-slate-300 border-white/20"
-                            }`}
-                        >
-                          {item.badge}
-                        </span>
-                      )}
                     </div>
                   )}
                 </button>
@@ -474,16 +427,7 @@ export default function Sidebar({
                 {/* Floating Tooltip in Mini Mode */}
                 {isCollapsed && hoveredItem === item.id && (
                   <div className="absolute left-full ml-3 top-1/2 -translate-y-1/2 px-3 py-1.5 rounded-xl bg-[#0D1829] text-white border border-slate-800 text-xs font-semibold shadow-2xl whitespace-nowrap z-50 animate-in fade-in zoom-in-95 duration-150">
-                    <div className="flex items-center gap-2">
-                      <span>{item.label}</span>
-                      {item.badge && (
-                        <span
-                          className={`text-[10px] px-1.5 py-0.2 rounded border ${item.badgeColor}`}
-                        >
-                          {item.badge}
-                        </span>
-                      )}
-                    </div>
+                    <span>{item.label}</span>
                   </div>
                 )}
               </div>
