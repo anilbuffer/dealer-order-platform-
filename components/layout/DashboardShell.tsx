@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Sidebar from "./Sidebar";
 import Header from "./Header";
 import { useAuth } from "@/lib/auth-context";
@@ -8,24 +8,12 @@ import DealerStockCatalog from "@/components/dealer/DealerStockCatalog";
 import DealerOrdersView from "@/components/dealer/DealerOrdersView";
 import DealershipProfileView from "@/components/dealer/DealershipProfileView";
 import CommercialBoundaryView from "@/components/dealer/CommercialBoundaryView";
-import {
-  Car,
-  Package,
-  Shield,
-  Layers,
-  MapPin,
-  Clock,
-  Sparkles,
-  ArrowRight,
-  TrendingUp,
-  FileSpreadsheet,
-  CheckCircle2,
-  AlertCircle,
-  ExternalLink,
-} from "lucide-react";
+import JapanInventoryView from "@/components/japan/JapanInventoryView";
+import BatchUploadView from "@/components/japan/BatchUploadView";
+import AddVehicleForm from "@/components/japan/AddVehicleForm";
 
 export default function DashboardShell() {
-  const { currentUser, currentDealer } = useAuth();
+  const { currentUser } = useAuth();
   const [activeTab, setActiveTab] = useState<string>(() => {
     if (currentUser?.role === "AUTOHUB_ADMIN") return "admin-dashboard";
     if (currentUser?.role === "NISSAN_JAPAN") return "japan-inventory";
@@ -34,7 +22,18 @@ export default function DashboardShell() {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
-  // Determine what view to render in the scrollable view area
+  // Automatically sync primary tab on role switch
+  useEffect(() => {
+    if (currentUser?.role === "DEALER_USER" || currentUser?.role === "DEALER_ADMIN") {
+      setActiveTab("dealer-stock");
+    } else if (currentUser?.role === "NISSAN_JAPAN") {
+      setActiveTab("japan-inventory");
+    } else if (currentUser?.role === "AUTOHUB_ADMIN") {
+      setActiveTab("admin-dashboard");
+    }
+  }, [currentUser?.role]);
+
+  // Determine what view to render based on role and active tab
   const renderViewContent = () => {
     // 1. DEALER VIEWS
     if (currentUser?.role === "DEALER_USER" || currentUser?.role === "DEALER_ADMIN") {
@@ -52,25 +51,46 @@ export default function DashboardShell() {
       }
     }
 
-    // 2. PLACEHOLDER FOR ADMIN / JAPAN ROLES (Which we'll implement in subsequent phases)
+    // 2. NISSAN JAPAN VIEWS
+    if (currentUser?.role === "NISSAN_JAPAN") {
+      switch (activeTab) {
+        case "japan-inventory":
+          return (
+            <JapanInventoryView
+              onNavigateAdd={() => setActiveTab("japan-add-single")}
+              onNavigateBatch={() => setActiveTab("japan-upload")}
+            />
+          );
+        case "japan-upload":
+          return (
+            <BatchUploadView onSuccessReturn={() => setActiveTab("japan-inventory")} />
+          );
+        case "japan-add-single":
+          return (
+            <AddVehicleForm onSuccessReturn={() => setActiveTab("japan-inventory")} />
+          );
+        default:
+          return (
+            <JapanInventoryView
+              onNavigateAdd={() => setActiveTab("japan-add-single")}
+              onNavigateBatch={() => setActiveTab("japan-upload")}
+            />
+          );
+      }
+    }
+
+    // 3. AUTOHUB ADMIN VIEWS (Next Phase)
     return (
       <div className="space-y-6">
-        <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-soft">
-          <div className="flex items-center gap-2 mb-1">
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
-              {currentUser?.role === "AUTOHUB_ADMIN" ? "Operations Command Portal" : "Nissan Japan Export HQ"}
-            </span>
-            <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200">
-              Tab: {activeTab}
-            </span>
+        <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-soft">
+          <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">
+            Autohub Operations Admin
           </div>
-          <h2 className="text-2xl font-extrabold text-slate-900 tracking-tight">
-            {currentUser?.role === "AUTOHUB_ADMIN"
-              ? "Autohub Operations Dashboard"
-              : "Nissan Japan Inventory Dispatch"}
+          <h2 className="text-xl font-bold text-slate-900 tracking-tight">
+            Operations Command Center
           </h2>
-          <p className="text-xs sm:text-sm text-slate-500 mt-1">
-            Switch back to <strong className="text-slate-900">Auckland Nissan (DEALER VIEW)</strong> using the top-right Role Switcher to test the completed dealer workflow.
+          <p className="text-xs text-slate-500 mt-1">
+            Switch between Auckland Nissan, Nissan Japan, and Admin via the top-right Role Switcher.
           </p>
         </div>
       </div>

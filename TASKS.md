@@ -15,7 +15,7 @@
 | **Phase 3** | Dealer Portal: Stock Catalogue, Filters & Atomic Reservation | 🟡 **IN PROGRESS / NEXT** |
 | **Phase 4** | Order Milestones (9 Stages) & Additional Cost Approval | ⏳ **PENDING** |
 | **Phase 5** | Autohub Operations Portal (Approvals, Allocations, Export) | ⏳ **PENDING** |
-| **Phase 6** | Nissan Japan Portal (Vehicle Entry & Batch CSV Validation) | ⏳ **PENDING** |
+| **Phase 6** | Nissan Japan Portal (Vehicle Entry & Batch CSV Validation) | ✅ **COMPLETED** |
 | **Phase 7** | End-to-End User Story & Acceptance Criteria Verification | ⏳ **PENDING** |
 
 ---
@@ -112,15 +112,19 @@
 
 ---
 
-## Phase 6: Nissan Japan Inventory Portal ⏳
+## Phase 6: Nissan Japan Inventory Portal ✅
 
-- [ ] **Single Vehicle Entry Form (US-06, US-07):**
-  - [ ] Input fields: Stock ID, Chassis/VIN, Model, Grade, Year, Odometer, FOB Price, Auction Grade.
-  - [ ] Multi-image photo upload and condition inspection sheet attachment.
-- [ ] **Batch CSV / Excel Inventory Upload:**
-  - [ ] Drag-and-drop CSV file ingestion.
-  - [ ] Live parser with row-level validation: Flags duplicate VINs, missing mandatory fields, and format errors.
-  - [ ] Batch publish action to transition validated vehicles to `Available` stock.
+- [x] **Single Vehicle Entry Form (US-06, US-07):**
+  - [x] Input fields: Stock ID, Chassis/VIN, Model, Grade, Year, Odometer, FOB Price (JPY), Auction Grade, and Location.
+  - [x] Form submission with "Save as Draft" vs "Publish to Programme".
+- [x] **Batch CSV / Excel Inventory Upload (US-06):**
+  - [x] Drag-and-drop CSV file ingestion with template download.
+  - [x] 1-click simulation sample batch load.
+  - [x] Live row-level validation engine: Flags duplicate active VINs (e.g. Row 4 error), invalid fields, and validates clean records.
+  - [x] Batch publish action to transition validated vehicles to Available stock.
+- [x] **Export Inventory Management (US-08):**
+  - [x] Restrained monochromatic inventory data table with status filters (All, Available, Reserved, Withdrawn).
+  - [x] Quick actions to publish/withdraw stock.
 
 ---
 
