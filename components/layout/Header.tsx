@@ -4,7 +4,6 @@ import React, { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
 import { audio } from "@/lib/sound";
-import RoleSwitcher from "./RoleSwitcher";
 import GlobalSearchModal from "./GlobalSearchModal";
 import {
   Search,
@@ -268,8 +267,6 @@ export default function Header({
           )}
         </div>
 
-        {/* Dynamic Multi-Role Switcher (Compact on mobile, full on desktop) */}
-        <RoleSwitcher />
       </div>
 
       {/* Universal Global Search Modal Listing */}

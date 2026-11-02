@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React, { useState, useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
@@ -219,9 +219,15 @@ export default function Sidebar({
       };
     }
     if (currentUser?.role === "DEALER_USER" || currentUser?.role === "DEALER_ADMIN") {
+      const rawName = currentDealer?.legalTradingName || currentUser?.dealershipName || "Auckland Nissan";
+      const shortName = rawName
+        .replace(/\s+(Ltd|Limited|Co\.|Corp)\.?$/i, "")
+        .replace(/\s+City$/i, "")
+        .toUpperCase();
+
       return {
         section: "DEALER PORTAL",
-        badge: currentDealer?.legalTradingName?.toUpperCase() || currentUser?.dealershipName?.toUpperCase() || "FRANCHISE DEALERSHIP",
+        badge: shortName,
         badgeColor: "bg-emerald-500/15 text-emerald-400 border-emerald-500/30",
         roleDesc: currentDealer?.legalTradingName || currentUser?.dealershipName || "Auckland Nissan City",
       };
@@ -299,7 +305,8 @@ export default function Sidebar({
                 {panelInfo.section}
               </span>
               <span
-                className={`text-[9px] font-bold px-2 py-0.5 rounded-full border ${panelInfo.badgeColor}`}
+                className={`text-[9px] font-bold px-2 py-0.5 rounded-full border whitespace-nowrap truncate max-w-[130px] inline-block ${panelInfo.badgeColor}`}
+                title={panelInfo.badge}
               >
                 {panelInfo.badge}
               </span>
