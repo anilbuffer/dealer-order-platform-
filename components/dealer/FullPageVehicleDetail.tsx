@@ -144,33 +144,22 @@ export default function FullPageVehicleDetail({
           </div>
         </div>
 
-        {/* Right: Pricing Tier Badge & Quick Reserve */}
-        <div className="flex items-center gap-3">
-          <div className="hidden sm:flex items-center gap-2 text-xs">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
-              Pricing Profile:
-            </span>
-            <span className="font-extrabold text-slate-800 bg-slate-100 px-3 py-1 rounded-xl border border-slate-200/80">
-              {dealerZone} Guaranteed Landed
-            </span>
+        {/* Right: Clean Status & Pricing Tier Profile */}
+        <div className="flex items-center gap-2.5">
+          <div className="hidden sm:flex items-center gap-1.5 text-xs font-semibold text-slate-500 bg-slate-50 border border-slate-200 px-3 py-1 rounded-full">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Profile:</span>
+            <span className="text-slate-800">{dealerZone} Landed</span>
           </div>
 
           {vehicle.status === "AVAILABLE" ? (
-            <button
-              type="button"
-              onClick={() => {
-                audio.playSubtleClick();
-                setIsReserveModalOpen(true);
-              }}
-              className="px-5 py-2 rounded-xl bg-gradient-to-r from-[#E11D48] to-[#BE123C] hover:from-[#BE123C] hover:to-[#9F1239] text-white text-xs font-extrabold transition-all shadow-[0_3px_12px_rgba(225,29,72,0.28)] hover:shadow-[0_4px_16px_rgba(225,29,72,0.38)] active:scale-[0.98] cursor-pointer flex items-center gap-1.5"
-            >
-              <Lock className="w-3.5 h-3.5" />
-              <span>Reserve (24h Hold)</span>
-            </button>
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200/80">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+              <span>Available for Allocation</span>
+            </span>
           ) : (
-            <span className="px-4 py-2 rounded-xl bg-slate-100 text-slate-500 text-xs font-bold border border-slate-200 flex items-center gap-1.5">
-              <Lock className="w-3.5 h-3.5 text-amber-500" />
-              <span>Currently Reserved</span>
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200/80">
+              <Lock className="w-3.5 h-3.5 text-amber-600" />
+              <span>Active 24-Hour Hold</span>
             </span>
           )}
         </div>
@@ -185,37 +174,25 @@ export default function FullPageVehicleDetail({
         {/* ───────────────────────────────────────────────────────── */}
         <div className="lg:col-span-7 space-y-3">
           {/* Main Vehicle Photo */}
-          <div className="relative aspect-[16/10] w-full rounded-2xl overflow-hidden bg-slate-900 border border-slate-200/80 shadow-xs">
+          <div className="relative aspect-[16/10] w-full rounded-2xl overflow-hidden bg-slate-900 border border-slate-200/80 shadow-xs group">
             <img
               src={vehicle.images[activeImageIdx] || vehicle.images[0]}
               alt={`${vehicle.make} ${vehicle.model}`}
               className="w-full h-full object-cover select-none transition-all duration-300"
             />
 
-            {/* Gradient Overlay for Crisp Text Contrast */}
-            <div className="absolute inset-0 bg-gradient-to-t from-slate-950/60 via-transparent to-slate-950/40 pointer-events-none" />
+            {/* Gradient Overlay for subtle contrast */}
+            <div className="absolute inset-0 bg-gradient-to-t from-slate-950/40 via-transparent to-slate-950/20 pointer-events-none" />
 
-            {/* Top-Left: Auction Grade */}
-            <div className="absolute top-3.5 left-3.5 px-3 py-1 rounded-full bg-slate-900/85 backdrop-blur-md text-amber-300 font-mono text-xs font-bold border border-white/10 shadow-xs flex items-center gap-1.5">
+            {/* Top-Left: Discreet Auction Grade Pill */}
+            <div className="absolute top-3.5 left-3.5 px-3 py-1 rounded-full bg-slate-950/80 backdrop-blur-md text-amber-300 font-mono text-xs font-bold border border-white/10 shadow-xs flex items-center gap-1.5">
               <span>★</span>
               <span>Grade {vehicle.auctionGrade} / {vehicle.interiorGrade}</span>
             </div>
 
-            {/* Top-Right: Export Yard Origin */}
-            <div className="absolute top-3.5 right-3.5 px-3 py-1 rounded-full bg-slate-900/85 backdrop-blur-md text-slate-200 text-xs font-medium border border-white/10 shadow-xs flex items-center gap-1.5">
-              <MapPin className="w-3.5 h-3.5 text-slate-400" />
-              <span>{vehicle.location.split("(")[0].trim()}</span>
-            </div>
-
-            {/* Bottom-Left: Stock Code */}
-            <div className="absolute bottom-3.5 left-3.5 px-2.5 py-1 rounded-lg bg-black/60 backdrop-blur-md text-xs font-mono font-bold text-white border border-white/15">
-              {vehicle.stockId}
-            </div>
-
-            {/* Bottom-Right: Radiation Passed */}
-            <div className="absolute bottom-3.5 right-3.5 px-2.5 py-1 rounded-lg bg-emerald-600/90 backdrop-blur-md text-white text-[11px] font-bold shadow-xs flex items-center gap-1.5">
-              <ShieldCheck className="w-3.5 h-3.5" />
-              <span>Radiation &lt;0.08 μSv/h Passed</span>
+            {/* Top-Right: Photo Index Counter */}
+            <div className="absolute top-3.5 right-3.5 px-2.5 py-1 rounded-full bg-slate-950/80 backdrop-blur-md text-white/90 font-mono text-[11px] font-medium border border-white/10 shadow-xs">
+              {activeImageIdx + 1} / {Math.min(vehicle.images.length, 5)} Photos
             </div>
 
             {vehicle.status !== "AVAILABLE" && (
@@ -241,7 +218,7 @@ export default function FullPageVehicleDetail({
                 className={`relative flex-1 aspect-[16/10] rounded-xl overflow-hidden border-2 transition-all cursor-pointer ${
                   activeImageIdx === idx
                     ? "border-[#E11D48] ring-2 ring-[#E11D48]/20 shadow-xs"
-                    : "border-slate-200 hover:border-slate-300 opacity-70 hover:opacity-100"
+                    : "border-slate-200 hover:border-slate-300 opacity-75 hover:opacity-100"
                 }`}
               >
                 <img src={img} alt="Angle preview" className="w-full h-full object-cover" />
@@ -251,107 +228,153 @@ export default function FullPageVehicleDetail({
         </div>
 
         {/* ───────────────────────────────────────────────────────── */}
-        {/* RIGHT COLUMN: Clean Commercial Acquisition Terminal       */}
+        {/* RIGHT COLUMN: Clean Executive Commercial Acquisition Card */}
         {/* ───────────────────────────────────────────────────────── */}
         <div className="lg:col-span-5 space-y-4">
-          <div className="bg-white rounded-2xl border border-slate-200/90 p-5 sm:p-6 shadow-2xs space-y-4">
-            {/* Header: Title, Specs & VIN */}
+          <div className="bg-white rounded-2xl border border-slate-200/90 p-5 sm:p-6 shadow-2xs space-y-5">
+            {/* Header: Title, Specs & Identity Chips */}
             <div>
-              <div className="flex items-center justify-between text-xs text-slate-400 font-medium mb-1">
-                <span>{vehicle.year} · {vehicle.transmission}</span>
-                <span className="font-mono text-slate-500 font-semibold">{vehicle.vinChassis}</span>
+              <div className="flex items-center justify-between text-xs font-semibold text-slate-400 mb-1">
+                <span className="uppercase tracking-wider font-bold text-[#E11D48]">
+                  {vehicle.year} · {vehicle.transmission}
+                </span>
+                <span className="font-mono text-slate-600 bg-slate-100 px-2 py-0.5 rounded text-[11px] font-bold border border-slate-200/60">
+                  {vehicle.vinChassis}
+                </span>
               </div>
 
-              <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight leading-tight">
+              <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight leading-tight">
                 {vehicle.make} {vehicle.model}
               </h1>
 
-              <div className="flex items-center gap-2 text-xs text-slate-600 font-medium mt-2 flex-wrap">
-                <span>{vehicle.grade}</span>
-                <span className="text-slate-300">•</span>
-                <span>{vehicle.odometerKm.toLocaleString()} km</span>
-                <span className="text-slate-300">•</span>
-                <span>{vehicle.fuelType}</span>
-                <span className="text-slate-300">•</span>
-                <span>{vehicle.color}</span>
+              <p className="text-xs text-slate-500 font-medium mt-1">
+                {vehicle.grade} · {vehicle.color} · {vehicle.odometerKm.toLocaleString()} km
+              </p>
+
+              {/* Clean Meta Verification Chips */}
+              <div className="flex flex-wrap items-center gap-1.5 mt-3 pt-3 border-t border-slate-100 text-[11px]">
+                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 font-medium border border-slate-200/60">
+                  <MapPin className="w-3 h-3 text-slate-400" />
+                  {vehicle.location.split("(")[0].trim()}
+                </span>
+                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-700 font-medium border border-emerald-200/60">
+                  <ShieldCheck className="w-3 h-3 text-emerald-600" />
+                  MPI &amp; Radiation Pass
+                </span>
+                <span className="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-slate-100 text-slate-600 font-mono font-bold border border-slate-200/60">
+                  #{vehicle.stockId}
+                </span>
               </div>
             </div>
 
-            {/* Landed Pricing & Retail Margin Card */}
-            <div className="p-4 rounded-xl bg-slate-50 border border-slate-200/80 space-y-3">
-              <div className="flex items-baseline justify-between">
+            {/* Landed Pricing & Margin Box (Sleek High-Contrast Card) */}
+            <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-br from-slate-900 to-slate-950 text-white shadow-xs space-y-3">
+              <div className="flex items-start justify-between">
                 <div>
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
-                    Guaranteed Landed Price ({dealerZone})
-                  </span>
-                  <div className="text-3xl font-black font-mono tracking-tight text-slate-900 mt-0.5">
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] uppercase font-bold tracking-wider text-slate-400">
+                      Guaranteed Landed Price
+                    </span>
+                    <span className="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded bg-white/10 text-slate-300">
+                      {dealerZone}
+                    </span>
+                  </div>
+                  <div className="text-3xl font-black font-mono tracking-tight text-white mt-1">
                     ${price.totalBuyPriceNZD.toLocaleString()}
-                    <span className="text-xs text-slate-500 font-normal ml-1">NZD</span>
+                    <span className="text-xs font-normal text-slate-400 ml-1.5">NZD</span>
                   </div>
                 </div>
 
                 <div className="text-right">
                   <span className="text-[10px] font-medium text-slate-400 block">Est. Retail Margin</span>
-                  <span className="text-xs font-mono font-bold text-emerald-700 bg-emerald-100/70 border border-emerald-200 px-2 py-0.5 rounded-md inline-block mt-0.5">
-                    +${dealerMarginNZD.toLocaleString()} ({marginPercentage}%)
-                  </span>
+                  <div className="inline-flex items-center gap-1 mt-1 px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-mono text-xs font-bold">
+                    <TrendingUp className="w-3 h-3" />
+                    <span>+${dealerMarginNZD.toLocaleString()} ({marginPercentage}%)</span>
+                  </div>
                 </div>
               </div>
 
-              <div className="text-[11px] text-slate-500 flex items-center justify-between pt-2 border-t border-slate-200/60">
-                <span>Est. NZ Retail: <strong>${retailEstimateNZD.toLocaleString()} NZD</strong></span>
-                <span className="text-emerald-600 font-medium">✓ 15% GST &amp; MR2A included</span>
+              <div className="flex items-center justify-between text-xs text-slate-300/90 pt-3 border-t border-white/10">
+                <span className="text-slate-400">
+                  Est. NZ Retail: <strong className="text-white font-mono">${retailEstimateNZD.toLocaleString()} NZD</strong>
+                </span>
+                <span className="text-emerald-400 font-medium flex items-center gap-1 text-[11px]">
+                  <CheckCircle2 className="w-3.5 h-3.5" />
+                  All duties, GST &amp; MR2A included
+                </span>
               </div>
             </div>
 
-            {/* Itemized Cost Breakdown (Clean 2-Column Table) */}
-            <div className="space-y-2">
-              <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 block">
-                Itemized Landed Cost Breakdown
-              </span>
+            {/* Itemized Cost Breakdown (Clean Segmented Bar + Compact Minimal List) */}
+            <div className="space-y-2.5">
+              <div className="flex items-center justify-between text-xs">
+                <span className="font-bold text-slate-800 tracking-tight text-[11px] uppercase">
+                  Landed Cost Breakdown
+                </span>
+                <span className="font-mono text-slate-400 text-[10px]">
+                  100% Fixed Cap
+                </span>
+              </div>
 
-              <div className="grid grid-cols-2 gap-2 text-xs">
+              {/* Proportional Segmented Progress Bar */}
+              <div className="h-1.5 w-full rounded-full bg-slate-100 overflow-hidden flex">
+                <div style={{ width: `${costBreakdownItems[0].percentage}%` }} className="bg-slate-800 h-full" />
+                <div style={{ width: `${costBreakdownItems[1].percentage}%` }} className="bg-blue-600 h-full" />
+                <div style={{ width: `${costBreakdownItems[2].percentage}%` }} className="bg-emerald-600 h-full" />
+                <div style={{ width: `${costBreakdownItems[3].percentage}%` }} className="bg-[#E11D48] h-full" />
+              </div>
+
+              {/* Clean 4-Item List without individual nested boxes */}
+              <div className="grid grid-cols-2 gap-x-3 gap-y-1.5 pt-1 text-xs">
                 {costBreakdownItems.map((item, idx) => (
-                  <div key={idx} className="p-2.5 rounded-xl bg-white border border-slate-200/80">
-                    <span className="text-[10px] text-slate-400 font-medium block truncate">
-                      {item.label}
+                  <div key={idx} className="flex items-center justify-between py-1 border-b border-slate-100">
+                    <div className="flex items-center gap-1.5 min-w-0 pr-1">
+                      <span className={`w-2 h-2 rounded-full shrink-0 ${item.color}`} />
+                      <span className="text-slate-600 truncate text-[11px] font-medium">{item.label}</span>
+                    </div>
+                    <span className="font-mono font-bold text-slate-800 text-[11px] shrink-0">
+                      ${item.amount.toLocaleString()}
                     </span>
-                    <strong className="text-xs font-mono font-bold text-slate-800 block mt-0.5">
-                      ${item.amount.toLocaleString()} NZD
-                    </strong>
-                    <span className="text-[10px] text-slate-500 block truncate">{item.sublabel}</span>
                   </div>
                 ))}
               </div>
             </div>
 
-            {/* Reserve Button CTA */}
-            {vehicle.status === "AVAILABLE" ? (
-              <button
-                type="button"
-                onClick={() => {
-                  audio.playSubtleClick();
-                  setIsReserveModalOpen(true);
-                }}
-                className="w-full py-3.5 px-5 rounded-xl bg-[#E11D48] hover:bg-[#BE123C] text-white font-bold text-xs tracking-wide transition-all shadow-md hover:shadow-lg active:scale-[0.99] cursor-pointer text-center flex items-center justify-center gap-2"
-              >
-                <Lock className="w-4 h-4" />
-                <span>Reserve Vehicle (24-Hour Atomic Hold)</span>
-              </button>
-            ) : (
-              <button
-                type="button"
-                disabled
-                className="w-full py-3.5 px-5 rounded-xl bg-slate-100 text-slate-400 font-bold text-xs cursor-not-allowed text-center flex items-center justify-center gap-2"
-              >
-                <Lock className="w-4 h-4 text-slate-400" />
-                <span>Vehicle Currently Held by Network Dealer</span>
-              </button>
-            )}
+            {/* Primary Action CTA */}
+            <div className="space-y-2 pt-1">
+              {vehicle.status === "AVAILABLE" ? (
+                <button
+                  type="button"
+                  onClick={() => {
+                    audio.playSubtleClick();
+                    setIsReserveModalOpen(true);
+                  }}
+                  className="w-full py-3.5 px-5 rounded-xl bg-[#E11D48] hover:bg-[#BE123C] text-white font-extrabold text-xs tracking-wide transition-all shadow-[0_3px_12px_rgba(225,29,72,0.3)] hover:shadow-[0_4px_16px_rgba(225,29,72,0.4)] active:scale-[0.99] cursor-pointer flex items-center justify-center gap-2"
+                >
+                  <Lock className="w-4 h-4" />
+                  <span>Reserve Vehicle (24-Hour Atomic Hold)</span>
+                </button>
+              ) : (
+                <div className="w-full py-3.5 px-5 rounded-xl bg-slate-100 text-slate-400 font-bold text-xs text-center flex items-center justify-center gap-2 border border-slate-200">
+                  <Lock className="w-4 h-4 text-slate-400" />
+                  <span>Vehicle Held Under 24h Network Lock</span>
+                </div>
+              )}
 
-            <p className="text-[11px] text-slate-400 text-center">
-              Zero deposit required · Locks out other NZ franchise dealers for 24 hours.
-            </p>
+              <div className="flex items-center justify-center gap-3 text-[11px] text-slate-400 pt-1">
+                <span className="flex items-center gap-1">
+                  <Check className="w-3.5 h-3.5 text-emerald-500" /> Zero deposit
+                </span>
+                <span>•</span>
+                <span className="flex items-center gap-1">
+                  <Check className="w-3.5 h-3.5 text-emerald-500" /> 24h floorplan hold
+                </span>
+                <span>•</span>
+                <span className="flex items-center gap-1">
+                  <Check className="w-3.5 h-3.5 text-emerald-500" /> Fixed landed price
+                </span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
