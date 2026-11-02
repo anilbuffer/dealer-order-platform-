@@ -22,7 +22,9 @@ import {
   LogOut,
   MapPin,
   ExternalLink,
+  Settings,
 } from "lucide-react";
+import SettingsModal from "./SettingsModal";
 
 interface NavItem {
   id: string;
@@ -48,6 +50,7 @@ export default function Sidebar({
   const { currentUser, currentDealer, logout } = useAuth();
   const { vehicles, orders, dealers, users } = useProgramme();
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   // Dynamic live synced counts
   const dealerOrdersCount = orders.filter(
@@ -293,19 +296,93 @@ export default function Sidebar({
         </nav>
       </div>
 
-      {/* Bottom User Profile & Sign Out Section */}
-      <div className="p-3 border-t border-[#1B2A42] bg-[#070D18]/50">
+      {/* Bottom User Profile, Settings & Sign Out Section */}
+      <div className="p-3 border-t border-[#1B2A42] bg-[#070D18]/60">
         {!isCollapsed ? (
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2.5 min-w-0">
-              <div className="w-8 h-8 rounded-full bg-slate-800 border border-[#1B2A42] flex items-center justify-center font-bold text-xs text-white">
-                {currentUser?.name.charAt(0) || "U"}
+          <div className="space-y-2">
+            {/* Clickable Profile Card -> Opens Settings */}
+            <div
+              onClick={() => {
+                audio.playSubtleClick();
+                setIsSettingsOpen(true);
+              }}
+              title="Click to open Profile & Settings"
+              className="flex items-center justify-between p-2 rounded-xl hover:bg-white/5 transition-all cursor-pointer group"
+            >
+              <div className="flex items-center gap-2.5 min-w-0">
+                <div className="relative">
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-slate-700 to-slate-900 border border-[#1B2A42] flex items-center justify-center font-bold text-xs text-white shadow-xs">
+                    {currentUser?.name.charAt(0) || "U"}
+                  </div>
+                  <span className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-emerald-500 ring-2 ring-[#0A1322]" />
+                </div>
+                <div className="min-w-0">
+                  <div className="text-xs font-semibold text-white truncate group-hover:text-rose-200 transition-colors">
+                    {currentUser?.name}
+                  </div>
+                  <div className="text-[10px] text-slate-400 truncate">
+                    {currentUser?.email}
+                  </div>
+                </div>
               </div>
-              <div className="min-w-0">
-                <div className="text-xs font-semibold text-white truncate">{currentUser?.name}</div>
-                <div className="text-[10px] text-slate-400 truncate">{currentUser?.email}</div>
+
+              {/* Action Buttons: Settings & Sign Out */}
+              <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
+                <button
+                  type="button"
+                  onClick={() => {
+                    audio.playSubtleClick();
+                    setIsSettingsOpen(true);
+                  }}
+                  title="Platform Settings"
+                  aria-label="Platform Settings"
+                  className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
+                >
+                  <Settings className="w-4 h-4" />
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    audio.playSubtleClick();
+                    logout();
+                  }}
+                  title="Sign Out"
+                  aria-label="Sign Out"
+                  className="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-rose-500/20 transition-colors cursor-pointer"
+                >
+                  <LogOut className="w-4 h-4" />
+                </button>
               </div>
             </div>
+          </div>
+        ) : (
+          <div className="flex flex-col items-center gap-2">
+            <button
+              type="button"
+              onClick={() => {
+                audio.playSubtleClick();
+                setIsSettingsOpen(true);
+              }}
+              title="Profile & Settings"
+              aria-label="Profile & Settings"
+              className="w-8 h-8 rounded-full bg-gradient-to-br from-slate-700 to-slate-900 border border-[#1B2A42] flex items-center justify-center font-bold text-xs text-white hover:ring-2 hover:ring-rose-500/50 transition-all cursor-pointer"
+            >
+              {currentUser?.name.charAt(0) || "U"}
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                audio.playSubtleClick();
+                setIsSettingsOpen(true);
+              }}
+              title="Platform Settings"
+              aria-label="Platform Settings"
+              className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
+            >
+              <Settings className="w-4 h-4" />
+            </button>
 
             <button
               type="button"
@@ -315,28 +392,19 @@ export default function Sidebar({
               }}
               title="Sign Out"
               aria-label="Sign Out"
-              className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-crimson-600/20 hover:text-crimson-400 transition-colors cursor-pointer"
-            >
-              <LogOut className="w-4 h-4" />
-            </button>
-          </div>
-        ) : (
-          <div className="flex justify-center">
-            <button
-              type="button"
-              onClick={() => {
-                audio.playSubtleClick();
-                logout();
-              }}
-              title="Sign Out"
-              aria-label="Sign Out"
-              className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-[#1B2A42] transition-colors cursor-pointer"
+              className="p-2 rounded-xl text-slate-400 hover:text-rose-400 hover:bg-rose-500/20 transition-colors cursor-pointer"
             >
               <LogOut className="w-4 h-4" />
             </button>
           </div>
         )}
       </div>
+
+      {/* Platform Settings Modal */}
+      <SettingsModal
+        isOpen={isSettingsOpen}
+        onClose={() => setIsSettingsOpen(false)}
+      />
     </aside>
   );
 }

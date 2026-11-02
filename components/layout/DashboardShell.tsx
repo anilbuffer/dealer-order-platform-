@@ -2,7 +2,6 @@
 
 import React, { useState } from "react";
 import Sidebar from "./Sidebar";
-import Header from "./Header";
 import { useAuth } from "@/lib/auth-context";
 import DealerStockCatalog from "@/components/dealer/DealerStockCatalog";
 import FullPageVehicleDetail from "@/components/dealer/FullPageVehicleDetail";
@@ -160,11 +159,8 @@ export default function DashboardShell({ initialVehicleId }: DashboardShellProps
         onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
       />
 
-      {/* 2. Main Content Container */}
+      {/* 2. Main Content Container (Full Height Canvas) */}
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
-        {/* Top Header with Search shortcut, Notifications & Role Switcher */}
-        <Header />
-
         {/* Scrollable View Content Canvas */}
         <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
           <div className="max-w-7xl mx-auto">{renderViewContent()}</div>
