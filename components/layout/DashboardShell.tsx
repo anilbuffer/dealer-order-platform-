@@ -17,6 +17,8 @@ import DealerApprovalsView from "@/components/admin/DealerApprovalsView";
 import AdminInventoryControllerView from "@/components/admin/AdminInventoryControllerView";
 import AllocationMilestonesView from "@/components/admin/AllocationMilestonesView";
 import AuditExportView from "@/components/admin/AuditExportView";
+import UserManagementView from "@/components/admin/UserManagementView";
+import RolesPermissionsView from "@/components/admin/RolesPermissionsView";
 
 interface DashboardShellProps {
   initialVehicleId?: string;
@@ -128,6 +130,10 @@ export default function DashboardShell({ initialVehicleId }: DashboardShellProps
       switch (activeTab) {
         case "admin-dashboard":
           return <AdminDashboardView onNavigateTab={(t) => setActiveTab(t)} />;
+        case "admin-users":
+          return <UserManagementView />;
+        case "admin-roles":
+          return <RolesPermissionsView />;
         case "admin-approvals":
           return <DealerApprovalsView />;
         case "admin-stock":

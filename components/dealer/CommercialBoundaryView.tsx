@@ -5,7 +5,7 @@ import { Check, AlertCircle } from "lucide-react";
 
 export default function CommercialBoundaryView() {
   return (
-    <div className="space-y-6 max-w-4xl">
+    <div className="space-y-6 max-w-7xl mx-auto">
       {/* Clean Header */}
       <div className="pb-2">
         <h1 className="text-2xl font-bold tracking-tight text-slate-900">

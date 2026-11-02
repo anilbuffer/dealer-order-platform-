@@ -64,7 +64,38 @@ export interface UserAccount {
   dealershipName?: string;
   avatar?: string;
   active: boolean;
+  phone?: string;
+  title?: string;
+  department?: string;
+  zoneId?: ZoneId;
+  mfaEnabled?: boolean;
+  lastLoginAt?: string;
+  lastLoginIp?: string;
+  holdingLimitNZD?: number;
+  maxActiveHolds?: number;
+  permissions?: string[];
+  createdAt?: string;
 }
+
+export type PlatformPermission =
+  | "inventory.browse"
+  | "inventory.view_fob"
+  | "inventory.view_landed"
+  | "inventory.reserve_hold"
+  | "inventory.create_edit"
+  | "inventory.batch_upload"
+  | "commercial.view_margins"
+  | "commercial.configure_zones"
+  | "commercial.approve_dealers"
+  | "commercial.override_costs"
+  | "compliance.view_auction_sheet"
+  | "compliance.jevic_signoff"
+  | "compliance.mr2a_certification"
+  | "compliance.biosecurity_export"
+  | "admin.manage_users"
+  | "admin.manage_roles"
+  | "admin.view_audit_log"
+  | "admin.export_financials";
 
 export type VehicleStatus =
   | "DRAFT"

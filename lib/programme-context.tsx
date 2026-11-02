@@ -9,12 +9,14 @@ import {
   OrderMilestone,
   AdditionalCostItem,
   ZoneId,
+  UserAccount,
 } from "./types";
 import {
   MOCK_VEHICLES,
   MOCK_ORDERS,
   MOCK_DEALERS,
   MOCK_AUDIT_LOGS,
+  MOCK_USERS,
 } from "./mock-data";
 import { calculateLandedPrice } from "./pricing-calculator";
 import { audio } from "./sound";
@@ -24,6 +26,13 @@ interface ProgrammeContextType {
   orders: Order[];
   dealers: DealerAccount[];
   auditLogs: AuditEvent[];
+  users: UserAccount[];
+
+  // User Management Actions
+  addUser: (user: Omit<UserAccount, "id">) => UserAccount;
+  updateUser: (userId: string, updates: Partial<UserAccount>) => void;
+  toggleUserStatus: (userId: string) => void;
+  deleteUser: (userId: string) => void;
 
   // Vehicle & Allocation actions
   reserveVehicle: (vehicleId: string, dealerId: string) => boolean;
@@ -56,6 +65,7 @@ export function ProgrammeProvider({ children }: { children: React.ReactNode }) {
   const [orders, setOrders] = useState<Order[]>(MOCK_ORDERS);
   const [dealers, setDealers] = useState<DealerAccount[]>(MOCK_DEALERS);
   const [auditLogs, setAuditLogs] = useState<AuditEvent[]>(MOCK_AUDIT_LOGS);
+  const [users, setUsers] = useState<UserAccount[]>(MOCK_USERS);
   const [isHydrated, setIsHydrated] = useState(false);
 
   // Hydrate from localStorage on client mount
@@ -69,6 +79,9 @@ export function ProgrammeProvider({ children }: { children: React.ReactNode }) {
           if (parsed.orders) setOrders(parsed.orders);
           if (parsed.dealers) setDealers(parsed.dealers);
           if (parsed.auditLogs) setAuditLogs(parsed.auditLogs);
+          if (parsed.users && Array.isArray(parsed.users) && parsed.users.length > 0) {
+            setUsers(parsed.users);
+          }
         }
       } catch (e) {
         console.warn("Could not load persisted programme state:", e);
@@ -84,12 +97,12 @@ export function ProgrammeProvider({ children }: { children: React.ReactNode }) {
     try {
       localStorage.setItem(
         STORAGE_KEY,
-        JSON.stringify({ vehicles, orders, dealers, auditLogs })
+        JSON.stringify({ vehicles, orders, dealers, auditLogs, users })
       );
     } catch (e) {
       console.warn("Could not persist programme state:", e);
     }
-  }, [vehicles, orders, dealers, auditLogs, isHydrated]);
+  }, [vehicles, orders, dealers, auditLogs, users, isHydrated]);
 
   // Helper to log audit event
   const logAudit = (event: Omit<AuditEvent, "id" | "timestamp">) => {
@@ -495,12 +508,97 @@ export function ProgrammeProvider({ children }: { children: React.ReactNode }) {
     );
   };
 
-  // 13. Reset to Defaults
+  // 13. User Management Actions
+  const addUser = (userData: Omit<UserAccount, "id">): UserAccount => {
+    const newUser: UserAccount = {
+      ...userData,
+      id: `USR_${Date.now()}`,
+      createdAt: new Date().toISOString(),
+      active: true,
+      mfaEnabled: userData.mfaEnabled ?? true,
+      lastLoginAt: "Pending Invitation",
+      lastLoginIp: "—",
+    };
+    setUsers((prev) => [newUser, ...prev]);
+
+    logAudit({
+      actorName: "Sarah Jenkins",
+      actorEmail: "ops@autohub.co.nz",
+      actorRole: "AUTOHUB_ADMIN",
+      action: "USER_INVITED",
+      category: "AUTHENTICATION",
+      objectType: "UserAccount",
+      objectId: newUser.id,
+      details: `Invited new platform user ${newUser.name} (${newUser.email}) with role ${newUser.role}.`,
+    });
+
+    return newUser;
+  };
+
+  const updateUser = (userId: string, updates: Partial<UserAccount>) => {
+    setUsers((prev) =>
+      prev.map((u) => (u.id === userId ? { ...u, ...updates } : u))
+    );
+
+    logAudit({
+      actorName: "Sarah Jenkins",
+      actorEmail: "ops@autohub.co.nz",
+      actorRole: "AUTOHUB_ADMIN",
+      action: "USER_UPDATED",
+      category: "AUTHENTICATION",
+      objectType: "UserAccount",
+      objectId: userId,
+      details: `Updated account details and permissions for user ID ${userId}.`,
+    });
+  };
+
+  const toggleUserStatus = (userId: string) => {
+    setUsers((prev) =>
+      prev.map((u) => {
+        if (u.id === userId) {
+          const nextActive = !u.active;
+          logAudit({
+            actorName: "Sarah Jenkins",
+            actorEmail: "ops@autohub.co.nz",
+            actorRole: "AUTOHUB_ADMIN",
+            action: nextActive ? "USER_ACTIVATED" : "USER_SUSPENDED",
+            category: "AUTHENTICATION",
+            objectType: "UserAccount",
+            objectId: userId,
+            details: `${nextActive ? "Activated" : "Suspended"} platform access for ${u.name} (${u.email}).`,
+          });
+          return { ...u, active: nextActive };
+        }
+        return u;
+      })
+    );
+  };
+
+  const deleteUser = (userId: string) => {
+    const target = users.find((u) => u.id === userId);
+    setUsers((prev) => prev.filter((u) => u.id !== userId));
+
+    if (target) {
+      logAudit({
+        actorName: "Sarah Jenkins",
+        actorEmail: "ops@autohub.co.nz",
+        actorRole: "AUTOHUB_ADMIN",
+        action: "USER_DELETED",
+        category: "AUTHENTICATION",
+        objectType: "UserAccount",
+        objectId: userId,
+        details: `Revoked and removed user account for ${target.name} (${target.email}).`,
+      });
+    }
+  };
+
+  // 14. Reset to Defaults
   const resetToDefaultData = () => {
     setVehicles(MOCK_VEHICLES);
     setOrders(MOCK_ORDERS);
     setDealers(MOCK_DEALERS);
     setAuditLogs(MOCK_AUDIT_LOGS);
+    setUsers(MOCK_USERS);
     try {
       localStorage.removeItem(STORAGE_KEY);
     } catch (e) {}
@@ -513,6 +611,11 @@ export function ProgrammeProvider({ children }: { children: React.ReactNode }) {
         orders,
         dealers,
         auditLogs,
+        users,
+        addUser,
+        updateUser,
+        toggleUserStatus,
+        deleteUser,
         reserveVehicle,
         confirmAllocation,
         releaseHold,

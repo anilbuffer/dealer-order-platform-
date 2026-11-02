@@ -10,7 +10,7 @@ export default function DealershipProfileView() {
   const zone = OFFICIAL_PRICING_ZONES.ZONE_1;
 
   return (
-    <div className="space-y-6 max-w-4xl">
+    <div className="space-y-6 max-w-7xl mx-auto">
       {/* Clean Header */}
       <div className="pb-2">
         <h1 className="text-2xl font-bold tracking-tight text-slate-900">

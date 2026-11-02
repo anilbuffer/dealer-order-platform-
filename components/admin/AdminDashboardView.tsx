@@ -409,11 +409,25 @@ export default function AdminDashboardView({ onNavigateTab }: AdminDashboardView
             <p className="text-[11px] text-slate-300 leading-relaxed">
               Every dealer onboarding, pricing assignment, atomic lock, and milestone step is immutably logged for commercial verification.
             </p>
+            <div className="grid grid-cols-2 gap-2 pt-1">
+              <button
+                onClick={() => onNavigateTab("admin-users")}
+                className="py-2 px-3 rounded-xl bg-[#E11D48] hover:bg-[#BE123C] text-white text-xs font-semibold transition-colors cursor-pointer text-center"
+              >
+                Users Directory
+              </button>
+              <button
+                onClick={() => onNavigateTab("admin-roles")}
+                className="py-2 px-3 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-semibold transition-colors cursor-pointer text-center"
+              >
+                Roles & RBAC
+              </button>
+            </div>
             <button
               onClick={() => onNavigateTab("admin-audit")}
-              className="w-full py-2 px-3 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-semibold transition-colors cursor-pointer text-center"
+              className="w-full py-1.5 px-3 rounded-xl text-slate-400 hover:text-white text-[11px] font-medium transition-colors cursor-pointer text-center"
             >
-              View Audit Event Log
+              View Full Audit Log →
             </button>
           </div>
         </div>
