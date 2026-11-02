@@ -11,6 +11,7 @@ import {
   EyeOff,
   Globe2,
 } from "lucide-react";
+import Link from "next/link";
 import { useAuth } from "@/lib/auth-context";
 import DealerRegistrationModal from "@/components/onboarding/DealerRegistrationModal";
 
@@ -384,13 +385,12 @@ export default function LoginPage() {
           <div className="pt-3 border-t border-slate-200/80 text-center">
             <p className="text-xs text-slate-500">
               New Nissan NZ Dealership?{" "}
-              <button
-                type="button"
-                onClick={() => setIsRegisterModalOpen(true)}
+              <Link
+                href="/register"
                 className="font-semibold text-crimson-600 hover:text-crimson-700 hover:underline cursor-pointer"
               >
                 Register Dealership Application →
-              </button>
+              </Link>
             </p>
           </div>
         </div>
