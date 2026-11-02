@@ -21,9 +21,7 @@ import {
   Car,
   DollarSign,
   FileSpreadsheet,
-  FileCheck,
   Eye,
-  Sliders,
 } from "lucide-react";
 
 interface PermissionDef {
@@ -380,10 +378,6 @@ export const WHO_ENTERS_WHAT = [
 export default function RolesPermissionsView() {
   const { users } = useProgramme();
 
-  const [activeViewTab, setActiveViewTab] = useState<"WHO_ENTERS_WHAT" | "RBAC_MATRIX">(
-    "WHO_ENTERS_WHAT"
-  );
-
   const [rolePermissions, setRolePermissions] = useState<Record<UserRole, string[]>>(
     DEFAULT_ROLE_PERMISSIONS
   );
@@ -479,167 +473,9 @@ export default function RolesPermissionsView() {
       )}
 
       {/* ─────────────────────────────────────────────────────────── */}
-      {/* View Switcher: Who Enters What vs Granular RBAC Matrix       */}
+      {/* Granular RBAC Privilege Matrix                              */}
       {/* ─────────────────────────────────────────────────────────── */}
-      <div className="flex border-b border-slate-200 gap-2">
-        <button
-          type="button"
-          onClick={() => {
-            audio.playSubtleClick();
-            setActiveViewTab("WHO_ENTERS_WHAT");
-          }}
-          className={`flex items-center gap-2 px-4 py-2.5 text-xs font-bold transition-all border-b-2 cursor-pointer ${
-            activeViewTab === "WHO_ENTERS_WHAT"
-              ? "border-[#E11D48] text-[#E11D48]"
-              : "border-transparent text-slate-500 hover:text-slate-800"
-          }`}
-        >
-          <FileCheck className="w-4 h-4" />
-          <span>1. Who enters what? (Operational Data Ownership)</span>
-        </button>
-
-        <button
-          type="button"
-          onClick={() => {
-            audio.playSubtleClick();
-            setActiveViewTab("RBAC_MATRIX");
-          }}
-          className={`flex items-center gap-2 px-4 py-2.5 text-xs font-bold transition-all border-b-2 cursor-pointer ${
-            activeViewTab === "RBAC_MATRIX"
-              ? "border-[#E11D48] text-[#E11D48]"
-              : "border-transparent text-slate-500 hover:text-slate-800"
-          }`}
-        >
-          <Sliders className="w-4 h-4" />
-          <span>Granular RBAC Privilege Matrix</span>
-        </button>
-      </div>
-
-      {/* ─────────────────────────────────────────────────────────── */}
-      {/* VIEW A: 1. WHO ENTERS WHAT? (OPERATIONAL DATA OWNERSHIP)   */}
-      {/* ─────────────────────────────────────────────────────────── */}
-      {activeViewTab === "WHO_ENTERS_WHAT" && (
-        <div className="space-y-6 animate-in fade-in duration-200">
-          {/* Executive Summary Cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
-            <div className="p-4 rounded-2xl bg-white border border-purple-200/80 shadow-xs">
-              <div className="flex items-center justify-between text-xs mb-1.5">
-                <span className="font-bold text-purple-900">Nissan Japan</span>
-                <span className="px-2 py-0.5 rounded-full bg-purple-100 text-purple-800 text-[10px] font-mono font-bold">
-                  6 items
-                </span>
-              </div>
-              <div className="text-[11px] text-slate-500">
-                Specs, VIN, Odometer, Photos, Condition Report &amp; FOB Wholesale Cost.
-              </div>
-            </div>
-
-            <div className="p-4 rounded-2xl bg-white border border-blue-200/80 shadow-xs">
-              <div className="flex items-center justify-between text-xs mb-1.5">
-                <span className="font-bold text-blue-900">Autohub Admin</span>
-                <span className="px-2 py-0.5 rounded-full bg-blue-100 text-blue-800 text-[10px] font-mono font-bold">
-                  5 items
-                </span>
-              </div>
-              <div className="text-[11px] text-slate-500">
-                Geographic Zones (1–5), Fixed Costs, Delivery, Compliance &amp; Programme fees.
-              </div>
-            </div>
-
-            <div className="p-4 rounded-2xl bg-white border border-emerald-200/80 shadow-xs">
-              <div className="flex items-center justify-between text-xs mb-1.5">
-                <span className="font-bold text-emerald-900">Pricing Engine</span>
-                <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-mono font-bold">
-                  1 item
-                </span>
-              </div>
-              <div className="text-[11px] text-slate-500">
-                Deterministic real-time Landed Price calculation (zero manual dealer guesswork).
-              </div>
-            </div>
-
-            <div className="p-4 rounded-2xl bg-white border border-rose-200/80 shadow-xs">
-              <div className="flex items-center justify-between text-xs mb-1.5">
-                <span className="font-bold text-rose-900">Dealer Portal</span>
-                <span className="px-2 py-0.5 rounded-full bg-rose-100 text-rose-800 text-[10px] font-mono font-bold">
-                  1 item
-                </span>
-              </div>
-              <div className="text-[11px] text-slate-500">
-                Dealer-visible guaranteed Total Buy Price &amp; 24h atomic hold lock.
-              </div>
-            </div>
-          </div>
-
-          {/* Table: Who Enters What */}
-          <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs">
-            <div className="px-6 py-4 bg-slate-50/70 border-b border-slate-200 flex items-center justify-between">
-              <div>
-                <h3 className="text-sm font-black text-slate-900 tracking-tight">
-                  1. Who enters what? — Operational Data Ownership Matrix
-                </h3>
-                <p className="text-xs text-slate-500 mt-0.5">
-                  Official boundary matrix defining authoring authority, pricing baseline, and visibility roles.
-                </p>
-              </div>
-              <span className="text-[10px] font-mono bg-white px-2.5 py-1 rounded-full border border-slate-200 text-slate-600 font-semibold shadow-2xs">
-                v2026.1 Official Policy
-              </span>
-            </div>
-
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs border-collapse">
-                <thead className="bg-[#0A1322] text-white uppercase text-[10px] tracking-wider border-b border-slate-200">
-                  <tr>
-                    <th className="py-3.5 px-4 font-semibold w-12 text-center">#</th>
-                    <th className="py-3.5 px-4 font-semibold w-[260px]">Information</th>
-                    <th className="py-3.5 px-4 font-semibold w-[240px]">Entered / Managed by</th>
-                    <th className="py-3.5 px-4 font-semibold w-[160px]">Category</th>
-                    <th className="py-3.5 px-4 font-semibold">Scope &amp; System Component</th>
-                  </tr>
-                </thead>
-
-                <tbody className="divide-y divide-slate-100">
-                  {WHO_ENTERS_WHAT.map((item) => (
-                    <tr key={item.id} className="hover:bg-slate-50/80 transition-colors">
-                      <td className="py-3.5 px-4 text-center font-mono text-slate-400 font-bold">
-                        {item.id}
-                      </td>
-                      <td className="py-3.5 px-4 font-bold text-slate-900">
-                        {item.information}
-                      </td>
-                      <td className="py-3.5 px-4">
-                        <span
-                          className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold border ${item.actorBadge}`}
-                        >
-                          {item.enteredBy}
-                        </span>
-                      </td>
-                      <td className="py-3.5 px-4 text-slate-600 font-medium">
-                        {item.category}
-                      </td>
-                      <td className="py-3.5 px-4 text-slate-500">
-                        <div className="text-slate-800 font-semibold text-[11px]">
-                          {item.component}
-                        </div>
-                        <div className="text-[11px] text-slate-400 mt-0.5">
-                          {item.description}
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ─────────────────────────────────────────────────────────── */}
-      {/* VIEW B: GRANULAR RBAC PRIVILEGE MATRIX                      */}
-      {/* ─────────────────────────────────────────────────────────── */}
-      {activeViewTab === "RBAC_MATRIX" && (
-        <div className="space-y-6 animate-in fade-in duration-200">
+      <div className="space-y-6 animate-in fade-in duration-200">
           {/* 2. Platform Roles Summary Cards */}
           <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-3.5">
             {ROLES_META.map((meta) => {
@@ -793,7 +629,6 @@ export default function RolesPermissionsView() {
             </div>
           </div>
         </div>
-      )}
 
       {/* ─────────────────────────────────────────────────────────── */}
       {/* 5. Policy Enforcement Notice                               */}
