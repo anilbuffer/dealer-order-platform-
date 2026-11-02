@@ -150,8 +150,8 @@ export default function JapanInventoryView({
                 setStatusFilter(st);
               }}
               className={`px-3 py-1 rounded-md text-[11px] font-medium transition-colors cursor-pointer shrink-0 ${statusFilter === st
-                  ? "bg-slate-900 text-white"
-                  : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                ? "bg-slate-900 text-white"
+                : "bg-slate-100 text-slate-600 hover:bg-slate-200"
                 }`}
             >
               {st === "ALL" ? "All Units" : st.charAt(0) + st.slice(1).toLowerCase()}
@@ -160,10 +160,10 @@ export default function JapanInventoryView({
         </div>
       </div>
 
-      {/* Inventory Table (Clean, Restrained, Monochromatic) */}
+      {/* Inventory Table (Clean, Restrained, Monochromatic with Touch Momentum) */}
       <div className="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-soft">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs">
+        <div className="overflow-x-auto touch-scroll navy-scrollbar">
+          <table className="w-full text-left text-xs min-w-[700px]">
             <thead className="bg-slate-50 border-b border-slate-200 text-[11px] font-semibold text-slate-500 uppercase tracking-wider">
               <tr>
                 <th className="py-3 px-4">Vehicle / Model</th>
@@ -228,10 +228,10 @@ export default function JapanInventoryView({
                     <td className="py-3 px-4">
                       <span
                         className={`inline-block px-2 py-0.5 rounded text-[10px] font-semibold ${isAvailable
-                            ? "bg-slate-900 text-white"
-                            : isReserved
-                              ? "bg-amber-100 text-amber-900"
-                              : "bg-slate-100 text-slate-600"
+                          ? "bg-slate-900 text-white"
+                          : isReserved
+                            ? "bg-amber-100 text-amber-900"
+                            : "bg-slate-100 text-slate-600"
                           }`}
                       >
                         {vehicle.status}

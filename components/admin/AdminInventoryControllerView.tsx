@@ -142,11 +142,10 @@ export default function AdminInventoryControllerView() {
       </div>
 
       {/* ─────────────────────────────────────────────────────────── */}
-      {/* 3. Central Inventory Table                                  */}
-      {/* ─────────────────────────────────────────────────────────── */}
+      {/* 3. Central Inventory Table */}
       <div className="bg-white rounded-2xl border border-slate-200/90 shadow-sm overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs text-slate-600">
+        <div className="overflow-x-auto touch-scroll navy-scrollbar">
+          <table className="w-full text-left text-xs text-slate-600 min-w-[780px]">
             <thead className="bg-slate-50/80 border-b border-slate-200/80 text-[11px] font-bold uppercase tracking-wider text-slate-500">
               <tr>
                 <th className="py-3 px-5">Vehicle &amp; Stock ID</th>

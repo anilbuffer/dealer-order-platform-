@@ -522,7 +522,7 @@ export default function DealerStockCatalog({
         /* ───────────────────────────────────────────────────────── */
         /* 4A. GRID LAYOUT: Executive Automotive Cards (Reference Styled) */
         /* ───────────────────────────────────────────────────────── */
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-in fade-in duration-300">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 min-[2200px]:grid-cols-5 gap-4 sm:gap-6 animate-in fade-in duration-300">
           {filteredVehicles.map((vehicle) => {
             const price = calculateLandedPrice(vehicle.fobPriceJPY, dealerZone);
             const isAvailable = vehicle.status === "AVAILABLE";
@@ -536,34 +536,34 @@ export default function DealerStockCatalog({
               <div
                 key={vehicle.id}
                 onClick={() => handleOpenFullPageDetails(vehicle.id)}
-                className="bg-white rounded-[28px] border border-slate-200/80 hover:border-slate-300 shadow-[0_4px_24px_rgba(0,0,0,0.03)] hover:shadow-[0_16px_36px_rgba(0,0,0,0.08)] hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between group cursor-pointer overflow-hidden p-6"
+                className="bg-white rounded-[24px] sm:rounded-[28px] border border-slate-200/80 hover:border-slate-300 shadow-[0_4px_24px_rgba(0,0,0,0.03)] hover:shadow-[0_16px_36px_rgba(0,0,0,0.08)] hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between group cursor-pointer overflow-hidden p-4 sm:p-6"
               >
                 <div>
                   {/* Card Top Row: Title + Specs on Left, Price + Circular Arrow on Right */}
-                  <div className="flex items-start justify-between gap-3">
+                  <div className="flex items-start justify-between gap-2.5 sm:gap-3">
                     <div className="min-w-0 flex-1">
-                      <h3 className="text-base sm:text-lg font-black text-slate-900 group-hover:text-[#E11D48] transition-colors leading-snug truncate">
+                      <h3 className="text-sm sm:text-base lg:text-lg font-black text-slate-900 group-hover:text-[#E11D48] transition-colors leading-snug truncate">
                         {vehicle.make} {vehicle.model}
                       </h3>
-                      <p className="text-xs text-slate-400 font-medium mt-0.5 truncate">
+                      <p className="text-[11px] sm:text-xs text-slate-400 font-medium mt-0.5 truncate">
                         {vehicle.year} · {vehicle.fuelType} · {vehicle.transmission}
                       </p>
                     </div>
 
-                    <div className="flex items-center gap-2.5 shrink-0">
+                    <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
                       <div className="text-right">
-                        <span className="text-base sm:text-lg font-black text-slate-900 font-mono tracking-tight block leading-tight">
+                        <span className="text-sm sm:text-base lg:text-lg font-black text-slate-900 font-mono tracking-tight block leading-tight">
                           ${price.totalBuyPriceNZD.toLocaleString()}
                         </span>
-                        <span className="text-[10px] text-slate-400 font-medium block">
+                        <span className="text-[9px] sm:text-[10px] text-slate-400 font-medium block">
                           {isAdminView ? `FOB ¥${vehicle.fobPriceJPY.toLocaleString()}` : "NZD Landed"}
                         </span>
                       </div>
                       <div
-                        className="w-8 h-8 rounded-full bg-slate-100 group-hover:bg-[#E11D48] text-slate-600 group-hover:text-white flex items-center justify-center transition-all duration-200 shadow-2xs shrink-0"
+                        className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-slate-100 group-hover:bg-[#E11D48] text-slate-600 group-hover:text-white flex items-center justify-center transition-all duration-200 shadow-2xs shrink-0"
                         title="View Full Vehicle Details"
                       >
-                        <ArrowUpRight className="w-4 h-4" />
+                        <ArrowUpRight className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                       </div>
                     </div>
                   </div>
@@ -661,33 +661,33 @@ export default function DealerStockCatalog({
                   </div>
 
                   {/* Bottom Specification Strip (3 columns with vertical dividers) */}
-                  <div className="grid grid-cols-3 divide-x divide-slate-100 border-t border-slate-100 pt-3.5 text-center">
+                  <div className="grid grid-cols-3 divide-x divide-slate-100 border-t border-slate-100 pt-3 sm:pt-3.5 text-center">
                     {/* Col 1: Odometer */}
-                    <div className="px-1">
-                      <span className="text-sm font-black text-slate-900 font-mono block">
+                    <div className="px-0.5 sm:px-1">
+                      <span className="text-xs sm:text-sm font-black text-slate-900 font-mono block truncate">
                         {vehicle.odometerKm.toLocaleString()} km
                       </span>
-                      <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider block mt-0.5">
+                      <span className="text-[9px] sm:text-[10px] font-semibold text-slate-400 uppercase tracking-wider block mt-0.5 truncate">
                         Odometer
                       </span>
                     </div>
 
                     {/* Col 2: Auction Grade */}
-                    <div className="px-1">
-                      <span className="text-sm font-black text-slate-900 block">
+                    <div className="px-0.5 sm:px-1">
+                      <span className="text-xs sm:text-sm font-black text-slate-900 block truncate">
                         ★ {vehicle.auctionGrade} / {vehicle.interiorGrade}
                       </span>
-                      <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider block mt-0.5">
+                      <span className="text-[9px] sm:text-[10px] font-semibold text-slate-400 uppercase tracking-wider block mt-0.5 truncate">
                         Auction Grade
                       </span>
                     </div>
 
                     {/* Col 3: Est. Margin */}
-                    <div className="px-1">
-                      <span className="text-sm font-black text-emerald-600 font-mono block">
+                    <div className="px-0.5 sm:px-1">
+                      <span className="text-xs sm:text-sm font-black text-emerald-600 font-mono block truncate">
                         +${grossMargin.toLocaleString()}
                       </span>
-                      <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider block mt-0.5">
+                      <span className="text-[9px] sm:text-[10px] font-semibold text-slate-400 uppercase tracking-wider block mt-0.5 truncate">
                         Est. Margin
                       </span>
                     </div>

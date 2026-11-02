@@ -101,8 +101,8 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-xs animate-in fade-in duration-200">
-      <div className="relative w-full max-w-xl bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden animate-in zoom-in-95 duration-200">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/60 backdrop-blur-xs animate-in fade-in duration-200 overflow-y-auto">
+      <div className="relative w-full max-w-xl max-h-[92vh] flex flex-col bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden animate-in zoom-in-95 duration-200 my-auto">
         {/* Header */}
         <div className="px-6 py-5 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
           <div className="flex items-center gap-2.5">
@@ -131,8 +131,8 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
           </button>
         </div>
 
-        {/* Navigation Tabs */}
-        <div className="px-6 pt-3 flex gap-2 border-b border-slate-100 bg-white">
+        {/* Navigation Tabs with Touch Scrolling */}
+        <div className="px-4 sm:px-6 pt-3 flex gap-2 border-b border-slate-100 bg-white overflow-x-auto hide-scrollbar touch-scroll">
           {[
             { id: "ROLES", label: "Switch Persona / Role", icon: Shield },
             { id: "ACCOUNT", label: "My Profile", icon: User },
@@ -148,11 +148,10 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                   audio.playSubtleClick();
                   setActiveTab(tab.id as any);
                 }}
-                className={`flex items-center gap-2 px-3.5 py-2.5 text-xs font-bold border-b-2 transition-all cursor-pointer ${
-                  isActive
-                    ? "border-[#E11D48] text-[#E11D48]"
-                    : "border-transparent text-slate-500 hover:text-slate-800"
-                }`}
+                className={`flex items-center gap-2 px-3.5 py-2.5 text-xs font-bold border-b-2 transition-all cursor-pointer ${isActive
+                  ? "border-[#E11D48] text-[#E11D48]"
+                  : "border-transparent text-slate-500 hover:text-slate-800"
+                  }`}
               >
                 <Icon className="w-3.5 h-3.5" />
                 <span>{tab.label}</span>
@@ -183,45 +182,40 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                       key={item.role}
                       type="button"
                       onClick={() => handleRoleSelect(item.role)}
-                      className={`w-full p-3.5 rounded-2xl border text-left transition-all flex items-center justify-between gap-3 cursor-pointer ${
-                        isActive
-                          ? "bg-slate-900 text-white border-slate-900 shadow-sm ring-2 ring-[#E11D48]/30"
-                          : "bg-white hover:bg-slate-50 border-slate-200 hover:border-slate-300"
-                      }`}
+                      className={`w-full p-3.5 rounded-2xl border text-left transition-all flex items-center justify-between gap-3 cursor-pointer ${isActive
+                        ? "bg-slate-900 text-white border-slate-900 shadow-sm ring-2 ring-[#E11D48]/30"
+                        : "bg-white hover:bg-slate-50 border-slate-200 hover:border-slate-300"
+                        }`}
                     >
                       <div className="flex items-center gap-3 min-w-0">
                         <div
-                          className={`p-2.5 rounded-xl shrink-0 ${
-                            isActive
-                              ? "bg-white/10 text-white border border-white/20"
-                              : item.iconBg
-                          }`}
+                          className={`p-2.5 rounded-xl shrink-0 ${isActive
+                            ? "bg-white/10 text-white border border-white/20"
+                            : item.iconBg
+                            }`}
                         >
                           <Icon className="w-4 h-4" />
                         </div>
                         <div className="min-w-0">
                           <div className="flex items-center gap-2">
                             <span
-                              className={`text-xs font-extrabold truncate ${
-                                isActive ? "text-white" : "text-slate-900"
-                              }`}
+                              className={`text-xs font-extrabold truncate ${isActive ? "text-white" : "text-slate-900"
+                                }`}
                             >
                               {item.label}
                             </span>
                             <span
-                              className={`text-[9px] font-bold px-1.5 py-0.2 rounded border ${
-                                isActive
-                                  ? "bg-white/15 text-slate-200 border-white/20"
-                                  : item.badgeColor
-                              }`}
+                              className={`text-[9px] font-bold px-1.5 py-0.2 rounded border ${isActive
+                                ? "bg-white/15 text-slate-200 border-white/20"
+                                : item.badgeColor
+                                }`}
                             >
                               {item.badge}
                             </span>
                           </div>
                           <p
-                            className={`text-[11px] truncate mt-0.5 ${
-                              isActive ? "text-slate-300" : "text-slate-500"
-                            }`}
+                            className={`text-[11px] truncate mt-0.5 ${isActive ? "text-slate-300" : "text-slate-500"
+                              }`}
                           >
                             {item.sublabel} · {item.email}
                           </p>
@@ -323,11 +317,10 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                 <button
                   type="button"
                   onClick={handleToggleSound}
-                  className={`px-3 py-1.5 rounded-xl font-bold text-xs transition-colors cursor-pointer border ${
-                    !isMuted
-                      ? "bg-emerald-600 text-white border-emerald-700"
-                      : "bg-slate-200 text-slate-700 border-slate-300"
-                  }`}
+                  className={`px-3 py-1.5 rounded-xl font-bold text-xs transition-colors cursor-pointer border ${!isMuted
+                    ? "bg-emerald-600 text-white border-emerald-700"
+                    : "bg-slate-200 text-slate-700 border-slate-300"
+                    }`}
                 >
                   {!isMuted ? "Enabled" : "Muted"}
                 </button>
@@ -353,11 +346,10 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                     audio.playSubtleClick();
                     setNotificationsEnabled(!notificationsEnabled);
                   }}
-                  className={`px-3 py-1.5 rounded-xl font-bold text-xs transition-colors cursor-pointer border ${
-                    notificationsEnabled
-                      ? "bg-blue-600 text-white border-blue-700"
-                      : "bg-slate-200 text-slate-700 border-slate-300"
-                  }`}
+                  className={`px-3 py-1.5 rounded-xl font-bold text-xs transition-colors cursor-pointer border ${notificationsEnabled
+                    ? "bg-blue-600 text-white border-blue-700"
+                    : "bg-slate-200 text-slate-700 border-slate-300"
+                    }`}
                 >
                   {notificationsEnabled ? "Enabled" : "Off"}
                 </button>

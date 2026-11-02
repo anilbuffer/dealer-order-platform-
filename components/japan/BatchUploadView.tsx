@@ -266,8 +266,8 @@ export default function BatchUploadView({ onSuccessReturn }: BatchUploadViewProp
 
               {/* Parsed Rows Table */}
               <div className="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-soft">
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left text-xs">
+                <div className="overflow-x-auto touch-scroll navy-scrollbar">
+                  <table className="w-full text-left text-xs min-w-[680px]">
                     <thead className="bg-slate-50 border-b border-slate-200 text-[11px] font-semibold text-slate-500 uppercase tracking-wider">
                       <tr>
                         <th className="py-2.5 px-3">Row</th>

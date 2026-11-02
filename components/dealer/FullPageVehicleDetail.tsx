@@ -175,11 +175,10 @@ export default function FullPageVehicleDetail({
             <img
               src={images[activeImageIdx] || images[0]}
               alt={`${vehicle.make} ${vehicle.model}`}
-              className={`w-full h-full select-none transition-all duration-300 relative z-10 ${
-                (images[activeImageIdx] || images[0]).endsWith('.png')
-                  ? "object-contain filter drop-shadow-[0_16px_22px_rgba(0,0,0,0.16)] group-hover:scale-105"
-                  : "object-cover rounded-2xl"
-              }`}
+              className={`w-full h-full select-none transition-all duration-300 relative z-10 ${(images[activeImageIdx] || images[0]).endsWith('.png')
+                ? "object-contain filter drop-shadow-[0_16px_22px_rgba(0,0,0,0.16)] group-hover:scale-105"
+                : "object-cover rounded-2xl"
+                }`}
             />
 
             {/* Top-Left: Auction Grade Pill */}
@@ -223,8 +222,8 @@ export default function FullPageVehicleDetail({
             </div>
           </div>
 
-          {/* Clean Compact Thumbnails Strip */}
-          <div className="flex items-center gap-2 pt-1">
+          {/* Clean Compact Thumbnails Strip with Touch Horizontal Scrolling */}
+          <div className="flex items-center gap-2 pt-1 overflow-x-auto hide-scrollbar touch-scroll -mx-1 px-1">
             {images.slice(0, 8).map((img, idx) => (
               <button
                 key={idx}
@@ -234,8 +233,8 @@ export default function FullPageVehicleDetail({
                   setActiveImageIdx(idx);
                 }}
                 className={`relative w-16 h-11 sm:w-20 sm:h-14 rounded-xl overflow-hidden border-2 transition-all cursor-pointer bg-slate-50 flex items-center justify-center p-1 shrink-0 ${activeImageIdx === idx
-                    ? "border-[#E11D48] ring-2 ring-[#E11D48]/20 shadow-xs bg-white"
-                    : "border-slate-200 hover:border-slate-300 opacity-70 hover:opacity-100"
+                  ? "border-[#E11D48] ring-2 ring-[#E11D48]/20 shadow-xs bg-white"
+                  : "border-slate-200 hover:border-slate-300 opacity-70 hover:opacity-100"
                   }`}
               >
                 <img
@@ -451,272 +450,272 @@ export default function FullPageVehicleDetail({
         </div>
 
         <div className="divide-y divide-slate-100">
-            {/* ACCORDION 1: PERFORMANCE (Open by default) */}
-            <div className="py-3.5">
-              <button
-                type="button"
-                onClick={() => toggleAccordion("PERFORMANCE")}
-                className="w-full flex items-center justify-between text-left font-black text-xs uppercase tracking-wider text-slate-900 hover:text-[#E11D48] transition-colors py-1 cursor-pointer"
-              >
-                <div className="flex items-center gap-2">
-                  <Zap className="w-4 h-4 text-[#E11D48]" />
-                  <span>PERFORMANCE &amp; POWERTRAIN</span>
-                </div>
-                <ChevronDown
-                  className={`w-4 h-4 text-slate-400 transition-transform duration-200 ${openAccordion.PERFORMANCE ? "rotate-180 text-slate-900" : ""
-                    }`}
-                />
-              </button>
+          {/* ACCORDION 1: PERFORMANCE (Open by default) */}
+          <div className="py-3.5">
+            <button
+              type="button"
+              onClick={() => toggleAccordion("PERFORMANCE")}
+              className="w-full flex items-center justify-between text-left font-black text-xs uppercase tracking-wider text-slate-900 hover:text-[#E11D48] transition-colors py-1 cursor-pointer"
+            >
+              <div className="flex items-center gap-2">
+                <Zap className="w-4 h-4 text-[#E11D48]" />
+                <span>PERFORMANCE &amp; POWERTRAIN</span>
+              </div>
+              <ChevronDown
+                className={`w-4 h-4 text-slate-400 transition-transform duration-200 ${openAccordion.PERFORMANCE ? "rotate-180 text-slate-900" : ""
+                  }`}
+              />
+            </button>
 
-              {openAccordion.PERFORMANCE && (
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-y-3 gap-x-4 pt-3.5 pb-2 text-xs">
-                  <div>
-                    <span className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider block">0–100 km/h</span>
-                    <strong className="text-slate-900 font-mono text-sm block mt-0.5">7.90 seconds</strong>
+            {openAccordion.PERFORMANCE && (
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-y-3 gap-x-4 pt-3.5 pb-2 text-xs">
+                <div>
+                  <span className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider block">0–100 km/h</span>
+                  <strong className="text-slate-900 font-mono text-sm block mt-0.5">7.90 seconds</strong>
+                </div>
+                <div>
+                  <span className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider block">Top Speed</span>
+                  <strong className="text-slate-900 font-mono text-sm block mt-0.5">185 km/h</strong>
+                </div>
+                <div>
+                  <span className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider block">System / Engine</span>
+                  <strong className="text-slate-900 text-sm block mt-0.5 truncate">{vehicle.fuelType} (HR12DE + EM47)</strong>
+                </div>
+                <div>
+                  <span className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider block">Displacement</span>
+                  <strong className="text-slate-900 font-mono text-sm block mt-0.5">{vehicle.engineCc || 1200} cc</strong>
+                </div>
+                <div>
+                  <span className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider block">Power Output</span>
+                  <strong className="text-slate-900 font-mono text-sm block mt-0.5">100 kW (136 PS)</strong>
+                </div>
+                <div>
+                  <span className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider block">Instant Torque</span>
+                  <strong className="text-slate-900 font-mono text-sm block mt-0.5">280 Nm</strong>
+                </div>
+                <div>
+                  <span className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider block">Drivetrain</span>
+                  <strong className="text-slate-900 text-sm block mt-0.5">{vehicle.driveType}</strong>
+                </div>
+                <div>
+                  <span className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider block">Transmission</span>
+                  <strong className="text-slate-900 text-sm block mt-0.5">{vehicle.transmission}</strong>
+                </div>
+                <div>
+                  <span className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider block">Fuel / Battery</span>
+                  <strong className="text-slate-900 text-sm block mt-0.5">{vehicle.fuelType}</strong>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* ACCORDION 2: JAPAN INSPECTION & CONDITION */}
+          <div className="py-3.5">
+            <button
+              type="button"
+              onClick={() => toggleAccordion("INSPECTION")}
+              className="w-full flex items-center justify-between text-left font-black text-xs uppercase tracking-wider text-slate-900 hover:text-[#E11D48] transition-colors py-1 cursor-pointer"
+            >
+              <div className="flex items-center gap-2">
+                <FileCheck2 className="w-4 h-4 text-[#E11D48]" />
+                <span>JAPAN INSPECTION &amp; CONDITION</span>
+              </div>
+              <ChevronDown
+                className={`w-4 h-4 text-slate-400 transition-transform duration-200 ${openAccordion.INSPECTION ? "rotate-180 text-slate-900" : ""
+                  }`}
+              />
+            </button>
+
+            {openAccordion.INSPECTION && (
+              <div className="space-y-3 pt-3.5 pb-2 text-xs">
+                <div className="grid grid-cols-3 gap-3 text-center">
+                  <div className="p-3 rounded-xl bg-slate-50 border border-slate-200">
+                    <span className="text-[10px] text-slate-400 font-semibold uppercase block">Auction Grade</span>
+                    <strong className="text-base font-black text-slate-900 font-mono block mt-0.5">★ {vehicle.auctionGrade}</strong>
                   </div>
-                  <div>
-                    <span className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider block">Top Speed</span>
-                    <strong className="text-slate-900 font-mono text-sm block mt-0.5">185 km/h</strong>
+                  <div className="p-3 rounded-xl bg-slate-50 border border-slate-200">
+                    <span className="text-[10px] text-slate-400 font-semibold uppercase block">Interior Grade</span>
+                    <strong className="text-base font-black text-slate-900 block mt-0.5">Grade {vehicle.interiorGrade}</strong>
                   </div>
-                  <div>
-                    <span className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider block">System / Engine</span>
-                    <strong className="text-slate-900 text-sm block mt-0.5 truncate">{vehicle.fuelType} (HR12DE + EM47)</strong>
-                  </div>
-                  <div>
-                    <span className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider block">Displacement</span>
-                    <strong className="text-slate-900 font-mono text-sm block mt-0.5">{vehicle.engineCc || 1200} cc</strong>
-                  </div>
-                  <div>
-                    <span className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider block">Power Output</span>
-                    <strong className="text-slate-900 font-mono text-sm block mt-0.5">100 kW (136 PS)</strong>
-                  </div>
-                  <div>
-                    <span className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider block">Instant Torque</span>
-                    <strong className="text-slate-900 font-mono text-sm block mt-0.5">280 Nm</strong>
-                  </div>
-                  <div>
-                    <span className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider block">Drivetrain</span>
-                    <strong className="text-slate-900 text-sm block mt-0.5">{vehicle.driveType}</strong>
-                  </div>
-                  <div>
-                    <span className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider block">Transmission</span>
-                    <strong className="text-slate-900 text-sm block mt-0.5">{vehicle.transmission}</strong>
-                  </div>
-                  <div>
-                    <span className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider block">Fuel / Battery</span>
-                    <strong className="text-slate-900 text-sm block mt-0.5">{vehicle.fuelType}</strong>
+                  <div className="p-3 rounded-xl bg-slate-50 border border-slate-200">
+                    <span className="text-[10px] text-slate-400 font-semibold uppercase block">Exterior Grade</span>
+                    <strong className="text-base font-black text-slate-900 block mt-0.5">Grade {vehicle.exteriorGrade}</strong>
                   </div>
                 </div>
-              )}
-            </div>
 
-            {/* ACCORDION 2: JAPAN INSPECTION & CONDITION */}
-            <div className="py-3.5">
-              <button
-                type="button"
-                onClick={() => toggleAccordion("INSPECTION")}
-                className="w-full flex items-center justify-between text-left font-black text-xs uppercase tracking-wider text-slate-900 hover:text-[#E11D48] transition-colors py-1 cursor-pointer"
-              >
-                <div className="flex items-center gap-2">
-                  <FileCheck2 className="w-4 h-4 text-[#E11D48]" />
-                  <span>JAPAN INSPECTION &amp; CONDITION</span>
-                </div>
-                <ChevronDown
-                  className={`w-4 h-4 text-slate-400 transition-transform duration-200 ${openAccordion.INSPECTION ? "rotate-180 text-slate-900" : ""
-                    }`}
-                />
-              </button>
-
-              {openAccordion.INSPECTION && (
-                <div className="space-y-3 pt-3.5 pb-2 text-xs">
-                  <div className="grid grid-cols-3 gap-3 text-center">
-                    <div className="p-3 rounded-xl bg-slate-50 border border-slate-200">
-                      <span className="text-[10px] text-slate-400 font-semibold uppercase block">Auction Grade</span>
-                      <strong className="text-base font-black text-slate-900 font-mono block mt-0.5">★ {vehicle.auctionGrade}</strong>
+                <div className="space-y-2 pt-1">
+                  <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-200">
+                    <div className="flex items-center gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <span className="font-medium text-slate-800">JEVIC Odometer Certification</span>
                     </div>
-                    <div className="p-3 rounded-xl bg-slate-50 border border-slate-200">
-                      <span className="text-[10px] text-slate-400 font-semibold uppercase block">Interior Grade</span>
-                      <strong className="text-base font-black text-slate-900 block mt-0.5">Grade {vehicle.interiorGrade}</strong>
+                    <span className="text-emerald-700 font-mono font-bold text-[11px] bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                      100% Verified
+                    </span>
+                  </div>
+
+                  <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-200">
+                    <div className="flex items-center gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <span className="font-medium text-slate-800">Yokohama Port Radiation Screening (&lt;0.08 μSv/h)</span>
                     </div>
-                    <div className="p-3 rounded-xl bg-slate-50 border border-slate-200">
-                      <span className="text-[10px] text-slate-400 font-semibold uppercase block">Exterior Grade</span>
-                      <strong className="text-base font-black text-slate-900 block mt-0.5">Grade {vehicle.exteriorGrade}</strong>
-                    </div>
-                  </div>
-
-                  <div className="space-y-2 pt-1">
-                    <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-200">
-                      <div className="flex items-center gap-2">
-                        <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                        <span className="font-medium text-slate-800">JEVIC Odometer Certification</span>
-                      </div>
-                      <span className="text-emerald-700 font-mono font-bold text-[11px] bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
-                        100% Verified
-                      </span>
-                    </div>
-
-                    <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-200">
-                      <div className="flex items-center gap-2">
-                        <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                        <span className="font-medium text-slate-800">Yokohama Port Radiation Screening (&lt;0.08 μSv/h)</span>
-                      </div>
-                      <span className="text-emerald-700 font-mono font-bold text-[11px] bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
-                        Zero Detected
-                      </span>
-                    </div>
-                  </div>
-
-                  {vehicle.knownDefects && vehicle.knownDefects.length > 0 && (
-                    <div className="pt-1">
-                      <span className="text-[11px] font-bold text-slate-700 block mb-1.5">Pre-Export Condition Log:</span>
-                      <ul className="space-y-1">
-                        {vehicle.knownDefects.map((defect, i) => (
-                          <li key={i} className="flex items-center gap-2 text-slate-600 text-xs">
-                            <span className="w-1.5 h-1.5 rounded-full bg-slate-400" />
-                            <span>{defect}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-
-            {/* ACCORDION 3: SAFETY & ADAS */}
-            <div className="py-3.5">
-              <button
-                type="button"
-                onClick={() => toggleAccordion("SAFETY")}
-                className="w-full flex items-center justify-between text-left font-black text-xs uppercase tracking-wider text-slate-900 hover:text-[#E11D48] transition-colors py-1 cursor-pointer"
-              >
-                <div className="flex items-center gap-2">
-                  <ShieldCheck className="w-4 h-4 text-[#E11D48]" />
-                  <span>SAFETY &amp; ADAS SPECIFICATIONS</span>
-                </div>
-                <ChevronDown
-                  className={`w-4 h-4 text-slate-400 transition-transform duration-200 ${openAccordion.SAFETY ? "rotate-180 text-slate-900" : ""
-                    }`}
-                />
-              </button>
-
-              {openAccordion.SAFETY && (
-                <div className="space-y-2 pt-3.5 pb-2 text-xs">
-                  <div className="flex items-center gap-2.5 py-1 text-slate-700">
-                    <Check className="w-4 h-4 text-emerald-600 shrink-0" />
-                    <span>ProPILOT Autonomous Highway Cruise &amp; Steering Assist</span>
-                  </div>
-                  <div className="flex items-center gap-2.5 py-1 text-slate-700">
-                    <Check className="w-4 h-4 text-emerald-600 shrink-0" />
-                    <span>Intelligent Emergency Autonomous Forward Braking</span>
-                  </div>
-                  <div className="flex items-center gap-2.5 py-1 text-slate-700">
-                    <Check className="w-4 h-4 text-emerald-600 shrink-0" />
-                    <span>Around View 360° Monitor with Moving Object Detection</span>
-                  </div>
-                  <div className="flex items-center gap-2.5 py-1 text-slate-700">
-                    <Check className="w-4 h-4 text-emerald-600 shrink-0" />
-                    <span>Lane Departure Prevention &amp; Blind Spot Intervention</span>
-                  </div>
-                  <div className="flex items-center gap-2.5 py-1 text-slate-700">
-                    <Check className="w-4 h-4 text-emerald-600 shrink-0" />
-                    <span>Full Curtain &amp; Dual Front SRS Airbags (ANCAP 5-Star Equivalent)</span>
+                    <span className="text-emerald-700 font-mono font-bold text-[11px] bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                      Zero Detected
+                    </span>
                   </div>
                 </div>
-              )}
-            </div>
 
-            {/* ACCORDION 4: COMPLIANCE & BORDER SPECIFICATIONS */}
-            <div className="py-3.5">
-              <button
-                type="button"
-                onClick={() => toggleAccordion("COMPLIANCE")}
-                className="w-full flex items-center justify-between text-left font-black text-xs uppercase tracking-wider text-slate-900 hover:text-[#E11D48] transition-colors py-1 cursor-pointer"
-              >
-                <div className="flex items-center gap-2">
-                  <Ship className="w-4 h-4 text-[#E11D48]" />
-                  <span>COMPLIANCE &amp; BORDER SPECIFICATIONS</span>
-                </div>
-                <ChevronDown
-                  className={`w-4 h-4 text-slate-400 transition-transform duration-200 ${openAccordion.COMPLIANCE ? "rotate-180 text-slate-900" : ""
-                    }`}
-                />
-              </button>
+                {vehicle.knownDefects && vehicle.knownDefects.length > 0 && (
+                  <div className="pt-1">
+                    <span className="text-[11px] font-bold text-slate-700 block mb-1.5">Pre-Export Condition Log:</span>
+                    <ul className="space-y-1">
+                      {vehicle.knownDefects.map((defect, i) => (
+                        <li key={i} className="flex items-center gap-2 text-slate-600 text-xs">
+                          <span className="w-1.5 h-1.5 rounded-full bg-slate-400" />
+                          <span>{defect}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
 
-              {openAccordion.COMPLIANCE && (
-                <div className="space-y-2 pt-3.5 pb-2 text-xs">
-                  <div className="flex items-center justify-between py-1 border-b border-slate-100">
-                    <span className="text-slate-500">Departure Port:</span>
-                    <strong className="text-slate-900">Yokohama RoRo Terminal, Japan</strong>
-                  </div>
-                  <div className="flex items-center justify-between py-1 border-b border-slate-100">
-                    <span className="text-slate-500">Destination Port:</span>
-                    <strong className="text-slate-900">Ports of Auckland (Fergusson Wharf)</strong>
-                  </div>
-                  <div className="flex items-center justify-between py-1 border-b border-slate-100">
-                    <span className="text-slate-500">NZTA Entry Compliance:</span>
-                    <strong className="text-emerald-700 font-semibold">MR2A Certification Pass Included</strong>
-                  </div>
-                  <div className="flex items-center justify-between py-1 border-b border-slate-100">
-                    <span className="text-slate-500">Warrant of Fitness:</span>
-                    <strong className="text-slate-900">1-Year NZ WoF Issued</strong>
-                  </div>
-                  <div className="flex items-center justify-between py-1">
-                    <span className="text-slate-500">Biosecurity Clearance:</span>
-                    <strong className="text-slate-900">MPI Decontaminated &amp; Steam Cleared</strong>
-                  </div>
-                </div>
-              )}
-            </div>
+          {/* ACCORDION 3: SAFETY & ADAS */}
+          <div className="py-3.5">
+            <button
+              type="button"
+              onClick={() => toggleAccordion("SAFETY")}
+              className="w-full flex items-center justify-between text-left font-black text-xs uppercase tracking-wider text-slate-900 hover:text-[#E11D48] transition-colors py-1 cursor-pointer"
+            >
+              <div className="flex items-center gap-2">
+                <ShieldCheck className="w-4 h-4 text-[#E11D48]" />
+                <span>SAFETY &amp; ADAS SPECIFICATIONS</span>
+              </div>
+              <ChevronDown
+                className={`w-4 h-4 text-slate-400 transition-transform duration-200 ${openAccordion.SAFETY ? "rotate-180 text-slate-900" : ""
+                  }`}
+              />
+            </button>
 
-            {/* ACCORDION 5: DIMENSIONS & CAPACITIES */}
-            <div className="py-3.5">
-              <button
-                type="button"
-                onClick={() => toggleAccordion("DIMENSIONS")}
-                className="w-full flex items-center justify-between text-left font-black text-xs uppercase tracking-wider text-slate-900 hover:text-[#E11D48] transition-colors py-1 cursor-pointer"
-              >
-                <div className="flex items-center gap-2">
-                  <Car className="w-4 h-4 text-[#E11D48]" />
-                  <span>DIMENSIONS &amp; CAPACITIES</span>
+            {openAccordion.SAFETY && (
+              <div className="space-y-2 pt-3.5 pb-2 text-xs">
+                <div className="flex items-center gap-2.5 py-1 text-slate-700">
+                  <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <span>ProPILOT Autonomous Highway Cruise &amp; Steering Assist</span>
                 </div>
-                <ChevronDown
-                  className={`w-4 h-4 text-slate-400 transition-transform duration-200 ${openAccordion.DIMENSIONS ? "rotate-180 text-slate-900" : ""
-                    }`}
-                />
-              </button>
+                <div className="flex items-center gap-2.5 py-1 text-slate-700">
+                  <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <span>Intelligent Emergency Autonomous Forward Braking</span>
+                </div>
+                <div className="flex items-center gap-2.5 py-1 text-slate-700">
+                  <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <span>Around View 360° Monitor with Moving Object Detection</span>
+                </div>
+                <div className="flex items-center gap-2.5 py-1 text-slate-700">
+                  <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <span>Lane Departure Prevention &amp; Blind Spot Intervention</span>
+                </div>
+                <div className="flex items-center gap-2.5 py-1 text-slate-700">
+                  <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <span>Full Curtain &amp; Dual Front SRS Airbags (ANCAP 5-Star Equivalent)</span>
+                </div>
+              </div>
+            )}
+          </div>
 
-              {openAccordion.DIMENSIONS && (
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-y-3 gap-x-4 pt-3.5 pb-2 text-xs">
-                  <div>
-                    <span className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider block">Length</span>
-                    <strong className="text-slate-900 font-mono text-sm block mt-0.5">4,770 mm</strong>
-                  </div>
-                  <div>
-                    <span className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider block">Width</span>
-                    <strong className="text-slate-900 font-mono text-sm block mt-0.5">1,740 mm</strong>
-                  </div>
-                  <div>
-                    <span className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider block">Height</span>
-                    <strong className="text-slate-900 font-mono text-sm block mt-0.5">1,865 mm</strong>
-                  </div>
-                  <div>
-                    <span className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider block">Wheelbase</span>
-                    <strong className="text-slate-900 font-mono text-sm block mt-0.5">2,860 mm</strong>
-                  </div>
-                  <div>
-                    <span className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider block">Curb Weight</span>
-                    <strong className="text-slate-900 font-mono text-sm block mt-0.5">1,670 kg</strong>
-                  </div>
-                  <div>
-                    <span className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider block">Seating</span>
-                    <strong className="text-slate-900 text-sm block mt-0.5">5–7 Seats</strong>
-                  </div>
+          {/* ACCORDION 4: COMPLIANCE & BORDER SPECIFICATIONS */}
+          <div className="py-3.5">
+            <button
+              type="button"
+              onClick={() => toggleAccordion("COMPLIANCE")}
+              className="w-full flex items-center justify-between text-left font-black text-xs uppercase tracking-wider text-slate-900 hover:text-[#E11D48] transition-colors py-1 cursor-pointer"
+            >
+              <div className="flex items-center gap-2">
+                <Ship className="w-4 h-4 text-[#E11D48]" />
+                <span>COMPLIANCE &amp; BORDER SPECIFICATIONS</span>
+              </div>
+              <ChevronDown
+                className={`w-4 h-4 text-slate-400 transition-transform duration-200 ${openAccordion.COMPLIANCE ? "rotate-180 text-slate-900" : ""
+                  }`}
+              />
+            </button>
+
+            {openAccordion.COMPLIANCE && (
+              <div className="space-y-2 pt-3.5 pb-2 text-xs">
+                <div className="flex items-center justify-between py-1 border-b border-slate-100">
+                  <span className="text-slate-500">Departure Port:</span>
+                  <strong className="text-slate-900">Yokohama RoRo Terminal, Japan</strong>
                 </div>
-              )}
-            </div>
+                <div className="flex items-center justify-between py-1 border-b border-slate-100">
+                  <span className="text-slate-500">Destination Port:</span>
+                  <strong className="text-slate-900">Ports of Auckland (Fergusson Wharf)</strong>
+                </div>
+                <div className="flex items-center justify-between py-1 border-b border-slate-100">
+                  <span className="text-slate-500">NZTA Entry Compliance:</span>
+                  <strong className="text-emerald-700 font-semibold">MR2A Certification Pass Included</strong>
+                </div>
+                <div className="flex items-center justify-between py-1 border-b border-slate-100">
+                  <span className="text-slate-500">Warrant of Fitness:</span>
+                  <strong className="text-slate-900">1-Year NZ WoF Issued</strong>
+                </div>
+                <div className="flex items-center justify-between py-1">
+                  <span className="text-slate-500">Biosecurity Clearance:</span>
+                  <strong className="text-slate-900">MPI Decontaminated &amp; Steam Cleared</strong>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* ACCORDION 5: DIMENSIONS & CAPACITIES */}
+          <div className="py-3.5">
+            <button
+              type="button"
+              onClick={() => toggleAccordion("DIMENSIONS")}
+              className="w-full flex items-center justify-between text-left font-black text-xs uppercase tracking-wider text-slate-900 hover:text-[#E11D48] transition-colors py-1 cursor-pointer"
+            >
+              <div className="flex items-center gap-2">
+                <Car className="w-4 h-4 text-[#E11D48]" />
+                <span>DIMENSIONS &amp; CAPACITIES</span>
+              </div>
+              <ChevronDown
+                className={`w-4 h-4 text-slate-400 transition-transform duration-200 ${openAccordion.DIMENSIONS ? "rotate-180 text-slate-900" : ""
+                  }`}
+              />
+            </button>
+
+            {openAccordion.DIMENSIONS && (
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-y-3 gap-x-4 pt-3.5 pb-2 text-xs">
+                <div>
+                  <span className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider block">Length</span>
+                  <strong className="text-slate-900 font-mono text-sm block mt-0.5">4,770 mm</strong>
+                </div>
+                <div>
+                  <span className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider block">Width</span>
+                  <strong className="text-slate-900 font-mono text-sm block mt-0.5">1,740 mm</strong>
+                </div>
+                <div>
+                  <span className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider block">Height</span>
+                  <strong className="text-slate-900 font-mono text-sm block mt-0.5">1,865 mm</strong>
+                </div>
+                <div>
+                  <span className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider block">Wheelbase</span>
+                  <strong className="text-slate-900 font-mono text-sm block mt-0.5">2,860 mm</strong>
+                </div>
+                <div>
+                  <span className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider block">Curb Weight</span>
+                  <strong className="text-slate-900 font-mono text-sm block mt-0.5">1,670 kg</strong>
+                </div>
+                <div>
+                  <span className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider block">Seating</span>
+                  <strong className="text-slate-900 text-sm block mt-0.5">5–7 Seats</strong>
+                </div>
+              </div>
+            )}
           </div>
         </div>
+      </div>
 
       {/* Atomic Reservation Modal */}
       <AtomicReservationModal

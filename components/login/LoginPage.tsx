@@ -73,7 +73,7 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen w-full flex flex-col lg:flex-row bg-[#F8FAFC]">
       {/* LEFT HALF: Minimal & Clean Dark Brand Canvas */}
-      <div className="relative w-full lg:w-1/2 bg-[#0A1322] flex flex-col justify-between p-8 sm:p-12 lg:p-16 overflow-hidden text-white border-b lg:border-b-0 lg:border-r border-[#1B2A42]">
+      <div className="relative w-full lg:w-1/2 bg-[#0A1322] flex flex-col justify-between p-6 sm:p-10 lg:p-16 overflow-hidden text-white border-b lg:border-b-0 lg:border-r border-[#1B2A42]">
         {/* Subtle background ambient glow */}
         <div className="absolute -top-32 -left-32 w-96 h-96 bg-crimson-600/10 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute -bottom-32 -right-32 w-96 h-96 bg-blue-600/10 rounded-full blur-3xl pointer-events-none" />
@@ -155,38 +155,35 @@ export default function LoginPage() {
             <button
               type="button"
               onClick={() => handleTabChange("DEALER")}
-              className={`flex-1 py-2 text-xs font-semibold rounded-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
-                activeTab === "DEALER"
-                  ? "bg-white text-slate-900 shadow-soft"
-                  : "text-slate-500 hover:text-slate-800"
-              }`}
+              className={`flex-1 py-2 text-[11px] sm:text-xs font-semibold rounded-lg transition-all flex items-center justify-center gap-1 sm:gap-1.5 cursor-pointer truncate ${activeTab === "DEALER"
+                ? "bg-white text-slate-900 shadow-soft font-bold"
+                : "text-slate-500 hover:text-slate-800"
+                }`}
             >
-              <Car className="w-3.5 h-3.5 text-emerald-600" />
-              <span>Dealer Login</span>
+              <Car className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+              <span className="truncate">Dealer<span className="hidden sm:inline"> Login</span></span>
             </button>
             <button
               type="button"
               onClick={() => handleTabChange("ADMIN")}
-              className={`flex-1 py-2 text-xs font-semibold rounded-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
-                activeTab === "ADMIN"
-                  ? "bg-white text-slate-900 shadow-soft"
-                  : "text-slate-500 hover:text-slate-800"
-              }`}
+              className={`flex-1 py-2 text-[11px] sm:text-xs font-semibold rounded-lg transition-all flex items-center justify-center gap-1 sm:gap-1.5 cursor-pointer truncate ${activeTab === "ADMIN"
+                ? "bg-white text-slate-900 shadow-soft font-bold"
+                : "text-slate-500 hover:text-slate-800"
+                }`}
             >
-              <Shield className="w-3.5 h-3.5 text-blue-600" />
-              <span>Admin Operations</span>
+              <Shield className="w-3.5 h-3.5 text-blue-600 shrink-0" />
+              <span className="truncate">Admin<span className="hidden sm:inline"> Ops</span></span>
             </button>
             <button
               type="button"
               onClick={() => handleTabChange("JAPAN")}
-              className={`flex-1 py-2 text-xs font-semibold rounded-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
-                activeTab === "JAPAN"
-                  ? "bg-white text-slate-900 shadow-soft"
-                  : "text-slate-500 hover:text-slate-800"
-              }`}
+              className={`flex-1 py-2 text-[11px] sm:text-xs font-semibold rounded-lg transition-all flex items-center justify-center gap-1 sm:gap-1.5 cursor-pointer truncate ${activeTab === "JAPAN"
+                ? "bg-white text-slate-900 shadow-soft font-bold"
+                : "text-slate-500 hover:text-slate-800"
+                }`}
             >
-              <Globe2 className="w-3.5 h-3.5 text-purple-600" />
-              <span>Nissan Japan</span>
+              <Globe2 className="w-3.5 h-3.5 text-purple-600 shrink-0" />
+              <span className="truncate">Japan<span className="hidden sm:inline"> HQ</span></span>
             </button>
           </div>
 

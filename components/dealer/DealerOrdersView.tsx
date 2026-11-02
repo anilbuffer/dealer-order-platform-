@@ -62,6 +62,7 @@ export default function DealerOrdersView() {
   const [viewingDefectPhoto, setViewingDefectPhoto] = useState<boolean>(false);
   const [confirmingHoldVehicleId, setConfirmingHoldVehicleId] = useState<string | null>(null);
   const [toastNotice, setToastNotice] = useState<string | null>(null);
+  const [mobileSubTab, setMobileSubTab] = useState<"LIST" | "DETAIL">("LIST");
 
   // Filter orders for this dealer
   const dealerOrders = orders.filter(
@@ -537,34 +538,68 @@ export default function DealerOrdersView() {
               </p>
             </div>
           ) : (
-            /* Two-Column Cockpit Layout */
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-              {/* Left Column: Orders Cards List (4.5 Cols) */}
-              <div className="lg:col-span-4 space-y-3">
-                {filteredOrders.length === 0 ? (
-                  <div className="p-8 bg-white rounded-2xl border border-slate-200 text-center text-xs text-slate-400">
-                    No orders match your filter criteria.
-                  </div>
-                ) : (
-                  filteredOrders.map((order) => {
-                    const isSelected = order.id === (selectedOrder?.id || selectedOrderId);
-                    const hasPendingCost = order.additionalCosts.some(
-                      (c) => c.status === "PENDING_DEALER_APPROVAL"
-                    );
+            <div className="space-y-4">
+              {/* Mobile Sub-Tab Pill Bar (Orders List vs Order Details Cockpit) */}
+              <div className="lg:hidden flex items-center p-1 bg-slate-100 rounded-2xl border border-slate-200">
+                <button
+                  type="button"
+                  onClick={() => {
+                    audio.playSubtleClick();
+                    setMobileSubTab("LIST");
+                  }}
+                  className={`flex-1 py-2 rounded-xl text-xs font-bold transition-all ${
+                    mobileSubTab === "LIST"
+                      ? "bg-white text-slate-900 shadow-xs"
+                      : "text-slate-500 hover:text-slate-800"
+                  }`}
+                >
+                  All Orders ({filteredOrders.length})
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    audio.playSubtleClick();
+                    setMobileSubTab("DETAIL");
+                  }}
+                  className={`flex-1 py-2 rounded-xl text-xs font-bold transition-all ${
+                    mobileSubTab === "DETAIL"
+                      ? "bg-white text-slate-900 shadow-xs"
+                      : "text-slate-500 hover:text-slate-800"
+                  }`}
+                >
+                  Details: {selectedOrder?.orderNumber || "Selected"}
+                </button>
+              </div>
 
-                    return (
-                      <div
-                        key={order.id}
-                        onClick={() => {
-                          audio.playSubtleClick();
-                          setSelectedOrderId(order.id);
-                        }}
-                        className={`p-4 rounded-2xl border transition-all cursor-pointer text-left relative overflow-hidden group ${
-                          isSelected
-                            ? "bg-white border-[#E11D48] ring-2 ring-rose-500/20 shadow-md"
-                            : "bg-white border-slate-200 hover:border-slate-300 hover:shadow-xs"
-                        }`}
-                      >
+              {/* Two-Column Cockpit Layout */}
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                {/* Left Column: Orders Cards List (4.5 Cols) */}
+                <div className={`lg:col-span-4 space-y-3 ${mobileSubTab === "DETAIL" ? "hidden lg:block" : "block"}`}>
+                  {filteredOrders.length === 0 ? (
+                    <div className="p-8 bg-white rounded-2xl border border-slate-200 text-center text-xs text-slate-400">
+                      No orders match your filter criteria.
+                    </div>
+                  ) : (
+                    filteredOrders.map((order) => {
+                      const isSelected = order.id === (selectedOrder?.id || selectedOrderId);
+                      const hasPendingCost = order.additionalCosts.some(
+                        (c) => c.status === "PENDING_DEALER_APPROVAL"
+                      );
+
+                      return (
+                        <div
+                          key={order.id}
+                          onClick={() => {
+                            audio.playSubtleClick();
+                            setSelectedOrderId(order.id);
+                            setMobileSubTab("DETAIL");
+                          }}
+                          className={`p-4 rounded-2xl border transition-all cursor-pointer text-left relative overflow-hidden group ${
+                            isSelected
+                              ? "bg-white border-[#E11D48] ring-2 ring-rose-500/20 shadow-md"
+                              : "bg-white border-slate-200 hover:border-slate-300 hover:shadow-xs"
+                          }`}
+                        >
                         {isSelected && (
                           <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-[#E11D48]" />
                         )}
@@ -632,7 +667,17 @@ export default function DealerOrdersView() {
 
               {/* Right Column: Detailed Order Operations & Tracking Cockpit (7.5 Cols) */}
               {selectedOrder && (
-                <div className="lg:col-span-8 space-y-6">
+                <div className={`lg:col-span-8 space-y-6 ${mobileSubTab === "LIST" ? "hidden lg:block" : "block"}`}>
+                  {/* Mobile Back to Orders Button */}
+                  <div className="lg:hidden">
+                    <button
+                      type="button"
+                      onClick={() => setMobileSubTab("LIST")}
+                      className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white border border-slate-200 text-slate-800 text-xs font-bold shadow-2xs hover:bg-slate-50 transition-colors cursor-pointer"
+                    >
+                      ← Back to Orders List
+                    </button>
+                  </div>
                   {/* ─────────────────────────────────────────────────────────── */}
                   {/* Hero Vehicle & Identification Block                         */}
                   {/* ─────────────────────────────────────────────────────────── */}
@@ -1168,6 +1213,7 @@ export default function DealerOrdersView() {
                 </div>
               )}
             </div>
+          </div>
           )}
         </div>
       )}

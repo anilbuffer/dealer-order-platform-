@@ -221,7 +221,7 @@ export default function AllocationMilestonesView() {
                   </span>
                 </div>
 
-                <div className="grid grid-cols-4 sm:grid-cols-8 gap-1.5">
+                <div className="flex items-center gap-1.5 overflow-x-auto pb-1 hide-scrollbar touch-scroll sm:grid sm:grid-cols-8 -mx-1 px-1">
                   {MILESTONE_SEQUENCE.map((stage, idx) => {
                     const milestoneObj = order.milestones.find((m) => m.key === stage.key);
                     const isDone = !!milestoneObj?.completedAt;
@@ -230,7 +230,7 @@ export default function AllocationMilestonesView() {
                     return (
                       <div
                         key={stage.key}
-                        className={`p-2 rounded-xl text-center text-[10px] border transition-all ${
+                        className={`p-2 rounded-xl text-center text-[10px] border transition-all shrink-0 min-w-[95px] sm:min-w-0 ${
                           isDone
                             ? "bg-emerald-50 border-emerald-300 text-emerald-900 font-bold"
                             : isCurrent

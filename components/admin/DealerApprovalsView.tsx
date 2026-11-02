@@ -75,8 +75,8 @@ export default function DealerApprovalsView() {
           </p>
         </div>
 
-        {/* Tab switch matching left menu count */}
-        <div className="flex items-center gap-1.5 p-1 bg-slate-100 rounded-2xl border border-slate-200/80">
+        {/* Tab switch matching left menu count with smooth horizontal touch scroll on mobile */}
+        <div className="flex items-center gap-1.5 p-1 bg-slate-100 rounded-2xl border border-slate-200/80 overflow-x-auto hide-scrollbar touch-scroll max-w-full">
           <button
             type="button"
             onClick={() => {

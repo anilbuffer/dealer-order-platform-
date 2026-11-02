@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useRef, useEffect } from "react";
 import { useAuth } from "@/lib/auth-context";
@@ -83,14 +83,14 @@ export default function RoleSwitcher() {
         aria-haspopup="listbox"
         aria-expanded={isOpen}
         aria-label="Switch active workspace role"
-        className="flex items-center gap-2.5 px-3 py-1.5 rounded-xl bg-[#0F1B2E] hover:bg-[#142239] border border-[#1B2A42] hover:border-slate-600 text-white transition-all text-xs focus-visible:ring-2 focus-visible:ring-crimson-500 cursor-pointer shadow-soft"
+        className="flex items-center gap-1.5 sm:gap-2.5 px-2 sm:px-3 py-1.5 rounded-xl bg-[#0F1B2E] hover:bg-[#142239] border border-[#1B2A42] hover:border-slate-600 text-white transition-all text-xs focus-visible:ring-2 focus-visible:ring-crimson-500 cursor-pointer shadow-soft"
       >
         <div className={`p-1.5 rounded-lg ${activeRoleOption.iconBg}`}>
           <ActiveIcon className="w-3.5 h-3.5" />
         </div>
-        <div className="text-left hidden sm:block">
+        <div className="text-left hidden md:block">
           <div className="font-semibold text-white leading-tight flex items-center gap-1.5">
-            <span>{activeRoleOption.label}</span>
+            <span className="truncate max-w-[120px]">{activeRoleOption.label}</span>
             <span
               className={`text-[9px] font-bold px-1.5 py-0.2 rounded border ${activeRoleOption.badgeColor}`}
             >
@@ -99,9 +99,8 @@ export default function RoleSwitcher() {
           </div>
         </div>
         <ChevronDown
-          className={`w-3.5 h-3.5 text-slate-400 transition-transform duration-200 ${
-            isOpen ? "rotate-180" : ""
-          }`}
+          className={`w-3.5 h-3.5 text-slate-400 transition-transform duration-200 ${isOpen ? "rotate-180" : ""
+            }`}
         />
       </button>
 
@@ -109,7 +108,7 @@ export default function RoleSwitcher() {
       {isOpen && (
         <div
           role="listbox"
-          className="absolute right-0 mt-2 w-72 rounded-2xl bg-[#0F1B2E] border border-[#1B2A42] shadow-hover py-2 z-50 text-white backdrop-blur-md animate-in fade-in slide-in-from-top-2 duration-200"
+          className="fixed sm:absolute right-3 sm:right-0 top-16 sm:top-auto sm:mt-2 w-[calc(100vw-1.5rem)] sm:w-72 max-w-xs rounded-2xl bg-[#0F1B2E] border border-[#1B2A42] shadow-hover py-2 z-50 text-white backdrop-blur-md animate-in fade-in slide-in-from-top-2 duration-200"
         >
           <div className="px-3.5 py-2 border-b border-[#1B2A42] mb-1">
             <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
@@ -131,26 +130,25 @@ export default function RoleSwitcher() {
                   role="option"
                   aria-selected={isSelected}
                   onClick={() => handleSelectRole(option.role)}
-                  className={`w-full flex items-center justify-between p-2.5 rounded-xl transition-all text-left text-xs cursor-pointer ${
-                    isSelected
-                      ? "bg-white/10 text-white font-medium border border-white/10"
-                      : "text-slate-300 hover:text-white hover:bg-white/5 border border-transparent"
-                  }`}
+                  className={`w-full flex items-center justify-between p-2.5 rounded-xl transition-all text-left text-xs cursor-pointer ${isSelected
+                    ? "bg-white/10 text-white font-medium border border-white/10"
+                    : "text-slate-300 hover:text-white hover:bg-white/5 border border-transparent"
+                    }`}
                 >
-                  <div className="flex items-center gap-3">
-                    <div className={`p-2 rounded-lg ${option.iconBg}`}>
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className={`p-2 rounded-lg shrink-0 ${option.iconBg}`}>
                       <Icon className="w-4 h-4" />
                     </div>
-                    <div>
-                      <div className="font-medium text-white flex items-center gap-1.5">
-                        <span>{option.label}</span>
+                    <div className="min-w-0">
+                      <div className="font-medium text-white flex items-center gap-1.5 truncate">
+                        <span className="truncate">{option.label}</span>
                         <span
-                          className={`text-[9px] font-bold px-1.5 py-0.2 rounded border ${option.badgeColor}`}
+                          className={`text-[9px] font-bold px-1.5 py-0.2 rounded border shrink-0 ${option.badgeColor}`}
                         >
                           {option.badge}
                         </span>
                       </div>
-                      <div className="text-[11px] text-slate-400">{option.sublabel}</div>
+                      <div className="text-[11px] text-slate-400 truncate">{option.sublabel}</div>
                     </div>
                   </div>
                   {isSelected && <Check className="w-4 h-4 text-emerald-400 shrink-0 ml-2" />}
@@ -168,4 +166,3 @@ export default function RoleSwitcher() {
     </div>
   );
 }
-

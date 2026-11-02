@@ -292,11 +292,10 @@ export default function UserManagementView() {
       </div>
 
       {/* ─────────────────────────────────────────────────────────── */}
-      {/* 4. Users Table                                             */}
-      {/* ─────────────────────────────────────────────────────────── */}
+      {/* 4. Users Table */}
       <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-2xs">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs">
+        <div className="overflow-x-auto touch-scroll navy-scrollbar">
+          <table className="w-full text-left text-xs min-w-[760px]">
             <thead className="bg-[#0A1322] text-white uppercase text-[10px] tracking-wider border-b border-slate-200">
               <tr>
                 <th className="py-3 px-4 font-semibold">User & Contact</th>

@@ -142,8 +142,8 @@ export default function DealershipProfileView() {
           </div>
         </div>
 
-        {/* Tab Navigation Strip */}
-        <div className="mt-8 pt-4 border-t border-slate-800/80 flex flex-wrap items-center gap-2">
+        {/* Tab Navigation Strip with Smooth Touch Scrolling on Mobile */}
+        <div className="mt-8 pt-4 border-t border-slate-800/80 flex items-center gap-2 overflow-x-auto hide-scrollbar touch-scroll max-w-full pb-1">
           {[
             { id: "DETAILS", label: "Dealership Details & Location", icon: Building2 },
             { id: "PRICING", label: "Assigned Pricing Schedule (Zone 1-5)", icon: Truck },
@@ -161,8 +161,8 @@ export default function DealershipProfileView() {
                   setActiveSubTab(tab.id as any);
                 }}
                 className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-2 ${isActive
-                    ? "bg-white text-slate-900 shadow-sm"
-                    : "text-slate-300 hover:text-white hover:bg-white/10"
+                  ? "bg-white text-slate-900 shadow-sm"
+                  : "text-slate-300 hover:text-white hover:bg-white/10"
                   }`}
               >
                 <Icon className={`w-3.5 h-3.5 ${isActive ? "text-[#E11D48]" : "text-slate-400"}`} />
@@ -362,8 +362,8 @@ export default function DealershipProfileView() {
                     setSelectedPreviewZone(zKey);
                   }}
                   className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${selectedPreviewZone === zKey
-                      ? "bg-white text-slate-900 shadow-2xs"
-                      : "text-slate-600 hover:text-slate-900"
+                    ? "bg-white text-slate-900 shadow-2xs"
+                    : "text-slate-600 hover:text-slate-900"
                     }`}
                 >
                   {zKey === dealerZone ? `★ ${zKey}` : zKey}
@@ -481,8 +481,8 @@ export default function DealershipProfileView() {
                       <tr
                         key={zid}
                         className={`transition-colors ${isMyZone
-                            ? "bg-rose-50/60 font-semibold text-slate-900"
-                            : "hover:bg-slate-50/50 text-slate-600"
+                          ? "bg-rose-50/60 font-semibold text-slate-900"
+                          : "hover:bg-slate-50/50 text-slate-600"
                           }`}
                       >
                         <td className="py-3 px-4 font-mono font-bold">

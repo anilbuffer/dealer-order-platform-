@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import Sidebar from "./Sidebar";
 import Header from "./Header";
+import MobileBottomNav from "./MobileBottomNav";
 import { useAuth } from "@/lib/auth-context";
 import DealerStockCatalog from "@/components/dealer/DealerStockCatalog";
 import FullPageVehicleDetail from "@/components/dealer/FullPageVehicleDetail";
@@ -40,6 +41,7 @@ export default function DashboardShell({
   const { currentUser } = useAuth();
 
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const [isMobileDrawerOpen, setIsMobileDrawerOpen] = useState(false);
   const [viewingVehicleId, setViewingVehicleId] = useState<string | null>(initialVehicleId || null);
   const [globalSearch, setGlobalSearch] = useState("");
 
@@ -411,19 +413,27 @@ export default function DashboardShell({
 
   return (
     <div className="flex h-screen w-full bg-[#F8FAFC] overflow-hidden">
-      {/* 1. Responsive Collapsible Navy Sidebar (268px ↔ 76px) */}
+      {/* 1. Responsive Collapsible Navy Sidebar (Desktop persistent + Mobile/Tablet Drawer) */}
       <Sidebar
         activeTab={viewingVehicleId ? "dealer-stock" : activeTab}
         onTabChange={handleTabChange}
         isCollapsed={isSidebarCollapsed}
         onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+        isMobileOpen={isMobileDrawerOpen}
+        onCloseMobile={() => setIsMobileDrawerOpen(false)}
       />
 
       {/* 2. Main Content Container (Full Height Canvas with Top Header) */}
-      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
-        {/* Top Header across all panels matching attached design */}
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden relative">
+        {/* Top Header across all panels with responsive search and mobile menu trigger */}
         <Header
-          onToggleSidebar={() => setIsSidebarCollapsed((prev) => !prev)}
+          onToggleSidebar={() => {
+            if (typeof window !== "undefined" && window.innerWidth < 1024) {
+              setIsMobileDrawerOpen((prev) => !prev);
+            } else {
+              setIsSidebarCollapsed((prev) => !prev);
+            }
+          }}
           isSidebarCollapsed={isSidebarCollapsed}
           searchValue={globalSearch}
           onSearchChange={setGlobalSearch}
@@ -434,10 +444,19 @@ export default function DashboardShell({
           }}
         />
 
-        {/* Scrollable View Content Canvas */}
-        <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
-          <div className="max-w-7xl mx-auto">{renderViewContent()}</div>
+        {/* Scrollable View Content Canvas - Fluid Responsive for Desktop/Laptop/Tablet/Mobile */}
+        <main className="flex-1 overflow-y-auto p-3.5 sm:p-5 md:p-6 lg:p-8 pb-24 lg:pb-8 touch-scroll">
+          <div className="max-w-[1680px] 2xl:max-w-[1960px] w-full mx-auto">
+            {renderViewContent()}
+          </div>
         </main>
+
+        {/* 3. Mobile / Small Tablet Bottom Navigation Bar (Hidden on Desktop & Laptop) */}
+        <MobileBottomNav
+          activeTab={viewingVehicleId ? "dealer-stock" : activeTab}
+          onTabChange={handleTabChange}
+          onOpenMenu={() => setIsMobileDrawerOpen(true)}
+        />
       </div>
     </div>
   );

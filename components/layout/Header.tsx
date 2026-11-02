@@ -3,15 +3,18 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useAuth } from "@/lib/auth-context";
 import { audio } from "@/lib/sound";
+import RoleSwitcher from "./RoleSwitcher";
 import {
   Search,
   Bell,
   PanelLeft,
+  Menu,
   CheckCircle2,
   Clock,
   AlertTriangle,
   Ship,
   Sparkles,
+  X,
 } from "lucide-react";
 
 interface HeaderProps {
@@ -33,8 +36,10 @@ export default function Header({
 }: HeaderProps) {
   const { currentUser } = useAuth();
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
+  const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
   const notifRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const mobileSearchInputRef = useRef<HTMLInputElement>(null);
 
   // Close dropdown on click outside
   useEffect(() => {
@@ -56,7 +61,12 @@ export default function Header({
         document.activeElement?.tagName !== "TEXTAREA"
       ) {
         e.preventDefault();
-        searchInputRef.current?.focus();
+        if (window.innerWidth < 640) {
+          setIsMobileSearchOpen(true);
+          setTimeout(() => mobileSearchInputRef.current?.focus(), 100);
+        } else {
+          searchInputRef.current?.focus();
+        }
         audio.playSubtleClick();
       }
     }
@@ -96,9 +106,48 @@ export default function Header({
   ];
 
   return (
-    <header className="h-[60px] bg-white border-b border-slate-200/90 px-4 sm:px-6 flex items-center justify-between gap-4 sticky top-0 z-20 shrink-0">
-      {/* Left: Sidebar Toggle Icon + Search Bar (as attached screenshot) */}
-      <div className="flex items-center gap-3 flex-1 max-w-xl">
+    <header className="h-[60px] bg-white border-b border-slate-200/90 px-3 sm:px-6 flex items-center justify-between gap-2.5 sm:gap-4 sticky top-0 z-30 shrink-0">
+      {/* Mobile Search Overlay Bar */}
+      {isMobileSearchOpen && (
+        <div className="sm:hidden absolute inset-0 z-40 bg-white px-3 flex items-center gap-2 animate-in fade-in slide-in-from-top-1 duration-150">
+          <div className="relative flex-1">
+            <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <input
+              ref={mobileSearchInputRef}
+              type="text"
+              value={searchValue}
+              onChange={(e) => onSearchChange && onSearchChange(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && onSearchSubmit) {
+                  onSearchSubmit(searchValue);
+                  setIsMobileSearchOpen(false);
+                }
+              }}
+              placeholder="Search make, model, stock ID..."
+              className="w-full pl-9 pr-8 py-2 text-xs bg-slate-50 rounded-xl border border-slate-200 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-[#E11D48] focus:bg-white"
+            />
+            {searchValue && (
+              <button
+                type="button"
+                onClick={() => onSearchChange && onSearchChange("")}
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-1 text-xs"
+              >
+                ✕
+              </button>
+            )}
+          </div>
+          <button
+            type="button"
+            onClick={() => setIsMobileSearchOpen(false)}
+            className="p-2 text-slate-500 hover:text-slate-900 text-xs font-semibold cursor-pointer"
+          >
+            Cancel
+          </button>
+        </div>
+      )}
+
+      {/* Left: Sidebar Toggle Icon + Search Bar */}
+      <div className="flex items-center gap-2 sm:gap-3 flex-1 max-w-xl min-w-0">
         {onToggleSidebar && (
           <button
             type="button"
@@ -108,13 +157,23 @@ export default function Header({
             }}
             title={isSidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
             aria-label={isSidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
-            className="p-2 rounded-xl text-slate-500 hover:text-slate-900 hover:bg-slate-100/80 transition-colors cursor-pointer shrink-0"
+            className="p-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors cursor-pointer shrink-0"
           >
-            <PanelLeft className="w-5 h-5 text-slate-600" />
+            {/* Show Menu icon on mobile/tablet, PanelLeft on desktop */}
+            <Menu className="w-5 h-5 lg:hidden text-slate-700" />
+            <PanelLeft className="w-5 h-5 hidden lg:block text-slate-600" />
           </button>
         )}
 
-        <div className="relative flex-1">
+        {/* Mobile App Branding Mark on small screens */}
+        <div className="lg:hidden flex items-center gap-2 shrink-0">
+          <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-[#E11D48] to-[#881337] flex items-center justify-center font-black text-white text-xs shadow-xs">
+            D
+          </div>
+        </div>
+
+        {/* Desktop / Tablet Search Input */}
+        <div className="relative flex-1 hidden sm:block">
           <div className="relative flex items-center">
             <Search className="w-4 h-4 text-slate-400 absolute left-3.5 pointer-events-none" />
             <input
@@ -139,8 +198,22 @@ export default function Header({
         </div>
       </div>
 
-      {/* Right: Notifications, Role Switcher */}
-      <div className="flex items-center gap-2.5 sm:gap-3">
+      {/* Right: Quick Search Button on mobile, Notifications, Role Switcher */}
+      <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
+        {/* Mobile Search Trigger Icon */}
+        <button
+          type="button"
+          onClick={() => {
+            audio.playSubtleClick();
+            setIsMobileSearchOpen(true);
+            setTimeout(() => mobileSearchInputRef.current?.focus(), 100);
+          }}
+          aria-label="Open search input"
+          className="sm:hidden p-2 rounded-xl text-slate-500 hover:text-slate-800 hover:bg-slate-100 transition-colors cursor-pointer"
+        >
+          <Search className="w-5 h-5 text-slate-600" />
+        </button>
+
         {/* Real-time Notifications Popover */}
         <div className="relative" ref={notifRef}>
           <button
@@ -157,7 +230,7 @@ export default function Header({
           </button>
 
           {isNotificationsOpen && (
-            <div className="absolute right-0 mt-2 w-80 sm:w-96 rounded-2xl bg-white border border-slate-200 shadow-hover p-4 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
+            <div className="fixed sm:absolute right-3 sm:right-0 top-16 sm:top-auto sm:mt-2 w-[calc(100vw-1.5rem)] sm:w-96 max-w-sm rounded-2xl bg-white border border-slate-200 shadow-hover p-4 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
               <div className="flex items-center justify-between pb-3 border-b border-slate-100">
                 <div className="flex items-center gap-2">
                   <h4 className="font-semibold text-sm text-slate-900">Notifications</h4>
@@ -174,7 +247,7 @@ export default function Header({
                 </button>
               </div>
 
-              <div className="divide-y divide-slate-100 max-h-72 overflow-y-auto pt-1">
+              <div className="divide-y divide-slate-100 max-h-72 overflow-y-auto pt-1 navy-scrollbar">
                 {notifications.map((n) => {
                   const Icon = n.icon;
                   return (
@@ -217,6 +290,9 @@ export default function Header({
             </div>
           )}
         </div>
+
+        {/* Dynamic Multi-Role Switcher (Compact on mobile, full on desktop) */}
+        <RoleSwitcher />
       </div>
     </header>
   );
