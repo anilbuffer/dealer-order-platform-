@@ -177,95 +177,59 @@ export default function FullPageVehicleDetail({
       </div>
 
       {/* ─────────────────────────────────────────────────────────── */}
-      {/* 2. Top Hero Stage: Studio Showcase (Left) + Acquisition (Right)*/}
+      {/* 2. Top Hero Stage: Clean Studio Showcase + Acquisition     */}
       {/* ─────────────────────────────────────────────────────────── */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         {/* ───────────────────────────────────────────────────────── */}
-        {/* LEFT COLUMN: Cinematic Studio Showcase                    */}
+        {/* LEFT COLUMN: Clean Edge-to-Edge Vehicle Showcase          */}
         {/* ───────────────────────────────────────────────────────── */}
-        <div className="lg:col-span-7 space-y-5">
-          {/* Main Studio Car Showcase */}
-          <div className="relative aspect-[16/10] w-full flex items-center justify-center p-8 bg-gradient-to-b from-slate-50/90 via-slate-100/50 to-slate-50/90 rounded-3xl border border-slate-200/90 overflow-hidden studio-pedestal shadow-xs">
+        <div className="lg:col-span-7 space-y-3">
+          {/* Main Vehicle Photo */}
+          <div className="relative aspect-[16/10] w-full rounded-2xl overflow-hidden bg-slate-900 border border-slate-200/80 shadow-xs">
             <img
               src={vehicle.images[activeImageIdx] || vehicle.images[0]}
               alt={`${vehicle.make} ${vehicle.model}`}
-              className="w-full h-full object-contain studio-car-drop select-none transition-all duration-300"
+              className="w-full h-full object-cover select-none transition-all duration-300"
             />
 
-            {/* Top-Left: Stock Code & Port Origin Glass Badges */}
-            <div className="absolute top-4 left-4 flex items-center gap-2">
-              <div className="px-3 py-1 rounded-xl glass-badge text-xs font-mono font-bold text-slate-900 shadow-2xs">
-                {vehicle.stockId}
-              </div>
-              <div className="px-2.5 py-1 rounded-xl bg-slate-900/80 backdrop-blur-md text-[11px] font-semibold text-white flex items-center gap-1">
-                <MapPin className="w-3 h-3 text-slate-300" />
-                <span>{vehicle.location.split("(")[0].trim()}</span>
-              </div>
-            </div>
+            {/* Gradient Overlay for Crisp Text Contrast */}
+            <div className="absolute inset-0 bg-gradient-to-t from-slate-950/60 via-transparent to-slate-950/40 pointer-events-none" />
 
-            {/* Top-Right: Auction Grade Badge */}
-            <div className="absolute top-4 right-4 px-3.5 py-1.5 rounded-full bg-slate-900 text-white font-mono text-xs font-extrabold shadow-md flex items-center gap-1.5">
-              <span className="text-amber-400">★</span>
+            {/* Top-Left: Auction Grade */}
+            <div className="absolute top-3.5 left-3.5 px-3 py-1 rounded-full bg-slate-900/85 backdrop-blur-md text-amber-300 font-mono text-xs font-bold border border-white/10 shadow-xs flex items-center gap-1.5">
+              <span>★</span>
               <span>Grade {vehicle.auctionGrade} / {vehicle.interiorGrade}</span>
             </div>
 
-            {/* Bottom-Right: Radiation Passed Badge */}
-            <div className="absolute bottom-4 right-4 px-2.5 py-1 rounded-lg bg-emerald-500/90 backdrop-blur-md text-white text-[10px] font-bold shadow-xs flex items-center gap-1">
+            {/* Top-Right: Export Yard Origin */}
+            <div className="absolute top-3.5 right-3.5 px-3 py-1 rounded-full bg-slate-900/85 backdrop-blur-md text-slate-200 text-xs font-medium border border-white/10 shadow-xs flex items-center gap-1.5">
+              <MapPin className="w-3.5 h-3.5 text-slate-400" />
+              <span>{vehicle.location.split("(")[0].trim()}</span>
+            </div>
+
+            {/* Bottom-Left: Stock Code */}
+            <div className="absolute bottom-3.5 left-3.5 px-2.5 py-1 rounded-lg bg-black/60 backdrop-blur-md text-xs font-mono font-bold text-white border border-white/15">
+              {vehicle.stockId}
+            </div>
+
+            {/* Bottom-Right: Radiation Passed */}
+            <div className="absolute bottom-3.5 right-3.5 px-2.5 py-1 rounded-lg bg-emerald-600/90 backdrop-blur-md text-white text-[11px] font-bold shadow-xs flex items-center gap-1.5">
               <ShieldCheck className="w-3.5 h-3.5" />
-              <span>Radiation Cleared (&lt;0.08 μSv/h)</span>
+              <span>Radiation &lt;0.08 μSv/h Passed</span>
             </div>
 
             {vehicle.status !== "AVAILABLE" && (
-              <div className="absolute inset-0 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center">
+              <div className="absolute inset-0 bg-slate-950/65 backdrop-blur-xs flex items-center justify-center">
                 <div className="px-5 py-2.5 rounded-2xl bg-slate-900 text-white font-bold text-xs shadow-xl flex items-center gap-2 border border-slate-700">
                   <Lock className="w-4 h-4 text-rose-400" />
-                  <span>24-Hour Atomic Hold Active by Auckland Nissan City</span>
+                  <span>24-Hour Atomic Hold Active</span>
                 </div>
               </div>
             )}
           </div>
 
-          {/* 4 Micro Specs Strip with Icons */}
-          <div className="grid grid-cols-4 gap-3 bg-white rounded-2xl border border-slate-200/90 p-3.5 shadow-2xs text-center">
-            <div className="space-y-0.5">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
-                Transmission
-              </span>
-              <strong className="text-xs font-extrabold text-slate-900 block truncate">
-                {vehicle.transmission}
-              </strong>
-            </div>
-
-            <div className="space-y-0.5">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
-                Odometer
-              </span>
-              <strong className="text-xs font-mono font-extrabold text-slate-900 block truncate">
-                {vehicle.odometerKm.toLocaleString()} km
-              </strong>
-            </div>
-
-            <div className="space-y-0.5">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
-                Japan History
-              </span>
-              <strong className="text-xs font-extrabold text-slate-900 block truncate">
-                1 Japan Owner
-              </strong>
-            </div>
-
-            <div className="space-y-0.5">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
-                Registration
-              </span>
-              <strong className="text-xs font-extrabold text-slate-900 block truncate">
-                {vehicle.year} Model
-              </strong>
-            </div>
-          </div>
-
-          {/* 5 Thumbnails Angle Strip */}
-          <div className="flex items-center gap-3">
+          {/* Clean Thumbnails Carousel Strip */}
+          <div className="flex items-center gap-2.5">
             {vehicle.images.slice(0, 5).map((img, idx) => (
               <button
                 key={idx}
@@ -274,115 +238,94 @@ export default function FullPageVehicleDetail({
                   audio.playSubtleClick();
                   setActiveImageIdx(idx);
                 }}
-                className={`relative flex-1 aspect-[16/11] rounded-2xl overflow-hidden border p-1.5 flex items-center justify-center cursor-pointer transition-all ${
+                className={`relative flex-1 aspect-[16/10] rounded-xl overflow-hidden border-2 transition-all cursor-pointer ${
                   activeImageIdx === idx
-                    ? "border-[#E11D48] ring-2 ring-[#E11D48]/20 bg-rose-50/20 shadow-xs"
-                    : "border-slate-200 bg-white hover:border-slate-300"
+                    ? "border-[#E11D48] ring-2 ring-[#E11D48]/20 shadow-xs"
+                    : "border-slate-200 hover:border-slate-300 opacity-70 hover:opacity-100"
                 }`}
               >
-                <img src={img} alt="Angle preview" className="w-full h-full object-contain" />
+                <img src={img} alt="Angle preview" className="w-full h-full object-cover" />
               </button>
             ))}
           </div>
         </div>
 
         {/* ───────────────────────────────────────────────────────── */}
-        {/* RIGHT COLUMN: Commercial Acquisition & Landed Terminal    */}
+        {/* RIGHT COLUMN: Clean Commercial Acquisition Terminal       */}
         {/* ───────────────────────────────────────────────────────── */}
-        <div className="lg:col-span-5 space-y-5">
-          {/* Main Title & Chassis */}
-          <div className="bg-white rounded-3xl border border-slate-200/90 p-6 shadow-xs space-y-4">
+        <div className="lg:col-span-5 space-y-4">
+          <div className="bg-white rounded-2xl border border-slate-200/90 p-5 sm:p-6 shadow-2xs space-y-4">
+            {/* Header: Title, Specs & VIN */}
             <div>
-              <div className="flex items-center justify-between mb-1">
-                <span className="text-[11px] font-extrabold uppercase tracking-wider text-[#E11D48]">
-                  {vehicle.year} · {vehicle.transmission}
-                </span>
-                <span className="text-[11px] font-mono font-bold text-slate-400">
-                  VIN {vehicle.vinChassis}
-                </span>
+              <div className="flex items-center justify-between text-xs text-slate-400 font-medium mb-1">
+                <span>{vehicle.year} · {vehicle.transmission}</span>
+                <span className="font-mono text-slate-500 font-semibold">{vehicle.vinChassis}</span>
               </div>
 
-              <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight leading-tight">
+              <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight leading-tight">
                 {vehicle.make} {vehicle.model}
               </h1>
-              <p className="text-xs text-slate-500 font-medium mt-1">
-                {vehicle.grade} · {vehicle.fuelType} · Color: {vehicle.color} · Yokohama Direct Export
-              </p>
-            </div>
 
-            {/* Guaranteed Landed Price Callout */}
-            <div className="p-4 rounded-2xl bg-gradient-to-br from-slate-900 to-slate-800 text-white space-y-2">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-300 block">
-                Guaranteed Landed Buy Price ({dealerZone})
-              </span>
-              <div className="text-3xl sm:text-4xl font-black font-mono tracking-tight text-white">
-                ${price.totalBuyPriceNZD.toLocaleString()}
-                <span className="text-xs text-slate-400 font-normal ml-1">NZD</span>
-              </div>
-              <p className="text-[11px] text-emerald-400 font-medium leading-relaxed">
-                ✓ Delivered to Dealership Yard. Includes FOB conversion, ocean RoRo freight, biosecurity entry, 15% NZ GST, and MR2A compliance certification.
-              </p>
-            </div>
-
-            {/* Dealer Margin & ROI Intelligence Widget */}
-            <div className="p-4 rounded-2xl bg-rose-50/60 border border-rose-200/80 grid grid-cols-2 gap-4 text-xs">
-              <div>
-                <span className="text-[10px] text-slate-500 font-medium block">
-                  Est. NZ Retail Market
-                </span>
-                <strong className="text-base font-bold font-mono text-slate-900 block mt-0.5">
-                  ${retailEstimateNZD.toLocaleString()} NZD
-                </strong>
-                <span className="text-[10px] text-slate-400">Based on NZ AutoTrader data</span>
-              </div>
-
-              <div className="text-right">
-                <span className="text-[10px] text-[#E11D48] font-bold block">
-                  Projected Dealer Margin
-                </span>
-                <strong className="text-base font-extrabold font-mono text-[#E11D48] block mt-0.5">
-                  +${dealerMarginNZD.toLocaleString()} NZD
-                </strong>
-                <span className="text-[10px] font-bold text-emerald-700 bg-emerald-100/80 px-1.5 py-0.2 rounded inline-block">
-                  +{marginPercentage}% Gross Margin
-                </span>
+              <div className="flex items-center gap-2 text-xs text-slate-600 font-medium mt-2 flex-wrap">
+                <span>{vehicle.grade}</span>
+                <span className="text-slate-300">•</span>
+                <span>{vehicle.odometerKm.toLocaleString()} km</span>
+                <span className="text-slate-300">•</span>
+                <span>{vehicle.fuelType}</span>
+                <span className="text-slate-300">•</span>
+                <span>{vehicle.color}</span>
               </div>
             </div>
 
-            {/* Landed Cost Itemized Breakdown */}
-            <div className="space-y-2 pt-1">
-              <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 block">
-                Itemized Landed Cost Structure
+            {/* Landed Pricing & Retail Margin Card */}
+            <div className="p-4 rounded-xl bg-slate-50 border border-slate-200/80 space-y-3">
+              <div className="flex items-baseline justify-between">
+                <div>
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
+                    Guaranteed Landed Price ({dealerZone})
+                  </span>
+                  <div className="text-3xl font-black font-mono tracking-tight text-slate-900 mt-0.5">
+                    ${price.totalBuyPriceNZD.toLocaleString()}
+                    <span className="text-xs text-slate-500 font-normal ml-1">NZD</span>
+                  </div>
+                </div>
+
+                <div className="text-right">
+                  <span className="text-[10px] font-medium text-slate-400 block">Est. Retail Margin</span>
+                  <span className="text-xs font-mono font-bold text-emerald-700 bg-emerald-100/70 border border-emerald-200 px-2 py-0.5 rounded-md inline-block mt-0.5">
+                    +${dealerMarginNZD.toLocaleString()} ({marginPercentage}%)
+                  </span>
+                </div>
+              </div>
+
+              <div className="text-[11px] text-slate-500 flex items-center justify-between pt-2 border-t border-slate-200/60">
+                <span>Est. NZ Retail: <strong>${retailEstimateNZD.toLocaleString()} NZD</strong></span>
+                <span className="text-emerald-600 font-medium">✓ 15% GST &amp; MR2A included</span>
+              </div>
+            </div>
+
+            {/* Itemized Cost Breakdown (Clean 2-Column Table) */}
+            <div className="space-y-2">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 block">
+                Itemized Landed Cost Breakdown
               </span>
 
-              {/* Stacked Visual Bar */}
-              <div className="h-2.5 w-full rounded-full bg-slate-100 flex overflow-hidden">
+              <div className="grid grid-cols-2 gap-2 text-xs">
                 {costBreakdownItems.map((item, idx) => (
-                  <div
-                    key={idx}
-                    style={{ width: `${item.percentage}%` }}
-                    className={`${item.color} h-full`}
-                    title={`${item.label}: $${item.amount.toLocaleString()} NZD`}
-                  />
-                ))}
-              </div>
-
-              <div className="grid grid-cols-2 gap-2 text-xs pt-1">
-                {costBreakdownItems.map((item, idx) => (
-                  <div key={idx} className="p-2.5 rounded-xl border border-slate-200/80 bg-slate-50/70">
-                    <span className="text-[10px] text-slate-500 font-medium block truncate">
+                  <div key={idx} className="p-2.5 rounded-xl bg-white border border-slate-200/80">
+                    <span className="text-[10px] text-slate-400 font-medium block truncate">
                       {item.label}
                     </span>
-                    <strong className="text-xs font-mono font-bold text-slate-900 block mt-0.5">
+                    <strong className="text-xs font-mono font-bold text-slate-800 block mt-0.5">
                       ${item.amount.toLocaleString()} NZD
                     </strong>
-                    <span className="text-[9px] text-slate-400 block truncate">{item.sublabel}</span>
+                    <span className="text-[10px] text-slate-500 block truncate">{item.sublabel}</span>
                   </div>
                 ))}
               </div>
             </div>
 
-            {/* Big Crimson Atomic Hold CTA Button */}
+            {/* Reserve Button CTA */}
             {vehicle.status === "AVAILABLE" ? (
               <button
                 type="button"
@@ -390,7 +333,7 @@ export default function FullPageVehicleDetail({
                   audio.playSubtleClick();
                   setIsReserveModalOpen(true);
                 }}
-                className="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-[#E11D48] via-[#BE123C] to-[#9F1239] hover:from-[#BE123C] hover:to-[#881337] text-white font-black text-sm tracking-wide transition-all shadow-[0_6px_22px_rgba(225,29,72,0.35)] hover:shadow-[0_8px_28px_rgba(225,29,72,0.45)] active:scale-[0.99] cursor-pointer text-center flex items-center justify-center gap-2.5"
+                className="w-full py-3.5 px-5 rounded-xl bg-[#E11D48] hover:bg-[#BE123C] text-white font-bold text-xs tracking-wide transition-all shadow-md hover:shadow-lg active:scale-[0.99] cursor-pointer text-center flex items-center justify-center gap-2"
               >
                 <Lock className="w-4 h-4" />
                 <span>Reserve Vehicle (24-Hour Atomic Hold)</span>
@@ -399,15 +342,15 @@ export default function FullPageVehicleDetail({
               <button
                 type="button"
                 disabled
-                className="w-full py-4 px-6 rounded-2xl bg-slate-100 text-slate-400 font-bold text-sm cursor-not-allowed text-center flex items-center justify-center gap-2"
+                className="w-full py-3.5 px-5 rounded-xl bg-slate-100 text-slate-400 font-bold text-xs cursor-not-allowed text-center flex items-center justify-center gap-2"
               >
                 <Lock className="w-4 h-4 text-slate-400" />
                 <span>Vehicle Currently Held by Network Dealer</span>
               </button>
             )}
 
-            <p className="text-[11px] text-slate-500 text-center">
-              No immediate payment required · Locks out other NZ dealers for 24 hours while you review floorplan financing and customer pre-orders.
+            <p className="text-[11px] text-slate-400 text-center">
+              Zero deposit required · Locks out other NZ franchise dealers for 24 hours.
             </p>
           </div>
         </div>

@@ -227,6 +227,17 @@ export function ProgrammeProvider({ children }: { children: React.ReactNode }) {
 
     setOrders((prev) => [newOrder, ...prev]);
 
+    setVehicles((prev) =>
+      prev.map((v) =>
+        v.id === vehicleId
+          ? {
+              ...v,
+              status: "ALLOCATED",
+            }
+          : v
+      )
+    );
+
     logAudit({
       actorName: "Sarah Jenkins",
       actorEmail: "ops@autohub.co.nz",

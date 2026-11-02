@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { Vehicle, LandedPriceBreakdown } from "@/lib/types";
 import { calculateLandedPrice } from "@/lib/pricing-calculator";
+import { useAuth } from "@/lib/auth-context";
 import { audio } from "@/lib/sound";
 import {
   X,
@@ -26,12 +27,14 @@ export default function AtomicReservationModal({
   onClose,
   onSuccess,
 }: AtomicReservationModalProps) {
+  const { currentDealer } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
 
   if (!vehicle) return null;
 
-  const price: LandedPriceBreakdown = calculateLandedPrice(vehicle.fobPriceJPY, "ZONE_1");
+  const dealerZone = currentDealer?.pricingZoneId || "ZONE_1";
+  const price: LandedPriceBreakdown = calculateLandedPrice(vehicle.fobPriceJPY, dealerZone);
 
   const handleConfirmReservation = () => {
     setIsSubmitting(true);
@@ -80,7 +83,7 @@ export default function AtomicReservationModal({
               <h4 className="text-xl font-extrabold text-slate-900">Reservation Confirmed!</h4>
               <p className="text-xs text-slate-600 leading-relaxed max-w-sm mx-auto">
                 <strong className="text-slate-900">{vehicle.make} {vehicle.model}</strong> ({vehicle.stockId}) has been locked to{" "}
-                <strong className="text-slate-900">Auckland Nissan City</strong>.
+                <strong className="text-slate-900">{currentDealer?.legalTradingName || "Your Dealership"}</strong>.
               </p>
             </div>
 
