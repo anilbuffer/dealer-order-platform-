@@ -350,9 +350,8 @@ export default function Sidebar({
                 </div>
               </div>
               <ChevronDown
-                className={`w-3.5 h-3.5 text-slate-400 shrink-0 transition-transform duration-200 group-hover:text-white ${
-                  isRoleDropdownOpen ? "rotate-180" : ""
-                }`}
+                className={`w-3.5 h-3.5 text-slate-400 shrink-0 transition-transform duration-200 group-hover:text-white ${isRoleDropdownOpen ? "rotate-180" : ""
+                  }`}
               />
             </button>
 
@@ -380,11 +379,10 @@ export default function Sidebar({
                         key={option.role}
                         type="button"
                         onClick={() => handleSelectRole(option.role)}
-                        className={`w-full flex items-center justify-between p-2 rounded-xl transition-all text-left text-xs cursor-pointer ${
-                          isSelected
+                        className={`w-full flex items-center justify-between p-2 rounded-xl transition-all text-left text-xs cursor-pointer ${isSelected
                             ? "bg-white/10 text-white font-medium border border-white/10"
                             : "text-slate-300 hover:text-white hover:bg-white/5 border border-transparent"
-                        }`}
+                          }`}
                       >
                         <div className="flex items-center gap-2.5 min-w-0">
                           <div className={`p-1.5 rounded-lg ${option.iconBg} shrink-0`}>
@@ -444,8 +442,8 @@ export default function Sidebar({
                   onClick={() => handleItemClick(item)}
                   aria-current={active ? "page" : undefined}
                   className={`group relative w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition-all duration-150 cursor-pointer ${active
-                      ? "bg-gradient-to-r from-white/[0.14] to-white/[0.04] text-white border border-white/15 shadow-[0_2px_12px_rgba(0,0,0,0.25)] ring-1 ring-white/10"
-                      : "text-slate-400 hover:text-white hover:bg-white/[0.06] border border-transparent"
+                    ? "bg-gradient-to-r from-white/[0.14] to-white/[0.04] text-white border border-white/15 shadow-[0_2px_12px_rgba(0,0,0,0.25)] ring-1 ring-white/10"
+                    : "text-slate-400 hover:text-white hover:bg-white/[0.06] border border-transparent"
                     } ${isCollapsed ? "justify-center px-0" : ""}`}
                 >
                   {/* Glowing left pip on active tab */}
@@ -506,10 +504,10 @@ export default function Sidebar({
               }}
               title="Click for Settings & Logout"
               className={`flex items-center justify-between p-2 rounded-2xl transition-all cursor-pointer group ${pathname === "/settings" || activeTab === "settings"
-                  ? "bg-gradient-to-r from-white/[0.12] to-white/[0.04] border border-white/15 ring-1 ring-white/10"
-                  : isProfileMenuOpen
-                    ? "bg-white/10 border border-white/10"
-                    : "hover:bg-white/[0.06] border border-transparent"
+                ? "bg-gradient-to-r from-white/[0.12] to-white/[0.04] border border-white/15 ring-1 ring-white/10"
+                : isProfileMenuOpen
+                  ? "bg-white/10 border border-white/10"
+                  : "hover:bg-white/[0.06] border border-transparent"
                 }`}
             >
               <div className="flex items-center gap-2.5 min-w-0">
@@ -561,8 +559,8 @@ export default function Sidebar({
                       router.push("/settings");
                     }}
                     className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-semibold transition-colors cursor-pointer text-left ${pathname === "/settings" || activeTab === "settings"
-                        ? "bg-[#E11D48] text-white"
-                        : "text-slate-200 hover:text-white hover:bg-white/10"
+                      ? "bg-[#E11D48] text-white"
+                      : "text-slate-200 hover:text-white hover:bg-white/10"
                       }`}
                   >
                     <User className="w-4 h-4 text-slate-300" />
@@ -597,8 +595,8 @@ export default function Sidebar({
               title="Click for Settings & Logout"
               aria-label="User account & options"
               className={`relative w-9 h-9 rounded-xl bg-gradient-to-br from-slate-700 via-slate-800 to-slate-900 border border-slate-700 flex items-center justify-center font-bold text-xs text-white transition-all cursor-pointer ${pathname === "/settings" || activeTab === "settings"
-                  ? "ring-2 ring-[#E11D48]"
-                  : "hover:ring-2 hover:ring-rose-500/50"
+                ? "ring-2 ring-[#E11D48]"
+                : "hover:ring-2 hover:ring-rose-500/50"
                 }`}
             >
               {currentUser?.name.charAt(0) || "U"}
@@ -631,8 +629,8 @@ export default function Sidebar({
                       router.push("/settings");
                     }}
                     className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold transition-colors cursor-pointer text-left ${pathname === "/settings" || activeTab === "settings"
-                        ? "bg-[#E11D48] text-white"
-                        : "text-slate-200 hover:text-white hover:bg-white/10"
+                      ? "bg-[#E11D48] text-white"
+                      : "text-slate-200 hover:text-white hover:bg-white/10"
                       }`}
                   >
                     <User className="w-4 h-4 text-slate-300" />
