@@ -444,7 +444,7 @@ export default function RolesPermissionsView() {
             </span>
           </div>
           <h1 className="text-2xl font-bold tracking-tight text-slate-900">
-            Roles & Permissions Governance
+            Roles & Permissions
           </h1>
           <p className="text-xs text-slate-500 mt-0.5">
             Configure granular operational boundaries, financial visibility, and regulatory sign-offs across all 5 platform user tiers.

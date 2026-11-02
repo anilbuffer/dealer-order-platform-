@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { useProgramme } from "@/lib/programme-context";
-import { ReservationRequest, ReservationStatus } from "@/lib/types";
+import { ReservationRequest } from "@/lib/types";
 import { audio } from "@/lib/sound";
 import ReservationDetailsModal from "./ReservationDetailsModal";
 import {
@@ -11,18 +11,13 @@ import {
   Lock,
   Unlock,
   CheckCircle2,
-  Building2,
-  MapPin,
-  ArrowRight,
-  ShieldAlert,
-  RotateCcw,
-  FileCheck2,
-  User,
   XCircle,
-  HelpCircle,
-  Info,
-  ChevronDown,
-  ChevronUp,
+  Building2,
+  Search,
+  Eye,
+  MapPin,
+  Calendar,
+  ArrowRight,
 } from "lucide-react";
 
 interface AdminReservationsViewProps {
@@ -31,12 +26,13 @@ interface AdminReservationsViewProps {
 
 export default function AdminReservationsView({ onNavigateTab }: AdminReservationsViewProps) {
   const { reservations, confirmAllocation, releaseHold, rejectReservation } = useProgramme();
+
   const [activeTab, setActiveTab] = useState<"ACTIVE" | "HISTORY">("ACTIVE");
+  const [searchQuery, setSearchQuery] = useState("");
   const [notification, setNotification] = useState<string | null>(null);
-  const [expandedBreakdownId, setExpandedBreakdownId] = useState<string | null>(null);
   const [selectedResForDetails, setSelectedResForDetails] = useState<ReservationRequest | null>(null);
 
-  // Modal dialog state for recording decision & reason (US-14)
+  // Quick Action Modal for confirm/release justification
   const [actionModal, setActionModal] = useState<{
     isOpen: boolean;
     type: "CONFIRM" | "RELEASE" | "REJECT";
@@ -52,14 +48,39 @@ export default function AdminReservationsView({ onNavigateTab }: AdminReservatio
   const activeReservations = reservations.filter((r) => r.status === "ACTIVE_HOLD");
   const historyReservations = reservations.filter((r) => r.status !== "ACTIVE_HOLD");
 
+  const filteredActive = activeReservations.filter((r) => {
+    if (!searchQuery) return true;
+    const q = searchQuery.toLowerCase();
+    return (
+      r.requestId.toLowerCase().includes(q) ||
+      r.dealerName.toLowerCase().includes(q) ||
+      r.dealerCode.toLowerCase().includes(q) ||
+      r.vehicle?.model?.toLowerCase().includes(q) ||
+      r.vehicle?.stockId?.toLowerCase().includes(q) ||
+      r.vehicle?.vinChassis?.toLowerCase().includes(q)
+    );
+  });
+
+  const filteredHistory = historyReservations.filter((r) => {
+    if (!searchQuery) return true;
+    const q = searchQuery.toLowerCase();
+    return (
+      r.requestId.toLowerCase().includes(q) ||
+      r.dealerName.toLowerCase().includes(q) ||
+      r.dealerCode.toLowerCase().includes(q) ||
+      r.vehicle?.model?.toLowerCase().includes(q) ||
+      r.vehicle?.stockId?.toLowerCase().includes(q)
+    );
+  });
+
   const openActionDialog = (type: "CONFIRM" | "RELEASE" | "REJECT", res: ReservationRequest) => {
     audio.playSubtleClick();
     const defaultReason =
       type === "CONFIRM"
         ? "Wholesale allocation confirmed by Autohub Ops. Purchase order issued."
         : type === "RELEASE"
-          ? "Administrative hold released. Stock returned to available catalog."
-          : "Allocation declined during wholesale review.";
+        ? "Administrative hold released. Stock returned to available catalog."
+        : "Allocation declined during wholesale review.";
 
     setActionModal({
       isOpen: true,
@@ -77,45 +98,45 @@ export default function AdminReservationsView({ onNavigateTab }: AdminReservatio
     if (actionModal.type === "CONFIRM") {
       audio.playSuccessChime();
       confirmAllocation(res.vehicleId, reasonText);
-      setNotification(`Confirmed allocation for ${res.vehicle.make} ${res.vehicle.model} (#${res.vehicle.stockId}) to ${res.dealerName}.`);
+      setNotification(`Confirmed allocation for #${res.vehicle.stockId} to ${res.dealerName}.`);
     } else if (actionModal.type === "RELEASE") {
       audio.playSubtleClick();
       releaseHold(res.vehicleId, reasonText);
-      setNotification(`Released 24h exclusivity hold for #${res.vehicle.stockId}. Stock is now Available.`);
+      setNotification(`Released 24h hold for #${res.vehicle.stockId}. Stock is now Available.`);
     } else if (actionModal.type === "REJECT") {
       audio.playSubtleClick();
       rejectReservation(res.id, reasonText);
-      setNotification(`Rejected reservation ${res.requestId} for ${res.dealerName}. Reason logged.`);
+      setNotification(`Declined reservation ${res.requestId} for ${res.dealerName}.`);
     }
 
     setActionModal({ isOpen: false, type: "CONFIRM", reservation: null, reason: "" });
-    setTimeout(() => setNotification(null), 4500);
+    setTimeout(() => setNotification(null), 4000);
   };
 
   return (
-    <div className="space-y-6 animate-in fade-in duration-300">
+    <div className="space-y-5 animate-in fade-in duration-300">
       {/* ─────────────────────────────────────────────────────────── */}
-      {/* 1. Header Banner & Status                                  */}
-      {/* ───────────────────────────────────────────────────────── */}
+      {/* 1. Header Banner & Scope Tab Switcher                      */}
+      {/* ─────────────────────────────────────────────────────────── */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-100">
         <div>
           <div className="flex items-center gap-2 mb-1">
             <span className="text-[11px] font-bold uppercase tracking-wider text-[#E11D48]">
-              Commercial Allocation Control
+              Wholesale Allocation Control
             </span>
-            <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200">
-              ● Section 5 Data &amp; Status Model
+            <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 border border-slate-200">
+              24-Hour Atomic Locks
             </span>
           </div>
           <h1 className="text-2xl font-bold tracking-tight text-slate-900">
-            Reservations
+            Reservations ({activeTab === "ACTIVE" ? activeReservations.length : historyReservations.length})
           </h1>
           <p className="text-xs text-slate-500 mt-0.5">
-            Manage 24-hour atomic exclusivity holds, monitor expiry countdowns, and execute wholesale allocation sign-offs.
+            Monitor dealer exclusivity hold countdowns and sign off on wholesale allocation confirmations.
           </p>
         </div>
 
-        {/* Tab switch */}
+        {/* Tab switch matching left menu count */}
         <div className="flex items-center gap-1.5 p-1 bg-slate-100 rounded-2xl border border-slate-200/80">
           <button
             type="button"
@@ -123,14 +144,15 @@ export default function AdminReservationsView({ onNavigateTab }: AdminReservatio
               audio.playSubtleClick();
               setActiveTab("ACTIVE");
             }}
-            className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${activeTab === "ACTIVE"
+            className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+              activeTab === "ACTIVE"
                 ? "bg-white text-slate-900 shadow-2xs"
                 : "text-slate-500 hover:text-slate-800"
-              }`}
+            }`}
           >
             <Lock className="w-3.5 h-3.5 text-amber-600" />
             <span>Active Holds</span>
-            <span className="ml-1 px-1.5 py-0.2 rounded-full text-[10px] bg-amber-100 text-amber-800 font-mono">
+            <span className="ml-1 px-1.5 py-0.2 rounded-full text-[10px] bg-amber-100 text-amber-800 font-mono font-bold">
               {activeReservations.length}
             </span>
           </button>
@@ -141,10 +163,11 @@ export default function AdminReservationsView({ onNavigateTab }: AdminReservatio
               audio.playSubtleClick();
               setActiveTab("HISTORY");
             }}
-            className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${activeTab === "HISTORY"
+            className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+              activeTab === "HISTORY"
                 ? "bg-white text-slate-900 shadow-2xs"
                 : "text-slate-500 hover:text-slate-800"
-              }`}
+            }`}
           >
             <Clock className="w-3.5 h-3.5 text-slate-500" />
             <span>History &amp; Decisions</span>
@@ -156,282 +179,217 @@ export default function AdminReservationsView({ onNavigateTab }: AdminReservatio
       </div>
 
       {notification && (
-        <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-900 text-xs font-semibold flex items-center gap-2 shadow-xs animate-in fade-in">
-          <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-          <span>{notification}</span>
+        <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-900 text-xs font-semibold flex items-center justify-between gap-2 shadow-2xs animate-in fade-in">
+          <div className="flex items-center gap-2">
+            <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+            <span>{notification}</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setNotification(null)}
+            className="text-emerald-700 hover:text-emerald-900 text-xs cursor-pointer"
+          >
+            ✕
+          </button>
         </div>
       )}
 
       {/* ─────────────────────────────────────────────────────────── */}
-      {/* 2. Active Tab: Active 24-Hour Holds                        */}
+      {/* 2. Compact Search & Filter Toolbar                         */}
+      {/* ─────────────────────────────────────────────────────────── */}
+      <div className="bg-white rounded-xl border border-slate-200/90 p-3 shadow-2xs flex items-center justify-between gap-4">
+        <div className="relative flex-1 max-w-md">
+          <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5 pointer-events-none" />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search by stock ID, model, dealer code, or VIN..."
+            className="w-full pl-9 pr-3 py-1.5 text-xs bg-slate-50 hover:bg-slate-100/60 focus:bg-white rounded-lg border border-slate-200 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-slate-400 transition-all font-medium"
+          />
+        </div>
+
+        <div className="text-xs text-slate-500 hidden sm:block">
+          {activeTab === "ACTIVE"
+            ? `${filteredActive.length} of ${activeReservations.length} Active Holds Displayed`
+            : `${filteredHistory.length} of ${historyReservations.length} Historical Records`}
+        </div>
+      </div>
+
+      {/* ─────────────────────────────────────────────────────────── */}
+      {/* 3. ACTIVE HOLDS LIST (Clean, Uncrowded Row Cards)           */}
       {/* ─────────────────────────────────────────────────────────── */}
       {activeTab === "ACTIVE" && (
-        <>
-          {activeReservations.length === 0 ? (
-            <div className="bg-white rounded-3xl border border-slate-200/90 p-12 text-center space-y-3">
-              <Clock className="w-12 h-12 text-slate-300 mx-auto" />
-              <h3 className="font-bold text-base text-slate-900">No Active 24-Hour Holds</h3>
-              <p className="text-xs text-slate-500 max-w-md mx-auto">
-                All Japanese certified stock is currently unreserved and available for franchise dealer ordering across all 5 geographic zones.
+        <div className="space-y-3">
+          {filteredActive.length === 0 ? (
+            <div className="bg-white rounded-2xl border border-slate-200 p-10 text-center space-y-2">
+              <Clock className="w-10 h-10 text-slate-300 mx-auto" />
+              <h3 className="font-bold text-sm text-slate-800">No Active 24-Hour Holds</h3>
+              <p className="text-xs text-slate-500 max-w-sm mx-auto">
+                All certified Japanese inventory units are available for dealer purchase.
               </p>
-              {onNavigateTab && (
-                <button
-                  type="button"
-                  onClick={() => onNavigateTab("admin-catalogue")}
-                  className="mt-2 px-5 py-2.5 rounded-xl bg-slate-900 text-white text-xs font-bold hover:bg-slate-800 transition-colors cursor-pointer"
-                >
-                  Browse Vehicle Catalogue
-                </button>
-              )}
             </div>
           ) : (
-            <div className="space-y-4">
-              {activeReservations.map((res) => {
-                const vehicle = res.vehicle;
-                const isBreakdownOpen = expandedBreakdownId === res.id;
+            filteredActive.map((res) => {
+              const vehicle = res.vehicle;
+              const price = res.priceSnapshot;
 
-                return (
-                  <div
-                    key={res.id}
-                    className="bg-white rounded-3xl border border-slate-200/90 hover:border-slate-300 p-6 shadow-xs transition-all space-y-5"
-                  >
-                    <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-                      {/* Vehicle & Image Info */}
-                      <div className="flex items-center gap-5 min-w-0">
-                        <div className="relative w-32 h-22 rounded-2xl bg-gradient-to-b from-slate-50 to-slate-100/80 border border-slate-200/80 p-2 flex items-center justify-center shrink-0">
-                          <img
-                            src={vehicle.images?.[0] || "/images/cars/kicks.png"}
-                            alt={vehicle.model || "Vehicle"}
-                            className="w-full h-full object-contain filter drop-shadow-xs select-none"
-                          />
-                          <div className="absolute top-1.5 left-1.5 px-1.5 py-0.2 rounded bg-slate-900/80 backdrop-blur-md text-[9px] font-mono font-bold text-amber-300">
-                            ★ {vehicle.auctionGrade}
-                          </div>
-                        </div>
-
-                        <div className="min-w-0 space-y-1">
-                          <div className="flex items-center gap-2">
-                            <span className="font-mono text-xs font-bold text-slate-500">
-                              #{vehicle.stockId}
-                            </span>
-                            <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 font-semibold border border-amber-200 flex items-center gap-1 font-mono">
-                              <Lock className="w-2.5 h-2.5 text-amber-600" />
-                              <span>24h Lock Active</span>
-                            </span>
-                            <span className="text-[10px] text-slate-400 font-mono">
-                              VIN: {vehicle.vinChassis}
-                            </span>
-                          </div>
-
-                          <h3 className="text-base font-black text-slate-900 truncate">
-                            {vehicle.year} {vehicle.make} {vehicle.model}
-                          </h3>
-
-                          <p className="text-xs text-slate-500 truncate">
-                            {vehicle.grade} · {vehicle.fuelType} · {vehicle.transmission} · {vehicle.odometerKm.toLocaleString()} {vehicle.odometerUnit || "km"} · {vehicle.location}
-                          </p>
-                        </div>
-                      </div>
-
-                      {/* Dealership & User Data */}
-                      <div className="flex flex-wrap items-center gap-6 text-xs">
-                        <div>
-                          <span className="text-[10px] uppercase font-bold text-slate-400 block tracking-wider">
-                            Franchise Dealer
-                          </span>
-                          <span className="font-bold text-slate-900 block truncate max-w-[200px]">
-                            {res.dealerName}
-                          </span>
-                          <span className="text-[11px] text-slate-500 font-mono">
-                            {res.dealerCode} · {res.priceSnapshot.zoneId}
-                          </span>
-                        </div>
-
-                        <div>
-                          <span className="text-[10px] uppercase font-bold text-slate-400 block tracking-wider">
-                            Requesting User
-                          </span>
-                          <span className="font-bold text-slate-900 block truncate">
-                            {res.userName}
-                          </span>
-                          <span className="text-[11px] text-slate-500 font-mono truncate max-w-[170px] block">
-                            {res.userEmail}
-                          </span>
-                        </div>
-
-                        <div>
-                          <span className="text-[10px] uppercase font-bold text-slate-400 block tracking-wider">
-                            Guaranteed Landed Total
-                          </span>
-                          <span className="font-mono font-black text-slate-900 text-sm block">
-                            ${res.priceSnapshot.totalBuyPriceNZD.toLocaleString()} NZD
-                          </span>
-                          <span className="text-[10px] text-slate-400 font-mono">
-                            ¥{vehicle.fobPriceJPY.toLocaleString()} FOB
-                          </span>
-                        </div>
-
-                        {/* Actions (US-14) */}
-                        <div className="flex items-center gap-2 shrink-0">
-                          <button
-                            type="button"
-                            onClick={() => openActionDialog("CONFIRM", res)}
-                            className="px-3.5 py-2.5 rounded-xl bg-[#E11D48] hover:bg-[#BE123C] text-white text-xs font-bold transition-colors shadow-xs cursor-pointer flex items-center gap-1.5"
-                          >
-                            <CheckCircle2 className="w-3.5 h-3.5" />
-                            <span>Confirm Order</span>
-                          </button>
-
-                          <button
-                            type="button"
-                            onClick={() => openActionDialog("RELEASE", res)}
-                            className="px-3 py-2.5 rounded-xl border border-slate-200 hover:border-slate-300 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold transition-colors cursor-pointer flex items-center gap-1"
-                          >
-                            <Unlock className="w-3.5 h-3.5 text-slate-400" />
-                            <span>Release</span>
-                          </button>
-
-                          <button
-                            type="button"
-                            onClick={() => openActionDialog("REJECT", res)}
-                            className="px-2.5 py-2.5 rounded-xl border border-rose-200 hover:bg-rose-50 text-rose-700 text-xs font-semibold transition-colors cursor-pointer flex items-center gap-1"
-                            title="Reject Request with Reason"
-                          >
-                            <XCircle className="w-3.5 h-3.5" />
-                          </button>
-                        </div>
-                      </div>
+              return (
+                <div
+                  key={res.id}
+                  className="bg-white rounded-2xl border border-slate-200/90 hover:border-slate-300 p-4 sm:p-5 shadow-2xs hover:shadow-xs transition-all flex flex-col xl:flex-row xl:items-center justify-between gap-4 text-xs"
+                >
+                  {/* Column 1: Vehicle Preview & Spec */}
+                  <div className="flex items-center gap-3.5 min-w-[280px]">
+                    <div className="w-20 h-14 rounded-xl bg-slate-50 border border-slate-200/80 p-1 flex items-center justify-center shrink-0">
+                      <img
+                        src={vehicle.images?.[0] || "/images/cars/kicks.png"}
+                        alt={vehicle.model || "Vehicle"}
+                        className="w-full h-full object-contain filter drop-shadow-xs"
+                      />
                     </div>
-
-                    {/* Minimum Data Snapshot Metadata Strip */}
-                    <div className="pt-3 border-t border-slate-100 flex flex-wrap items-center justify-between gap-4 text-[11px] text-slate-500">
-                      <div className="flex flex-wrap items-center gap-4">
-                        <span className="flex items-center gap-1 text-slate-600">
-                          <Clock className="w-3.5 h-3.5 text-amber-500" />
-                          <span>Hold Placed: </span>
-                          <strong className="font-mono text-slate-900">
-                            {new Date(res.requestedAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-                          </strong>
-                        </span>
-
-                        <span className="flex items-center gap-1 text-slate-600">
-                          <span>Expires: </span>
-                          <strong className="font-mono text-amber-700">
-                            {new Date(res.expiresAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })} (24h)
-                          </strong>
-                        </span>
-
-                        <span className="flex items-center gap-1 text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 font-medium">
-                          <FileCheck2 className="w-3 h-3" />
-                          <span>Terms Snapshot: {res.termsVersionSnapshot} Agreed</span>
-                        </span>
-
-                        <span className="flex items-center gap-1 text-slate-600">
-                          <span>Cost Boundary Acknowledged: </span>
-                          <strong className="text-slate-900">{res.acknowledgedBoundary ? "Yes" : "No"}</strong>
-                        </span>
-
-                        <span className="flex items-center gap-1 text-slate-600">
-                          <span>Cancellation Policy Agreed: </span>
-                          <strong className="text-slate-900">{res.acknowledgedCancellation ? "Yes" : "No"}</strong>
+                    <div className="space-y-0.5">
+                      <div className="flex items-center gap-2">
+                        <strong className="text-sm font-bold text-slate-900">
+                          {vehicle.year} {vehicle.make} {vehicle.model}
+                        </strong>
+                        <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-slate-100 text-slate-700 font-bold">
+                          #{vehicle.stockId}
                         </span>
                       </div>
-
-                      <button
-                        type="button"
-                        onClick={() => setExpandedBreakdownId(isBreakdownOpen ? null : res.id)}
-                        className="text-xs font-semibold text-[#E11D48] hover:text-[#BE123C] flex items-center gap-1 cursor-pointer"
-                      >
-                        <span>{isBreakdownOpen ? "Hide Price Snapshot" : "View Price Snapshot"}</span>
-                        {isBreakdownOpen ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
-                      </button>
+                      <p className="text-slate-500 text-xs">
+                        {vehicle.grade} · {vehicle.fuelType} · ★ Grade {vehicle.auctionGrade || "4.5"}
+                      </p>
+                      <p className="text-[11px] font-mono text-slate-400">
+                        VIN: {vehicle.vinChassis}
+                      </p>
                     </div>
-
-                    {/* Collapsible Price Snapshot Breakdown (Section 4 & 5) */}
-                    {isBreakdownOpen && (
-                      <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 grid grid-cols-2 sm:grid-cols-4 md:grid-cols-7 gap-3 text-xs animate-in fade-in">
-                        <div>
-                          <span className="text-[10px] text-slate-400 block uppercase font-bold">FOB JPY</span>
-                          <span className="font-mono font-bold text-slate-900">¥{res.priceSnapshot.fobJPY.toLocaleString()}</span>
-                        </div>
-                        <div>
-                          <span className="text-[10px] text-slate-400 block uppercase font-bold">FOB NZD</span>
-                          <span className="font-mono font-bold text-slate-900">${res.priceSnapshot.fobNZD.toLocaleString()}</span>
-                        </div>
-                        <div>
-                          <span className="text-[10px] text-slate-400 block uppercase font-bold">RoRo Freight</span>
-                          <span className="font-mono font-bold text-slate-900">${res.priceSnapshot.oceanFreightNZD.toLocaleString()}</span>
-                        </div>
-                        <div>
-                          <span className="text-[10px] text-slate-400 block uppercase font-bold">Customs &amp; GST</span>
-                          <span className="font-mono font-bold text-slate-900">${(res.priceSnapshot.customsProcessingNZD + res.priceSnapshot.gstNZD).toLocaleString()}</span>
-                        </div>
-                        <div>
-                          <span className="text-[10px] text-slate-400 block uppercase font-bold">MR2A Compliance</span>
-                          <span className="font-mono font-bold text-slate-900">${res.priceSnapshot.complianceInspectionNZD.toLocaleString()}</span>
-                        </div>
-                        <div>
-                          <span className="text-[10px] text-slate-400 block uppercase font-bold">2x NZ Delivery</span>
-                          <span className="font-mono font-bold text-slate-900">${res.priceSnapshot.zoneDeliveryNZD.toLocaleString()}</span>
-                        </div>
-                        <div>
-                          <span className="text-[10px] text-slate-400 block uppercase font-bold">Nissan Fee</span>
-                          <span className="font-mono font-bold text-slate-900">${res.priceSnapshot.programmeFeeNZD.toLocaleString()}</span>
-                        </div>
-                      </div>
-                    )}
                   </div>
-                );
-              })}
-            </div>
+
+                  {/* Column 2: Dealership & Requesting User */}
+                  <div className="min-w-[220px] space-y-0.5">
+                    <span className="text-[10px] uppercase font-bold text-slate-400 block tracking-wider">
+                      Reserving Dealership
+                    </span>
+                    <strong className="text-xs font-bold text-slate-900 block truncate">
+                      {res.dealerName}
+                    </strong>
+                    <div className="text-[11px] text-slate-500">
+                      {res.userName} · <span className="font-mono text-slate-700 font-bold">{price.zoneId}</span>
+                    </div>
+                  </div>
+
+                  {/* Column 3: Guaranteed Landed Price */}
+                  <div className="min-w-[170px] space-y-0.5">
+                    <span className="text-[10px] uppercase font-bold text-slate-400 block tracking-wider">
+                      Landed Wholesale Price
+                    </span>
+                    <div className="font-mono font-black text-slate-900 text-sm">
+                      ${price.totalBuyPriceNZD.toLocaleString()} <span className="text-[10px] font-sans text-slate-500">NZD</span>
+                    </div>
+                    <span className="text-[10px] font-mono text-emerald-700 font-semibold flex items-center gap-1">
+                      <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                      <span>Section 4 Locked</span>
+                    </span>
+                  </div>
+
+                  {/* Column 4: 24h Lock Status */}
+                  <div className="min-w-[140px] space-y-0.5">
+                    <span className="text-[10px] uppercase font-bold text-slate-400 block tracking-wider">
+                      Exclusivity Status
+                    </span>
+                    <div className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-amber-50 text-amber-800 border border-amber-200 font-mono font-bold text-[11px]">
+                      <Clock className="w-3 h-3 text-amber-600" />
+                      <span>24h Lock Active</span>
+                    </div>
+                  </div>
+
+                  {/* Column 5: Actions */}
+                  <div className="flex items-center gap-2 shrink-0 self-end xl:self-center">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        audio.playSubtleClick();
+                        setSelectedResForDetails(res);
+                      }}
+                      className="px-3 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs cursor-pointer flex items-center gap-1.5 transition-colors shadow-2xs"
+                    >
+                      <Eye className="w-3.5 h-3.5 text-slate-400" />
+                      <span>Dossier</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => openActionDialog("RELEASE", res)}
+                      className="px-3 py-2 rounded-xl border border-slate-200 hover:bg-slate-100 text-slate-600 font-bold text-xs cursor-pointer transition-colors"
+                    >
+                      Release
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => openActionDialog("CONFIRM", res)}
+                      className="px-3.5 py-2 rounded-xl bg-[#E11D48] hover:bg-[#BE123C] text-white font-bold text-xs cursor-pointer transition-colors shadow-2xs flex items-center gap-1"
+                    >
+                      <CheckCircle2 className="w-3.5 h-3.5" />
+                      <span>Confirm Allocation</span>
+                    </button>
+                  </div>
+                </div>
+              );
+            })
           )}
-        </>
+        </div>
       )}
 
       {/* ─────────────────────────────────────────────────────────── */}
-      {/* 3. History Tab: Historical Decisions & Requests             */}
+      {/* 4. HISTORY TAB (Clean, Elegant Table)                       */}
       {/* ─────────────────────────────────────────────────────────── */}
       {activeTab === "HISTORY" && (
-        <div className="bg-white rounded-2xl border border-slate-200/90 shadow-sm overflow-hidden">
+        <div className="bg-white rounded-2xl border border-slate-200/90 shadow-2xs overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs text-slate-600">
               <thead className="bg-slate-50/80 border-b border-slate-200/80 text-[11px] font-bold uppercase tracking-wider text-slate-500">
                 <tr>
-                  <th className="py-3 px-5">Request ID &amp; Date</th>
-                  <th className="py-3 px-4">Vehicle Details</th>
-                  <th className="py-3 px-4">Dealer &amp; User</th>
+                  <th className="py-3 px-5">Request ID</th>
+                  <th className="py-3 px-4">Vehicle</th>
+                  <th className="py-3 px-4">Dealership</th>
                   <th className="py-3 px-4">Landed Price</th>
-                  <th className="py-3 px-4">Status &amp; Decision</th>
-                  <th className="py-3 px-5">Audit Decision Reason</th>
+                  <th className="py-3 px-4">Decision</th>
+                  <th className="py-3 px-4">Audit Reason</th>
+                  <th className="py-3 px-5 text-right">Action</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
-                {historyReservations.map((res) => {
+                {filteredHistory.map((res) => {
                   const isAllocated = res.status === "CONFIRMED_ALLOCATED";
                   const isReleased = res.status === "RELEASED";
-                  const isRejected = res.status === "REJECTED";
 
                   return (
-                    <tr key={res.id} className="hover:bg-slate-50/50 transition-colors">
-                      <td className="py-3.5 px-5">
-                        <div className="font-mono font-bold text-slate-900">{res.requestId}</div>
+                    <tr
+                      key={res.id}
+                      onClick={() => {
+                        audio.playSubtleClick();
+                        setSelectedResForDetails(res);
+                      }}
+                      className="hover:bg-slate-50/60 transition-colors cursor-pointer group"
+                    >
+                      <td className="py-3.5 px-5 font-mono font-bold text-slate-900">
+                        {res.requestId}
+                      </td>
+
+                      <td className="py-3.5 px-4">
+                        <div className="font-bold text-slate-900 group-hover:text-[#E11D48] transition-colors">
+                          {res.vehicle.year} {res.vehicle.model}
+                        </div>
                         <div className="text-[10px] font-mono text-slate-400">
-                          {new Date(res.requestedAt).toLocaleDateString()} {new Date(res.requestedAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                          #{res.vehicle.stockId}
                         </div>
                       </td>
 
                       <td className="py-3.5 px-4">
-                        <div className="font-bold text-slate-900">
-                          {res.vehicle.year} {res.vehicle.make} {res.vehicle.model}
-                        </div>
-                        <div className="text-[10px] font-mono text-slate-400">
-                          #{res.vehicle.stockId} · VIN: {res.vehicle.vinChassis}
-                        </div>
-                      </td>
-
-                      <td className="py-3.5 px-4">
-                        <div className="font-semibold text-slate-900">{res.dealerName}</div>
-                        <div className="text-[10px] text-slate-500">{res.userName} ({res.priceSnapshot.zoneId})</div>
+                        <div className="font-semibold text-slate-800">{res.dealerName}</div>
+                        <div className="text-[10px] text-slate-400 font-mono">{res.dealerCode}</div>
                       </td>
 
                       <td className="py-3.5 px-4 font-mono font-bold text-slate-900">
@@ -440,29 +398,35 @@ export default function AdminReservationsView({ onNavigateTab }: AdminReservatio
 
                       <td className="py-3.5 px-4">
                         <span
-                          className={`px-2 py-0.5 rounded-full text-[10px] font-bold inline-flex items-center gap-1 ${isAllocated
+                          className={`px-2 py-0.5 rounded-full text-[10px] font-bold inline-flex items-center gap-1 ${
+                            isAllocated
                               ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
                               : isReleased
-                                ? "bg-slate-100 text-slate-700 border border-slate-200"
-                                : "bg-rose-50 text-rose-700 border border-rose-200"
-                            }`}
+                              ? "bg-slate-100 text-slate-700 border border-slate-200"
+                              : "bg-rose-50 text-rose-700 border border-rose-200"
+                          }`}
                         >
-                          {isAllocated && <CheckCircle2 className="w-2.5 h-2.5" />}
-                          {isReleased && <Unlock className="w-2.5 h-2.5" />}
-                          {isRejected && <XCircle className="w-2.5 h-2.5" />}
-                          <span>{res.status.replace(/_/g, " ")}</span>
+                          {isAllocated ? "CONFIRMED" : isReleased ? "RELEASED" : res.status}
                         </span>
                       </td>
 
-                      <td className="py-3.5 px-5 max-w-sm">
-                        <p className="text-slate-700 text-xs leading-snug">
-                          {res.decisionReason || "—"}
-                        </p>
-                        {res.decidedBy && (
-                          <span className="text-[10px] text-slate-400 font-mono block mt-0.5">
-                            Decided by: {res.decidedBy}
-                          </span>
-                        )}
+                      <td className="py-3.5 px-4 max-w-xs truncate text-slate-600">
+                        {res.decisionReason || "—"}
+                      </td>
+
+                      <td className="py-3.5 px-5 text-right">
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            audio.playSubtleClick();
+                            setSelectedResForDetails(res);
+                          }}
+                          className="px-2.5 py-1 rounded-lg border border-slate-200 bg-white hover:bg-slate-100 text-slate-700 text-xs font-semibold cursor-pointer inline-flex items-center gap-1"
+                        >
+                          <Eye className="w-3 h-3 text-slate-400" />
+                          <span>Dossier</span>
+                        </button>
                       </td>
                     </tr>
                   );
@@ -474,16 +438,16 @@ export default function AdminReservationsView({ onNavigateTab }: AdminReservatio
       )}
 
       {/* ─────────────────────────────────────────────────────────── */}
-      {/* 4. Action Reason Dialog Modal (US-14)                      */}
+      {/* 5. Minimal Action Reason Dialog Modal                       */}
       {/* ─────────────────────────────────────────────────────────── */}
       {actionModal.isOpen && actionModal.reservation && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in">
-          <div className="bg-white rounded-3xl border border-slate-200 shadow-2xl max-w-md w-full p-6 space-y-4">
+          <div className="bg-white rounded-2xl border border-slate-200 shadow-2xl max-w-md w-full p-6 space-y-4">
             <div className="flex items-center justify-between pb-2 border-b border-slate-100">
               <h3 className="font-bold text-base text-slate-900">
                 {actionModal.type === "CONFIRM" && "Confirm Wholesale Allocation"}
                 {actionModal.type === "RELEASE" && "Release 24-Hour Hold"}
-                {actionModal.type === "REJECT" && "Reject Reservation Request"}
+                {actionModal.type === "REJECT" && "Decline Reservation"}
               </h3>
               <button
                 type="button"
@@ -494,30 +458,26 @@ export default function AdminReservationsView({ onNavigateTab }: AdminReservatio
               </button>
             </div>
 
-            <div className="text-xs text-slate-600 space-y-2">
+            <div className="text-xs text-slate-600 space-y-1">
               <p>
                 <strong>Vehicle:</strong> {actionModal.reservation.vehicle.year}{" "}
                 {actionModal.reservation.vehicle.make} {actionModal.reservation.vehicle.model} (
                 #{actionModal.reservation.vehicle.stockId})
               </p>
               <p>
-                <strong>Dealer:</strong> {actionModal.reservation.dealerName} ({actionModal.reservation.dealerCode})
-              </p>
-              <p>
-                <strong>Guaranteed Landed Price:</strong> $
-                {actionModal.reservation.priceSnapshot.totalBuyPriceNZD.toLocaleString()} NZD
+                <strong>Dealer:</strong> {actionModal.reservation.dealerName}
               </p>
             </div>
 
-            <div className="space-y-1.5">
+            <div className="space-y-1">
               <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider block">
-                Decision &amp; Audit Reason (Mandatory under US-14)
+                Audit Justification Note
               </label>
               <textarea
-                rows={3}
+                rows={2}
                 value={actionModal.reason}
                 onChange={(e) => setActionModal({ ...actionModal, reason: e.target.value })}
-                placeholder="Enter formal justification for audit and dealer notification..."
+                placeholder="Enter justification for audit log..."
                 className="w-full text-xs p-3 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:outline-none focus:ring-1 focus:ring-slate-400"
               />
             </div>
@@ -526,7 +486,7 @@ export default function AdminReservationsView({ onNavigateTab }: AdminReservatio
               <button
                 type="button"
                 onClick={() => setActionModal({ isOpen: false, type: "CONFIRM", reservation: null, reason: "" })}
-                className="px-4 py-2 rounded-xl text-xs font-medium text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer"
+                className="px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer"
               >
                 Cancel
               </button>
@@ -535,21 +495,21 @@ export default function AdminReservationsView({ onNavigateTab }: AdminReservatio
                 type="button"
                 onClick={handleExecuteAction}
                 disabled={!actionModal.reason.trim()}
-                className={`px-4 py-2 rounded-xl text-xs font-bold text-white transition-all cursor-pointer shadow-xs disabled:opacity-50 ${actionModal.type === "CONFIRM"
+                className={`px-4 py-2 rounded-xl text-xs font-bold text-white transition-all cursor-pointer shadow-xs disabled:opacity-50 ${
+                  actionModal.type === "CONFIRM"
                     ? "bg-[#E11D48] hover:bg-[#BE123C]"
                     : actionModal.type === "RELEASE"
-                      ? "bg-slate-800 hover:bg-slate-900"
-                      : "bg-rose-600 hover:bg-rose-700"
-                  }`}
+                    ? "bg-slate-800 hover:bg-slate-900"
+                    : "bg-rose-600 hover:bg-rose-700"
+                }`}
               >
-                {actionModal.type === "CONFIRM" && "Confirm & Create Order"}
-                {actionModal.type === "RELEASE" && "Release Back to Stock"}
-                {actionModal.type === "REJECT" && "Reject Request"}
+                Execute {actionModal.type}
               </button>
             </div>
           </div>
         </div>
       )}
+
       {/* Reservation Details Dossier Modal */}
       {selectedResForDetails && (
         <ReservationDetailsModal

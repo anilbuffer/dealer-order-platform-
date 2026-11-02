@@ -155,6 +155,20 @@ export default function Sidebar({
           badge: vehicles.length > 0 ? vehicles.length : undefined,
           badgeColor: "bg-white/10 text-slate-200 border-white/10",
         },
+        {
+          id: "admin-users",
+          label: "User Management",
+          icon: Users,
+          href: "/admin/users",
+          badge: users.length > 0 ? users.length : undefined,
+          badgeColor: "bg-white/10 text-slate-200 border-white/10",
+        },
+        {
+          id: "admin-roles",
+          label: "Roles & Permissions",
+          icon: Shield,
+          href: "/admin/roles",
+        },
       ];
     }
 

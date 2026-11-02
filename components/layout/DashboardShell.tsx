@@ -137,6 +137,12 @@ export default function DashboardShell({
         case "stock":
         case "admin-stock":
           return "/admin/inventory";
+        case "admin-users":
+        case "users":
+          return "/admin/users";
+        case "admin-roles":
+        case "roles":
+          return "/admin/roles";
         case "admin-menu":
         case "menu":
           return "/admin";
@@ -373,6 +379,8 @@ export default function DashboardShell({
           if (pathname === "/admin/reservations") return <AdminReservationsView onNavigateTab={handleTabChange} />;
           if (pathname === "/admin/dealers") return <DealerApprovalsView />;
           if (pathname === "/admin/inventory") return <AdminInventoryControllerView />;
+          if (pathname === "/admin/users") return <UserManagementView />;
+          if (pathname === "/admin/roles") return <RolesPermissionsView />;
           return <AdminMenuPortalView onNavigateTab={handleTabChange} />;
       }
     }

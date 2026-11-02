@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { Vehicle } from "@/lib/types";
 import { useProgramme } from "@/lib/programme-context";
 import { audio } from "@/lib/sound";
+import JapanInventoryDetailsModal from "./JapanInventoryDetailsModal";
 import {
   Search,
   Plus,
@@ -29,6 +30,7 @@ export default function JapanInventoryView({
   const { vehicles, toggleVehicleStatus } = useProgramme();
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("ALL");
+  const [selectedVehicleForDetails, setSelectedVehicleForDetails] = useState<Vehicle | null>(null);
 
   const filteredVehicles = vehicles.filter((v) => {
     if (searchQuery) {
@@ -169,7 +171,14 @@ export default function JapanInventoryView({
                 const isReserved = vehicle.status === "RESERVED";
 
                 return (
-                  <tr key={vehicle.id} className="hover:bg-slate-50/70 transition-colors">
+                  <tr
+                    key={vehicle.id}
+                    onClick={() => {
+                      audio.playSubtleClick();
+                      setSelectedVehicleForDetails(vehicle);
+                    }}
+                    className="hover:bg-slate-50/80 transition-colors cursor-pointer group"
+                  >
                     <td className="py-3 px-4">
                       <div className="flex items-center gap-3">
                         <img
@@ -220,7 +229,19 @@ export default function JapanInventoryView({
                       </span>
                     </td>
 
-                    <td className="py-3 px-4 text-right">
+                    <td className="py-3 px-4 text-right space-x-2">
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          audio.playSubtleClick();
+                          setSelectedVehicleForDetails(vehicle);
+                        }}
+                        className="px-2.5 py-1 rounded-lg border border-slate-200 bg-white hover:bg-slate-100 text-slate-700 text-xs font-semibold cursor-pointer inline-flex items-center gap-1"
+                      >
+                        <Eye className="w-3 h-3 text-slate-400" />
+                        <span>Details</span>
+                      </button>
                       {isReserved ? (
                         <span className="text-[11px] text-slate-400 italic">Held by Dealer</span>
                       ) : (
@@ -240,6 +261,14 @@ export default function JapanInventoryView({
           </table>
         </div>
       </div>
+      {/* Japan Inventory Vehicle Dossier Modal */}
+      {selectedVehicleForDetails && (
+        <JapanInventoryDetailsModal
+          vehicle={selectedVehicleForDetails}
+          onClose={() => setSelectedVehicleForDetails(null)}
+          onToggleStatus={handleToggleStatus}
+        />
+      )}
     </div>
   );
 }

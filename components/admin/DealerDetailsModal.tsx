@@ -80,11 +80,10 @@ export default function DealerDetailsModal({
                   {dealer.dealerCode}
                 </span>
                 <span
-                  className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${
-                    dealer.status === "APPROVED"
-                      ? "bg-emerald-500/20 text-emerald-300 border-emerald-500/30"
-                      : "bg-amber-500/20 text-amber-300 border-amber-500/30"
-                  }`}
+                  className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${dealer.status === "APPROVED"
+                    ? "bg-emerald-500/20 text-emerald-300 border-emerald-500/30"
+                    : "bg-amber-500/20 text-amber-300 border-amber-500/30"
+                    }`}
                 >
                   {dealer.status === "APPROVED" ? "Approved Franchise" : "Pending Authorization"}
                 </span>
@@ -259,11 +258,10 @@ export default function DealerDetailsModal({
                       audio.playSubtleClick();
                       setSelectedZone(zoneKey);
                     }}
-                    className={`p-3.5 rounded-xl border text-left transition-all cursor-pointer ${
-                      isSelected
-                        ? "bg-white border-[#E11D48] ring-2 ring-[#E11D48]/20 shadow-xs"
-                        : "bg-white/80 border-slate-200 hover:border-slate-300"
-                    }`}
+                    className={`p-3.5 rounded-xl border text-left transition-all cursor-pointer ${isSelected
+                      ? "bg-white border-[#E11D48] ring-2 ring-[#E11D48]/20 shadow-xs"
+                      : "bg-white/80 border-slate-200 hover:border-slate-300"
+                      }`}
                   >
                     <div className="flex items-center justify-between mb-1">
                       <span className="font-mono font-bold text-xs text-slate-900">{zoneKey}</span>

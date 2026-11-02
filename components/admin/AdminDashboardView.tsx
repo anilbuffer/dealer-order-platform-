@@ -6,8 +6,7 @@ import { calculateLandedPrice } from "@/lib/pricing-calculator";
 import { audio } from "@/lib/sound";
 import DealerDetailsModal from "./DealerDetailsModal";
 import ReservationDetailsModal from "./ReservationDetailsModal";
-import { ReservationRequest, DealerAccount } from "@/lib/types";
-import { ZoneId } from "@/lib/types";
+import { ReservationRequest, DealerAccount, ZoneId } from "@/lib/types";
 import {
   Users,
   Lock,
@@ -25,6 +24,8 @@ import {
   Phone,
   Copy,
   Check,
+  AlertCircle,
+  Eye,
 } from "lucide-react";
 
 interface AdminDashboardViewProps {
@@ -44,7 +45,6 @@ export default function AdminDashboardView({ onNavigateTab }: AdminDashboardView
 
   const [notification, setNotification] = useState<string | null>(null);
   const [selectedZone, setSelectedZone] = useState<Record<string, ZoneId>>({});
-  const [copiedId, setCopiedId] = useState<string | null>(null);
   const [selectedDealerForDetails, setSelectedDealerForDetails] = useState<DealerAccount | null>(null);
   const [selectedResForDetails, setSelectedResForDetails] = useState<ReservationRequest | null>(null);
 
@@ -72,13 +72,6 @@ export default function AdminDashboardView({ onNavigateTab }: AdminDashboardView
     ...v,
     images: v.images && v.images.length > 0 ? v.images : ["/images/cars/kicks.png"],
   }));
-
-  const handleCopy = (text: string, id: string) => {
-    navigator.clipboard.writeText(text);
-    audio.playSubtleClick();
-    setCopiedId(id);
-    setTimeout(() => setCopiedId(null), 2500);
-  };
 
   // Dealer Approval Handler
   const handleApprove = (dealerId: string, defaultZone: ZoneId) => {
@@ -125,14 +118,14 @@ export default function AdminDashboardView({ onNavigateTab }: AdminDashboardView
               Autohub Platform Operations
             </span>
             <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 border border-slate-200">
-              Operations Dashboard
+              Operations Action Center
             </span>
           </div>
           <h1 className="text-2xl font-bold tracking-tight text-slate-900">
             Dashboard
           </h1>
           <p className="text-xs text-slate-500 mt-0.5">
-            Real-time action center for dealer onboarding approvals and 24-hour atomic reservation requests.
+            Real-time action alerts for dealer onboarding approvals and 24-hour atomic reservation requests.
           </p>
         </div>
       </div>
@@ -154,139 +147,123 @@ export default function AdminDashboardView({ onNavigateTab }: AdminDashboardView
       )}
 
       {/* ─────────────────────────────────────────────────────────── */}
-      {/* 2. FULL WIDTH HORIZONTAL CARDS (Consistent Color & Typo)    */}
+      {/* 2. ACTION ALERT CARDS (Clean, Uncluttered, Alert-Styled)     */}
       {/* ─────────────────────────────────────────────────────────── */}
-      <div className="space-y-6 w-full">
+      <div className="space-y-5 w-full">
         {/* ========================================================= */}
-        {/* CARD 1: Dealer Onboarding Approval Request (Full Width)   */}
+        {/* ALERT 1: Dealer Onboarding Approval Request (Amber Alert)  */}
         {/* ========================================================= */}
-        <div className="w-full bg-white rounded-3xl border border-slate-200/90 shadow-sm p-6 sm:p-7 hover:border-slate-300 transition-all space-y-6">
-          {/* Card Header */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-100">
-            <div className="flex items-center gap-3.5">
-              <div className="w-11 h-11 rounded-2xl bg-amber-50 border border-amber-200/80 flex items-center justify-center text-amber-600 shadow-2xs shrink-0">
-                <Building2 className="w-5 h-5" />
+        <div className="w-full bg-gradient-to-r from-amber-50/60 via-white to-amber-50/20 rounded-2xl border border-amber-200/90 shadow-2xs p-5 sm:p-6 transition-all space-y-4">
+          {/* Alert Header */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-amber-200/50">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-amber-100/90 border border-amber-300/80 flex items-center justify-center text-amber-700 shrink-0">
+                <AlertCircle className="w-5 h-5" />
               </div>
               <div>
-                <h2 className="text-lg font-bold text-slate-900">
-                  Dealer Onboarding Approval Request
-                </h2>
+                <div className="flex items-center gap-2">
+                  <h2 className="text-base font-bold text-slate-900">
+                    Dealer Onboarding Approval Request
+                  </h2>
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-900 border border-amber-200 font-mono">
+                    ACTION REQUIRED
+                  </span>
+                </div>
                 <p className="text-xs text-slate-500 mt-0.5">
-                  Dealership registration verification, NZBN identity check, and geographic pricing profile assignment.
+                  Franchise dealership registration pending NZBN verification and pricing zone mapping.
                 </p>
               </div>
             </div>
 
-            <span
-              className={`px-3.5 py-1 rounded-full text-xs font-bold font-mono border self-start sm:self-auto shrink-0 ${
-                pendingDealers.length > 0
-                  ? "bg-amber-50 text-amber-800 border-amber-200"
-                  : "bg-emerald-50 text-emerald-800 border-emerald-200"
-              }`}
-            >
-              {pendingDealers.length} {pendingDealers.length === 1 ? "Pending Application" : "Pending Applications"}
-            </span>
+            <div className="flex items-center gap-2 self-start sm:self-auto shrink-0">
+              <span className="px-3 py-1 rounded-full text-xs font-bold font-mono bg-white text-amber-900 border border-amber-300/80 shadow-2xs">
+                {pendingDealers.length} {pendingDealers.length === 1 ? "Application Pending" : "Applications Pending"}
+              </span>
+            </div>
           </div>
 
-          {/* Card Content (Horizontal Rows) */}
+          {/* Alert Body */}
           {pendingDealers.length === 0 ? (
-            <div className="p-12 text-center bg-slate-50 rounded-2xl border border-slate-100 space-y-2">
-              <CheckCircle2 className="w-9 h-9 text-emerald-500 mx-auto" />
-              <h3 className="text-sm font-bold text-slate-800">All Dealerships Approved</h3>
-              <p className="text-xs text-slate-500 max-w-sm mx-auto leading-relaxed">
-                There are no pending dealership onboarding requests. All active applicants have been verified and assigned pricing profiles.
-              </p>
+            <div className="py-6 px-4 bg-white/80 rounded-xl border border-amber-100 text-center text-xs text-slate-500 flex items-center justify-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+              <span>All dealer applications processed. No pending authorizations required.</span>
             </div>
           ) : (
-            <div className="space-y-4">
+            <div className="space-y-3">
               {pendingDealers.map((dealer) => {
                 const currentAssignedZone = selectedZone[dealer.id] || dealer.pricingZoneId || "ZONE_1";
 
                 return (
                   <div
                     key={dealer.id}
-                    className="p-5 rounded-2xl border border-slate-200/90 bg-slate-50/60 hover:bg-white hover:border-slate-300 hover:shadow-xs transition-all flex flex-col xl:flex-row xl:items-center justify-between gap-5 text-xs"
+                    className="p-4 rounded-xl bg-white border border-slate-200/80 hover:border-amber-300 shadow-2xs transition-all flex flex-col lg:flex-row lg:items-center justify-between gap-4 text-xs"
                   >
-                    {/* Block A: Dealership Identity */}
-                    <div className="space-y-1.5 min-w-[260px]">
-                      <div className="flex items-center gap-2">
-                        <h3 className="font-bold text-sm text-slate-900">
-                          {dealer.legalTradingName}
-                        </h3>
-                        <span className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded bg-amber-100 text-amber-800 border border-amber-200">
-                          {dealer.dealerCode}
-                        </span>
+                    {/* Dealer Info */}
+                    <div className="flex items-center gap-3.5 min-w-[280px]">
+                      <div className="w-10 h-10 rounded-xl bg-amber-50 border border-amber-200/60 flex items-center justify-center text-amber-700 font-bold text-sm shrink-0">
+                        <Building2 className="w-5 h-5" />
                       </div>
-                      <p className="text-slate-500 text-xs flex items-center gap-1.5">
-                        <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                        <span>{dealer.address}</span>
-                      </p>
-                      <div className="font-mono text-[11px] text-slate-400">
-                        NZBN: <strong className="text-slate-600">{dealer.nzbn}</strong> · Region: {dealer.region || "Auckland"}
-                      </div>
-                    </div>
-
-                    {/* Block B: Contact Person & Accepted Terms */}
-                    <div className="p-3.5 rounded-xl bg-white border border-slate-200/80 space-y-1.5 min-w-[240px]">
-                      <div className="flex items-center justify-between text-[11px]">
-                        <span className="text-slate-400">Primary Contact:</span>
-                        <strong className="text-slate-800">{dealer.primaryContactName}</strong>
-                      </div>
-                      <div className="flex items-center gap-1.5 text-[11px] text-slate-500">
-                        <Mail className="w-3 h-3 text-slate-400" />
-                        <span className="truncate">{dealer.primaryContactEmail}</span>
-                      </div>
-                      <div className="flex items-center justify-between pt-1 border-t border-slate-100 text-[11px]">
-                        <span className="text-slate-400">Terms &amp; Boundary:</span>
-                        <span className="text-emerald-700 font-semibold flex items-center gap-1">
-                          <FileCheck2 className="w-3 h-3 text-emerald-600" />
-                          <span>{dealer.termsAcceptedVersion || "v2026.1"} Verified</span>
-                        </span>
+                      <div className="space-y-0.5">
+                        <div className="flex items-center gap-2">
+                          <strong className="text-sm font-bold text-slate-900">
+                            {dealer.legalTradingName}
+                          </strong>
+                          <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-slate-100 text-slate-700 font-bold">
+                            {dealer.dealerCode}
+                          </span>
+                        </div>
+                        <p className="text-slate-500 text-xs flex items-center gap-1">
+                          <MapPin className="w-3 h-3 text-slate-400" />
+                          <span>{dealer.address}</span>
+                          <span className="text-slate-300">·</span>
+                          <span className="font-mono text-slate-500">NZBN: {dealer.nzbn}</span>
+                        </p>
                       </div>
                     </div>
 
-                    {/* Block C: Pricing Zone Assignment Selector */}
-                    <div className="space-y-1.5 min-w-[220px]">
-                      <label className="text-[11px] font-bold text-slate-600 uppercase tracking-wider block">
-                        Assigned Pricing Schedule:
-                      </label>
-                      <select
-                        value={currentAssignedZone}
-                        onChange={(e) =>
-                          setSelectedZone({
-                            ...selectedZone,
-                            [dealer.id]: e.target.value as ZoneId,
-                          })
-                        }
-                        className="w-full text-xs px-3 py-2 rounded-xl border border-slate-200 bg-white font-mono font-bold text-slate-800 focus:outline-none focus:ring-1 focus:ring-slate-400 cursor-pointer shadow-2xs"
+                    {/* Contact & Zone Summary */}
+                    <div className="flex flex-wrap items-center gap-4 text-xs text-slate-600">
+                      <div className="flex items-center gap-1.5">
+                        <Mail className="w-3.5 h-3.5 text-slate-400" />
+                        <span>{dealer.primaryContactName} ({dealer.primaryContactEmail})</span>
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-slate-400">Assigned Zone:</span>
+                        <span className="px-2 py-0.5 rounded-md bg-slate-100 text-slate-800 font-mono font-bold text-[11px] border border-slate-200">
+                          {currentAssignedZone}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Actions */}
+                    <div className="flex items-center gap-2 shrink-0 self-end lg:self-auto">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          audio.playSubtleClick();
+                          setSelectedDealerForDetails(dealer);
+                        }}
+                        className="px-3.5 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs cursor-pointer flex items-center gap-1.5 transition-colors"
                       >
-                        <option value="ZONE_1">Zone 1 (Auckland · $650 tow)</option>
-                        <option value="ZONE_2">Zone 2 (Tauranga / Waikato · $850 tow)</option>
-                        <option value="ZONE_3">Zone 3 (Wellington · $1,150 tow)</option>
-                        <option value="ZONE_4">Zone 4 (Canterbury · $1,450 tow)</option>
-                        <option value="ZONE_5">Zone 5 (Otago / Southland · $1,750 tow)</option>
-                      </select>
-                      <span className="text-[10px] text-slate-400 block font-mono">
-                        Applies fixed door-to-door freight rate
-                      </span>
-                    </div>
+                        <Eye className="w-3.5 h-3.5 text-slate-400" />
+                        <span>Review Dossier</span>
+                      </button>
 
-                    {/* Block D: Decision Action Buttons */}
-                    <div className="flex items-center gap-2.5 shrink-0 self-end xl:self-center">
                       <button
                         type="button"
                         onClick={() => handleReject(dealer.id)}
-                        className="px-4 py-2.5 rounded-xl border border-slate-200 hover:bg-rose-50 hover:border-rose-200 hover:text-rose-700 text-slate-600 text-xs font-semibold transition-colors cursor-pointer"
+                        className="px-3 py-2 rounded-xl border border-slate-200 hover:bg-rose-50 hover:text-rose-700 text-slate-600 font-bold text-xs cursor-pointer transition-colors"
                       >
                         Decline
                       </button>
+
                       <button
                         type="button"
                         onClick={() => handleApprove(dealer.id, currentAssignedZone)}
-                        className="px-5 py-2.5 rounded-xl bg-slate-900 hover:bg-black text-white text-xs font-bold transition-colors cursor-pointer shadow-xs flex items-center gap-1.5"
+                        className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs cursor-pointer transition-colors shadow-2xs flex items-center gap-1.5"
                       >
-                        <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                        <span>Authorize Dealership</span>
+                        <CheckCircle2 className="w-3.5 h-3.5" />
+                        <span>Authorize</span>
                       </button>
                     </div>
                   </div>
@@ -295,64 +272,60 @@ export default function AdminDashboardView({ onNavigateTab }: AdminDashboardView
             </div>
           )}
 
-          {/* Card Footer Link */}
-          <div className="pt-4 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-            <span className="text-xs text-slate-500">
-              Manage complete dealership network and zone pricing profiles
-            </span>
+          {/* Alert Footer */}
+          <div className="pt-2 flex items-center justify-between text-xs text-slate-500 border-t border-amber-200/50">
+            <span>Requires administrative franchise authorization before stock ordering is enabled.</span>
             <button
               type="button"
               onClick={() => onNavigateTab("admin-dealers")}
-              className="text-xs font-bold text-[#E11D48] hover:text-[#BE123C] flex items-center gap-1.5 cursor-pointer self-start sm:self-auto"
+              className="text-amber-800 hover:text-amber-900 font-bold flex items-center gap-1 cursor-pointer"
             >
-              <span>View Dealerships Directory</span>
-              <ArrowRight className="w-3.5 h-3.5" />
+              <span>Manage All Franchisees</span>
+              <ArrowRight className="w-3 h-3" />
             </button>
           </div>
         </div>
 
         {/* ========================================================= */}
-        {/* CARD 2: Atomic Reservation Queue Request (Full Width)      */}
+        {/* ALERT 2: Atomic Reservation Queue Request (Rose Alert)     */}
         {/* ========================================================= */}
-        <div className="w-full bg-white rounded-3xl border border-slate-200/90 shadow-sm p-6 sm:p-7 hover:border-slate-300 transition-all space-y-6">
-          {/* Card Header */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-100">
-            <div className="flex items-center gap-3.5">
-              <div className="w-11 h-11 rounded-2xl bg-rose-50 border border-rose-200/80 flex items-center justify-center text-[#E11D48] shadow-2xs shrink-0">
+        <div className="w-full bg-gradient-to-r from-rose-50/60 via-white to-rose-50/20 rounded-2xl border border-rose-200/90 shadow-2xs p-5 sm:p-6 transition-all space-y-4">
+          {/* Alert Header */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-rose-200/50">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-rose-100/90 border border-rose-300/80 flex items-center justify-center text-[#E11D48] shrink-0">
                 <Lock className="w-5 h-5" />
               </div>
               <div>
-                <h2 className="text-lg font-bold text-slate-900">
-                  Atomic Reservation Queue Request
-                </h2>
+                <div className="flex items-center gap-2">
+                  <h2 className="text-base font-bold text-slate-900">
+                    Atomic Reservation Queue Request
+                  </h2>
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-rose-100 text-rose-900 border border-rose-200 font-mono">
+                    24H LOCK ACTIVE
+                  </span>
+                </div>
                 <p className="text-xs text-slate-500 mt-0.5">
-                  24-hour exclusivity locks requested by franchise dealers awaiting wholesale confirmation or manual release.
+                  Dealer exclusivity locks awaiting wholesale allocation confirmation or manual stock release.
                 </p>
               </div>
             </div>
 
-            <span
-              className={`px-3.5 py-1 rounded-full text-xs font-bold font-mono border self-start sm:self-auto shrink-0 ${
-                heldVehicles.length > 0
-                  ? "bg-rose-50 text-rose-800 border-rose-200"
-                  : "bg-slate-50 text-slate-700 border-slate-200"
-              }`}
-            >
-              {heldVehicles.length} {heldVehicles.length === 1 ? "Active Exclusivity Lock" : "Active Exclusivity Locks"}
-            </span>
+            <div className="flex items-center gap-2 self-start sm:self-auto shrink-0">
+              <span className="px-3 py-1 rounded-full text-xs font-bold font-mono bg-white text-rose-900 border border-rose-300/80 shadow-2xs">
+                {heldVehicles.length} {heldVehicles.length === 1 ? "Active Lock" : "Active Locks"}
+              </span>
+            </div>
           </div>
 
-          {/* Card Content (Horizontal Rows) */}
+          {/* Alert Body */}
           {heldVehicles.length === 0 ? (
-            <div className="p-12 text-center bg-slate-50 rounded-2xl border border-slate-100 space-y-2">
-              <Clock className="w-9 h-9 text-slate-300 mx-auto" />
-              <h3 className="text-sm font-bold text-slate-800">No Active 24h Holds</h3>
-              <p className="text-xs text-slate-500 max-w-sm mx-auto leading-relaxed">
-                All Japanese export inventory units are currently available for purchase across all 5 New Zealand pricing zones.
-              </p>
+            <div className="py-6 px-4 bg-white/80 rounded-xl border border-rose-100 text-center text-xs text-slate-500 flex items-center justify-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+              <span>No active 24h exclusivity holds. All catalogue stock is available.</span>
             </div>
           ) : (
-            <div className="space-y-4">
+            <div className="space-y-3">
               {heldVehicles.map((vehicle) => {
                 const matchingRes = reservations.find(
                   (r) => r.vehicleId === vehicle.id && r.status === "ACTIVE_HOLD"
@@ -365,85 +338,54 @@ export default function AdminDashboardView({ onNavigateTab }: AdminDashboardView
                 return (
                   <div
                     key={vehicle.id}
-                    className="p-5 rounded-2xl border border-slate-200/90 bg-slate-50/60 hover:bg-white hover:border-slate-300 hover:shadow-xs transition-all flex flex-col xl:flex-row xl:items-center justify-between gap-5 text-xs"
+                    className="p-4 rounded-xl bg-white border border-slate-200/80 hover:border-rose-300 shadow-2xs transition-all flex flex-col lg:flex-row lg:items-center justify-between gap-4 text-xs"
                   >
-                    {/* Block A: Vehicle Image & Core Specifications */}
-                    <div className="flex items-center gap-4 min-w-[280px]">
-                      <div className="w-24 h-16 rounded-xl bg-white border border-slate-200/80 p-1 flex items-center justify-center shrink-0">
+                    {/* Vehicle & Image */}
+                    <div className="flex items-center gap-3.5 min-w-[280px]">
+                      <div className="w-16 h-12 rounded-xl bg-slate-50 border border-slate-200/80 p-1 flex items-center justify-center shrink-0">
                         <img
                           src={vehicle.images?.[0] || "/images/cars/kicks.png"}
                           alt={vehicle.model || "Vehicle"}
                           className="w-full h-full object-contain filter drop-shadow-xs"
                         />
                       </div>
-
-                      <div className="min-w-0 space-y-1">
+                      <div className="space-y-0.5">
                         <div className="flex items-center gap-2">
-                          <span className="font-mono text-xs font-bold text-slate-500">
+                          <strong className="text-sm font-bold text-slate-900">
+                            {vehicle.year} {vehicle.make} {vehicle.model}
+                          </strong>
+                          <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-slate-100 text-slate-600 font-bold">
                             #{vehicle.stockId}
                           </span>
-                          <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 font-bold border border-amber-200 font-mono flex items-center gap-1">
-                            <Lock className="w-2.5 h-2.5 text-amber-600" />
-                            <span>24h Lock Active</span>
-                          </span>
                         </div>
-                        <h3 className="font-bold text-sm text-slate-900 truncate">
-                          {vehicle.year} {vehicle.make} {vehicle.model}
-                        </h3>
-                        <p className="text-slate-500 text-xs truncate">
-                          {vehicle.grade} · {vehicle.fuelType} · {vehicle.odometerKm.toLocaleString()} {vehicle.odometerUnit || "km"} · ★ {vehicle.auctionGrade || "4.5"}
+                        <p className="text-slate-500 text-xs">
+                          {vehicle.grade} · {vehicle.fuelType} · ★ Grade {vehicle.auctionGrade || "4.5"}
                         </p>
-                        <div className="flex items-center gap-1.5 font-mono text-[11px] text-slate-400">
-                          <span>VIN: {vehicle.vinChassis}</span>
-                          <button
-                            type="button"
-                            onClick={() => handleCopy(vehicle.vinChassis, vehicle.id)}
-                            className="text-slate-400 hover:text-slate-700 cursor-pointer ml-1"
-                            title="Copy VIN"
-                          >
-                            {copiedId === vehicle.id ? (
-                              <Check className="w-3 h-3 text-emerald-600" />
-                            ) : (
-                              <Copy className="w-3 h-3" />
-                            )}
-                          </button>
+                      </div>
+                    </div>
+
+                    {/* Reserving Dealer & Guaranteed Price */}
+                    <div className="flex flex-wrap items-center gap-4 text-xs text-slate-600">
+                      <div className="space-y-0.5">
+                        <div className="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Reserved By</div>
+                        <div className="font-bold text-slate-900">{dealerName} ({dealerCode})</div>
+                      </div>
+
+                      <div className="space-y-0.5">
+                        <div className="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Landed Buy Price</div>
+                        <div className="font-mono font-bold text-slate-900">
+                          ${price.totalBuyPriceNZD.toLocaleString()} <span className="text-[10px] font-normal text-slate-500">NZD ({dealerZone})</span>
                         </div>
                       </div>
-                    </div>
 
-                    {/* Block B: Reserving Dealership Details */}
-                    <div className="p-3.5 rounded-xl bg-white border border-slate-200/80 space-y-1.5 min-w-[240px]">
-                      <div className="flex items-center justify-between text-[11px]">
-                        <span className="text-slate-400">Reserved Dealership:</span>
-                        <span className="font-mono text-[10px] px-1.5 py-0.2 rounded bg-slate-100 text-slate-700 font-bold">
-                          {dealerCode}
-                        </span>
-                      </div>
-                      <strong className="text-xs font-bold text-slate-900 block truncate">
-                        {dealerName}
-                      </strong>
-                      <div className="flex items-center justify-between pt-1 border-t border-slate-100 text-[11px]">
-                        <span className="text-slate-400">Assigned Zone:</span>
-                        <strong className="font-mono text-slate-700">{dealerZone}</strong>
+                      <div className="flex items-center gap-1 text-amber-700 bg-amber-50 px-2 py-1 rounded-lg border border-amber-200 font-mono text-[11px] font-bold">
+                        <Clock className="w-3 h-3 text-amber-600" />
+                        <span>24h Lock Active</span>
                       </div>
                     </div>
 
-                    {/* Block C: Landed Price & Terms Snapshot */}
-                    <div className="p-3.5 rounded-xl bg-white border border-slate-200/80 space-y-1 min-w-[190px]">
-                      <span className="text-[10px] text-slate-400 uppercase font-bold tracking-wider block">
-                        Guaranteed Landed Price
-                      </span>
-                      <div className="font-mono font-black text-slate-900 text-base">
-                        ${price.totalBuyPriceNZD.toLocaleString()} <span className="text-xs font-sans text-slate-500">NZD</span>
-                      </div>
-                      <div className="text-[10px] text-emerald-700 font-semibold flex items-center gap-1 font-mono">
-                        <CheckCircle2 className="w-3 h-3 text-emerald-600" />
-                        <span>Section 4 Rate Locked</span>
-                      </div>
-                    </div>
-
-                    {/* Block D: Decision Action Buttons */}
-                    <div className="flex items-center gap-2.5 shrink-0 self-end xl:self-center">
+                    {/* Actions */}
+                    <div className="flex items-center gap-2 shrink-0 self-end lg:self-auto">
                       <button
                         type="button"
                         onClick={() => {
@@ -451,25 +393,26 @@ export default function AdminDashboardView({ onNavigateTab }: AdminDashboardView
                           const r = reservations.find((res) => res.vehicleId === vehicle.id && res.status === "ACTIVE_HOLD") || reservations[0];
                           if (r) setSelectedResForDetails(r);
                         }}
-                        className="px-3.5 py-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-100 text-slate-700 text-xs font-bold transition-colors cursor-pointer"
+                        className="px-3.5 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs cursor-pointer flex items-center gap-1.5 transition-colors"
                       >
-                        Inspect Dossier
+                        <Eye className="w-3.5 h-3.5 text-slate-400" />
+                        <span>Inspect Hold</span>
                       </button>
+
                       <button
                         type="button"
                         onClick={() => handleReleaseReservation(vehicle.id)}
-                        className="px-4 py-2.5 rounded-xl border border-slate-200 hover:bg-slate-100 text-slate-700 text-xs font-semibold transition-colors cursor-pointer flex items-center gap-1.5"
+                        className="px-3 py-2 rounded-xl border border-slate-200 hover:bg-slate-100 text-slate-600 font-bold text-xs cursor-pointer transition-colors"
                       >
-                        <Unlock className="w-3.5 h-3.5 text-slate-400" />
-                        <span>Release Hold</span>
+                        Release
                       </button>
 
                       <button
                         type="button"
                         onClick={() => handleConfirmReservation(vehicle.id)}
-                        className="px-5 py-2.5 rounded-xl bg-[#E11D48] hover:bg-[#BE123C] text-white text-xs font-bold transition-colors cursor-pointer shadow-xs flex items-center gap-1.5"
+                        className="px-4 py-2 rounded-xl bg-[#E11D48] hover:bg-[#BE123C] text-white font-bold text-xs cursor-pointer transition-colors shadow-2xs flex items-center gap-1.5"
                       >
-                        <CheckCircle2 className="w-4 h-4" />
+                        <CheckCircle2 className="w-3.5 h-3.5" />
                         <span>Confirm Allocation</span>
                       </button>
                     </div>
@@ -479,22 +422,21 @@ export default function AdminDashboardView({ onNavigateTab }: AdminDashboardView
             </div>
           )}
 
-          {/* Card Footer Link */}
-          <div className="pt-4 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-            <span className="text-xs text-slate-500">
-              Manage complete atomic reservations queue, timer expiries, and release history
-            </span>
+          {/* Alert Footer */}
+          <div className="pt-2 flex items-center justify-between text-xs text-slate-500 border-t border-rose-200/50">
+            <span>24-hour exclusivity timer guarantees dealer price protection without duplicate allocation.</span>
             <button
               type="button"
               onClick={() => onNavigateTab("admin-reservations")}
-              className="text-xs font-bold text-[#E11D48] hover:text-[#BE123C] flex items-center gap-1.5 cursor-pointer self-start sm:self-auto"
+              className="text-[#E11D48] hover:text-[#BE123C] font-bold flex items-center gap-1 cursor-pointer"
             >
-              <span>View Full Reservations Queue</span>
-              <ArrowRight className="w-3.5 h-3.5" />
+              <span>Manage Full Reservations Queue</span>
+              <ArrowRight className="w-3 h-3" />
             </button>
           </div>
         </div>
       </div>
+
       {/* Dealer Details Dossier Modal */}
       {selectedDealerForDetails && (
         <DealerDetailsModal

@@ -143,7 +143,7 @@ export default function UserManagementView() {
             </span>
           </div>
           <h1 className="text-2xl font-bold tracking-tight text-slate-900">
-            User Management Directory
+            User Management ({users.length})
           </h1>
           <p className="text-xs text-slate-500 mt-0.5">
             Oversee franchise dealer buyer credentials, Yokohama export leads, and operational permissions across New Zealand.
