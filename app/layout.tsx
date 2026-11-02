@@ -5,6 +5,7 @@ import ClientProviders from "@/components/providers/ClientProviders";
 
 const inter = Inter({
   subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700", "800"],
   variable: "--font-inter",
   display: "swap",
 });
@@ -20,8 +21,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${inter.variable} h-full antialiased`}>
-      <body className="min-h-full flex flex-col font-sans bg-[#F8FAFC] text-[#0A1322]">
+    <html lang="en" className={`${inter.variable} ${inter.className} h-full antialiased`}>
+      <body className="min-h-full flex flex-col bg-[#F8FAFC] text-[#0A1322] antialiased">
         <ClientProviders>{children}</ClientProviders>
       </body>
     </html>

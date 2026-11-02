@@ -7,8 +7,6 @@ import RoleSwitcher from "./RoleSwitcher";
 import {
   Search,
   Bell,
-  Volume2,
-  VolumeX,
   CheckCircle2,
   Clock,
   AlertTriangle,
@@ -30,7 +28,6 @@ export default function Header({
 }: HeaderProps) {
   const { currentUser } = useAuth();
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
-  const [isMuted, setIsMuted] = useState(false);
   const notifRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
 
@@ -61,14 +58,6 @@ export default function Header({
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
-
-  const handleToggleSound = () => {
-    const muted = audio.toggleMute();
-    setIsMuted(muted);
-    if (!muted) {
-      audio.playSoftChime();
-    }
-  };
 
   // Sample real-time notifications
   const notifications = [
@@ -123,26 +112,8 @@ export default function Header({
         </div>
       </div>
 
-      {/* Right: Sound Toggle, Notifications, Role Switcher */}
+      {/* Right: Notifications, Role Switcher */}
       <div className="flex items-center gap-2.5 sm:gap-3">
-        {/* Soft Audio Feedback Toggle */}
-        <button
-          type="button"
-          onClick={handleToggleSound}
-          title={isMuted ? "Unmute UI chimes (Web Audio)" : "Mute UI chimes"}
-          aria-label={isMuted ? "Unmute audio" : "Mute audio"}
-          className={`p-2 rounded-xl border transition-colors cursor-pointer text-xs flex items-center gap-1.5 ${
-            isMuted
-              ? "text-slate-400 bg-slate-50 border-slate-200 hover:text-slate-600"
-              : "text-emerald-700 bg-emerald-50/60 border-emerald-200 hover:bg-emerald-50"
-          }`}
-        >
-          {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
-          <span className="hidden xl:inline text-[11px] font-medium">
-            {isMuted ? "Sound Off" : "Sound On"}
-          </span>
-        </button>
-
         {/* Real-time Notifications Popover */}
         <div className="relative" ref={notifRef}>
           <button
