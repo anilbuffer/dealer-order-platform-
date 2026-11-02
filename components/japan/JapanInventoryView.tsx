@@ -70,16 +70,7 @@ export default function JapanInventoryView({
         </div>
 
         <div className="flex items-center gap-2">
-          <button
-            onClick={() => {
-              audio.playSubtleClick();
-              onNavigateBatch();
-            }}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-medium transition-colors cursor-pointer"
-          >
-            <FileSpreadsheet className="w-3.5 h-3.5" />
-            <span>Batch Upload</span>
-          </button>
+
 
           <button
             onClick={() => {
@@ -138,11 +129,10 @@ export default function JapanInventoryView({
                 audio.playSubtleClick();
                 setStatusFilter(st);
               }}
-              className={`px-3 py-1 rounded-md text-[11px] font-medium transition-colors cursor-pointer shrink-0 ${
-                statusFilter === st
+              className={`px-3 py-1 rounded-md text-[11px] font-medium transition-colors cursor-pointer shrink-0 ${statusFilter === st
                   ? "bg-slate-900 text-white"
                   : "bg-slate-100 text-slate-600 hover:bg-slate-200"
-              }`}
+                }`}
             >
               {st === "ALL" ? "All Units" : st.charAt(0) + st.slice(1).toLowerCase()}
             </button>
@@ -217,13 +207,12 @@ export default function JapanInventoryView({
 
                     <td className="py-3 px-4">
                       <span
-                        className={`inline-block px-2 py-0.5 rounded text-[10px] font-semibold ${
-                          isAvailable
+                        className={`inline-block px-2 py-0.5 rounded text-[10px] font-semibold ${isAvailable
                             ? "bg-slate-900 text-white"
                             : isReserved
-                            ? "bg-amber-100 text-amber-900"
-                            : "bg-slate-100 text-slate-600"
-                        }`}
+                              ? "bg-amber-100 text-amber-900"
+                              : "bg-slate-100 text-slate-600"
+                          }`}
                       >
                         {vehicle.status}
                       </span>

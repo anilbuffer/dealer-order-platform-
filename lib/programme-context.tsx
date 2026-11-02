@@ -66,7 +66,7 @@ interface ProgrammeContextType {
 
 const ProgrammeContext = createContext<ProgrammeContextType | undefined>(undefined);
 
-const STORAGE_KEY = "dealer_platform_programme_state_v5";
+const STORAGE_KEY = "dealer_platform_programme_state_v6";
 
 export function ProgrammeProvider({ children }: { children: React.ReactNode }) {
   const [vehicles, setVehicles] = useState<Vehicle[]>(MOCK_VEHICLES);
@@ -87,6 +87,7 @@ export function ProgrammeProvider({ children }: { children: React.ReactNode }) {
           localStorage.removeItem("dealer_platform_programme_state_v2");
           localStorage.removeItem("dealer_platform_programme_state_v3");
           localStorage.removeItem("dealer_platform_programme_state_v4");
+          localStorage.removeItem("dealer_platform_programme_state_v5");
         } catch (e) { }
 
         const stored = localStorage.getItem(STORAGE_KEY);
