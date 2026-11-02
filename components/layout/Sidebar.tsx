@@ -108,55 +108,70 @@ export default function Sidebar({
       ];
     }
 
-    if (pathname.startsWith("/admin") || currentUser?.role === "AUTOHUB_ADMIN") {
+    if (pathname.startsWith("/admin") || currentUser?.role === "AUTOHUB_ADMIN" || currentUser?.role === "READONLY_AUDITOR") {
+      const isAuditor = currentUser?.role === "READONLY_AUDITOR";
       return [
-        {
-          id: "admin-dashboard",
-          label: "Dashboard",
-          icon: LayoutDashboard,
-          href: "/admin/dashboard",
-        },
+        ...(!isAuditor ? [
+          {
+            id: "admin-dashboard",
+            label: "Dashboard",
+            icon: LayoutDashboard,
+            href: "/admin/dashboard",
+          },
+        ] : []),
         {
           id: "admin-catalogue",
           label: "Vehicle Catalogue",
           icon: Car,
           href: "/admin/catalogue",
         },
-        {
-          id: "admin-orders",
-          label: "Orders",
-          icon: ShoppingBag,
-          href: "/admin/orders",
-        },
+        ...(!isAuditor ? [
+          {
+            id: "admin-orders",
+            label: "Orders",
+            icon: ShoppingBag,
+            href: "/admin/orders",
+          },
+        ] : []),
         {
           id: "admin-reservations",
           label: "Reservations",
           icon: Clock,
           href: "/admin/reservations",
         },
-        {
-          id: "admin-dealers",
-          label: "Dealers",
-          icon: Building2,
-          href: "/admin/dealers",
-        },
+        ...(!isAuditor ? [
+          {
+            id: "admin-dealers",
+            label: "Dealers",
+            icon: Building2,
+            href: "/admin/dealers",
+          },
+        ] : []),
         {
           id: "admin-inventory",
           label: "Inventory",
           icon: Layers,
           href: "/admin/inventory",
         },
-        {
-          id: "admin-users",
-          label: "User Management",
-          icon: Users,
-          href: "/admin/users",
-        },
+        ...(!isAuditor ? [
+          {
+            id: "admin-users",
+            label: "User Management",
+            icon: Users,
+            href: "/admin/users",
+          },
+        ] : []),
         {
           id: "admin-roles",
           label: "Roles & Permissions",
           icon: Shield,
           href: "/admin/roles",
+        },
+        {
+          id: "admin-audit",
+          label: "Audit Logs",
+          icon: FileText,
+          href: "/admin/audit",
         },
       ];
     }
@@ -187,6 +202,14 @@ export default function Sidebar({
   const navItems = getNavItems();
 
   const getPanelInfo = () => {
+    if (currentUser?.role === "READONLY_AUDITOR") {
+      return {
+        section: "AUDIT PORTAL",
+        badge: "REGULATORY AUDITOR",
+        badgeColor: "bg-amber-500/15 text-amber-400 border-amber-500/30",
+        roleDesc: "NZTA & Customs Audit",
+      };
+    }
     if (pathname.startsWith("/admin") || currentUser?.role === "AUTOHUB_ADMIN") {
       return {
         section: "ADMIN PORTAL",
@@ -198,9 +221,9 @@ export default function Sidebar({
     if (currentUser?.role === "DEALER_USER" || currentUser?.role === "DEALER_ADMIN") {
       return {
         section: "DEALER PORTAL",
-        badge: "AUCKLAND NISSAN",
+        badge: currentDealer?.legalTradingName?.toUpperCase() || currentUser?.dealershipName?.toUpperCase() || "FRANCHISE DEALERSHIP",
         badgeColor: "bg-emerald-500/15 text-emerald-400 border-emerald-500/30",
-        roleDesc: currentDealer?.legalTradingName || "Auckland Nissan City",
+        roleDesc: currentDealer?.legalTradingName || currentUser?.dealershipName || "Auckland Nissan City",
       };
     }
     return {

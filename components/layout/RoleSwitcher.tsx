@@ -21,8 +21,17 @@ const ROLES: RoleOption[] = [
   {
     role: "DEALER_USER",
     label: "Auckland Nissan",
-    sublabel: "David Miller · Dealer",
-    badge: "DEALER",
+    sublabel: "David Miller · Sales Buyer",
+    badge: "BUYER",
+    badgeColor: "bg-emerald-500/15 text-emerald-400 border-emerald-500/30",
+    icon: Car,
+    iconBg: "bg-emerald-500/10 text-emerald-400",
+  },
+  {
+    role: "DEALER_ADMIN",
+    label: "Bay of Plenty Nissan",
+    sublabel: "Marcus Vance · Dealer Principal",
+    badge: "PRINCIPAL",
     badgeColor: "bg-emerald-500/15 text-emerald-400 border-emerald-500/30",
     icon: Car,
     iconBg: "bg-emerald-500/10 text-emerald-400",
@@ -30,7 +39,7 @@ const ROLES: RoleOption[] = [
   {
     role: "AUTOHUB_ADMIN",
     label: "Platform Operations",
-    sublabel: "Sarah Jenkins · Command Admin",
+    sublabel: "Sarah Jenkins · Central Controller",
     badge: "ADMIN",
     badgeColor: "bg-blue-500/15 text-blue-400 border-blue-500/30",
     icon: Shield,
@@ -39,11 +48,20 @@ const ROLES: RoleOption[] = [
   {
     role: "NISSAN_JAPAN",
     label: "Nissan Japan HQ",
-    sublabel: "Kenji Sato · Tokyo Inventory",
+    sublabel: "Kenji Sato · Export Marshalling",
     badge: "JAPAN",
     badgeColor: "bg-purple-500/15 text-purple-400 border-purple-500/30",
     icon: Globe2,
     iconBg: "bg-purple-500/10 text-purple-400",
+  },
+  {
+    role: "READONLY_AUDITOR",
+    label: "Regulatory Audit",
+    sublabel: "Elena Campbell · Customs/NZTA",
+    badge: "AUDITOR",
+    badgeColor: "bg-amber-500/15 text-amber-400 border-amber-500/30",
+    icon: Shield,
+    iconBg: "bg-amber-500/10 text-amber-400",
   },
 ];
 

@@ -17,6 +17,11 @@ import {
   Filter,
   Eye,
   MoreVertical,
+  Star,
+  MapPin,
+  Clock,
+  Layers,
+  Upload,
 } from "lucide-react";
 
 interface JapanInventoryViewProps {
@@ -75,110 +80,179 @@ export default function JapanInventoryView({
 
   const availableCount = vehicles.filter((v) => v.status === "AVAILABLE").length;
   const reservedCount = vehicles.filter((v) => v.status === "RESERVED").length;
+  const withdrawnCount = vehicles.filter((v) => v.status === "WITHDRAWN").length;
 
   return (
-    <div className="space-y-6">
-      {/* Clean Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2">
+    <div className="space-y-6 max-w-7xl mx-auto animate-in fade-in duration-300">
+      {/* ─────────────────────────────────────────────────────────── */}
+      {/* 1. Header Banner                                           */}
+      {/* ─────────────────────────────────────────────────────────── */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-100">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900">
+          <div className="flex items-center gap-2 mb-1">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-[#E11D48] flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#E11D48]" />
+              Japan Export Stock Control
+            </span>
+            <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 border border-slate-200 font-mono">
+              Yokohama &amp; Kobe Dispatch
+            </span>
+          </div>
+          <h1 className="text-2xl font-black tracking-tight text-slate-900">
             Export Inventory
           </h1>
           <p className="text-xs text-slate-500 mt-0.5">
-            Nissan Motor Co. Japan · Yokohama & Kobe Export Terminals
+            Nissan Motor Co. Japan · Central vehicle repository, yard marshalling, and franchise publication controls.
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
-
+        <div className="flex items-center gap-2.5">
+          <button
+            type="button"
+            onClick={() => {
+              audio.playSubtleClick();
+              onNavigateBatch();
+            }}
+            className="btn-outline text-xs py-2 px-3.5"
+          >
+            <Upload className="w-3.5 h-3.5 text-slate-400" />
+            <span>Batch Upload</span>
+          </button>
 
           <button
+            type="button"
             onClick={() => {
               audio.playSubtleClick();
               onNavigateAdd();
             }}
-            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-[#E11D48] hover:bg-[#BE123C] text-white text-xs font-semibold transition-colors cursor-pointer"
+            className="py-2.5 px-4 rounded-xl bg-gradient-to-r from-[#E11D48] via-[#BE123C] to-[#9F1239] hover:from-[#BE123C] hover:to-[#881337] text-white text-xs font-bold transition-all shadow-[0_4px_16px_rgba(225,29,72,0.3)] cursor-pointer flex items-center gap-1.5 active:scale-[0.98]"
           >
-            <Plus className="w-3.5 h-3.5" />
+            <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
             <span>Add Vehicle</span>
           </button>
         </div>
       </div>
 
-      {/* Metrics Row (Required Info Only) */}
+      {/* ─────────────────────────────────────────────────────────── */}
+      {/* 2. Executive 4-KPI Metric Strip                             */}
+      {/* ─────────────────────────────────────────────────────────── */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <div className="bg-white p-4 rounded-xl border border-slate-200/90 shadow-soft">
-          <span className="text-[11px] text-slate-400 block">Total Listed</span>
-          <span className="text-xl font-bold font-mono text-slate-900">{vehicles.length}</span>
+        <div className="p-4 rounded-2xl bg-white border border-slate-200/90 shadow-2xs space-y-1">
+          <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block truncate">
+            Total Listed
+          </span>
+          <div className="text-2xl font-black text-slate-900 font-mono">
+            {vehicles.length}
+          </div>
+          <span className="text-xs text-slate-500 font-medium block truncate">
+            Yokohama &amp; Kobe Bays
+          </span>
         </div>
 
-        <div className="bg-white p-4 rounded-xl border border-slate-200/90 shadow-soft">
-          <span className="text-[11px] text-slate-400 block">Available to NZ</span>
-          <span className="text-xl font-bold font-mono text-slate-900">{availableCount}</span>
+        <div className="p-4 rounded-2xl bg-white border border-slate-200/90 shadow-2xs space-y-1">
+          <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block truncate">
+            Available to NZ
+          </span>
+          <div className="text-2xl font-black text-emerald-600 font-mono">
+            {availableCount}
+          </div>
+          <span className="text-xs text-slate-500 font-medium block truncate">
+            Franchise Catalog Active
+          </span>
         </div>
 
-        <div className="bg-white p-4 rounded-xl border border-slate-200/90 shadow-soft">
-          <span className="text-[11px] text-slate-400 block">Dealer Reserved</span>
-          <span className="text-xl font-bold font-mono text-slate-900">{reservedCount}</span>
+        <div className="p-4 rounded-2xl bg-white border border-slate-200/90 shadow-2xs space-y-1">
+          <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block truncate">
+            Dealer Reserved
+          </span>
+          <div className="text-2xl font-black text-amber-600 font-mono">
+            {reservedCount}
+          </div>
+          <span className="text-xs text-slate-500 font-medium block truncate">
+            24h Atomic Exclusivity
+          </span>
         </div>
 
-        <div className="bg-white p-4 rounded-xl border border-slate-200/90 shadow-soft">
-          <span className="text-[11px] text-slate-400 block">Yard Location</span>
-          <span className="text-xs font-semibold text-slate-800 mt-1 block">Yokohama Terminal</span>
+        <div className="p-4 rounded-2xl bg-white border border-slate-200/90 shadow-2xs space-y-1">
+          <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block truncate">
+            Primary Staging Yard
+          </span>
+          <div className="text-xl font-black text-slate-900 truncate">
+            Yokohama Terminal
+          </div>
+          <span className="text-xs text-slate-500 font-medium block truncate">
+            Bay 14 Marshalling Base
+          </span>
         </div>
       </div>
 
-      {/* Filter Row */}
-      <div className="bg-white rounded-xl border border-slate-200/90 p-3 shadow-soft flex flex-col sm:flex-row items-center justify-between gap-3">
-        <div className="relative flex-1 w-full sm:max-w-md">
+      {/* ─────────────────────────────────────────────────────────── */}
+      {/* 3. Search & Status Filter Toolbar                           */}
+      {/* ─────────────────────────────────────────────────────────── */}
+      <div className="bg-white rounded-2xl border border-slate-200/90 p-3.5 shadow-2xs flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="relative flex-1 w-full max-w-md">
           <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5 pointer-events-none" />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search stock ID, chassis, or model..."
-            className="w-full pl-9 pr-3 py-1.5 text-xs bg-slate-50 hover:bg-slate-100/60 focus:bg-white rounded-lg border border-slate-200 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-slate-400 transition-all"
+            placeholder="Search stock ID, chassis VIN, or model..."
+            className="w-full pl-9 pr-3 py-2 text-xs bg-slate-50 hover:bg-slate-100/60 focus:bg-white rounded-xl border border-slate-200 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-500 transition-all font-medium"
           />
         </div>
 
-        <div className="flex items-center gap-1.5 w-full sm:w-auto overflow-x-auto text-xs">
-          {["ALL", "AVAILABLE", "RESERVED", "WITHDRAWN"].map((st) => (
+        <div className="flex items-center gap-1.5 p-1 bg-slate-100 rounded-2xl border border-slate-200/80 w-full sm:w-auto overflow-x-auto text-xs">
+          {[
+            { id: "ALL", label: "All Units", count: vehicles.length },
+            { id: "AVAILABLE", label: "Available", count: availableCount },
+            { id: "RESERVED", label: "Reserved", count: reservedCount },
+            { id: "WITHDRAWN", label: "Withdrawn", count: withdrawnCount },
+          ].map((st) => (
             <button
-              key={st}
+              key={st.id}
+              type="button"
               onClick={() => {
                 audio.playSubtleClick();
-                setStatusFilter(st);
+                setStatusFilter(st.id);
               }}
-              className={`px-3 py-1 rounded-md text-[11px] font-medium transition-colors cursor-pointer shrink-0 ${statusFilter === st
-                ? "bg-slate-900 text-white"
-                : "bg-slate-100 text-slate-600 hover:bg-slate-200"
-                }`}
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer shrink-0 flex items-center gap-1.5 ${
+                statusFilter === st.id
+                  ? "bg-white text-slate-900 shadow-2xs font-black"
+                  : "text-slate-500 hover:text-slate-800 font-medium"
+              }`}
             >
-              {st === "ALL" ? "All Units" : st.charAt(0) + st.slice(1).toLowerCase()}
+              <span>{st.label}</span>
+              <span className="text-[10px] font-mono text-slate-400 font-normal">
+                ({st.count})
+              </span>
             </button>
           ))}
         </div>
       </div>
 
-      {/* Inventory Table (Clean, Restrained, Monochromatic with Touch Momentum) */}
-      <div className="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-soft">
+      {/* ─────────────────────────────────────────────────────────── */}
+      {/* 4. Inventory Table (Clean, Refined Light Header)             */}
+      {/* ─────────────────────────────────────────────────────────── */}
+      <div className="bg-white rounded-3xl border border-slate-200/90 shadow-2xs overflow-hidden">
         <div className="overflow-x-auto touch-scroll navy-scrollbar">
-          <table className="w-full text-left text-xs min-w-[700px]">
-            <thead className="bg-[#0A1322] text-white text-[10px] font-bold uppercase tracking-wider border-b border-[#1B2A42]">
+          <table className="w-full text-left text-xs min-w-[760px]">
+            {/* Clean Light Executive Table Header (Replaced Heavy Solid Dark) */}
+            <thead className="bg-slate-50/90 border-b border-slate-200 text-slate-500 text-[10px] font-bold uppercase tracking-wider">
               <tr>
-                <th className="py-3 px-4">Vehicle / Model</th>
-                <th className="py-3 px-4">Stock ID & VIN</th>
-                <th className="py-3 px-4">Grade / Odometer</th>
-                <th className="py-3 px-4">Location</th>
-                <th className="py-3 px-4">FOB Price (JPY)</th>
-                <th className="py-3 px-4">Status</th>
-                <th className="py-3 px-4 text-right">Action</th>
+                <th className="py-3.5 px-6">Vehicle / Model</th>
+                <th className="py-3.5 px-4">Stock ID &amp; VIN</th>
+                <th className="py-3.5 px-4">Grade &amp; Odo</th>
+                <th className="py-3.5 px-4">Location</th>
+                <th className="py-3.5 px-4">FOB Price (JPY)</th>
+                <th className="py-3.5 px-4">Status</th>
+                <th className="py-3.5 px-6 text-right">Action</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
               {filteredVehicles.map((vehicle) => {
                 const isAvailable = vehicle.status === "AVAILABLE";
                 const isReserved = vehicle.status === "RESERVED";
+                const isWithdrawn = vehicle.status === "WITHDRAWN";
 
                 return (
                   <tr
@@ -189,79 +263,112 @@ export default function JapanInventoryView({
                     }}
                     className="hover:bg-slate-50/80 transition-colors cursor-pointer group"
                   >
-                    <td className="py-3 px-4">
+                    {/* Vehicle & Model */}
+                    <td className="py-4 px-6">
                       <div className="flex items-center gap-3">
                         <img
                           src={vehicle.images?.[0] || "/images/cars/kicks.png"}
                           alt={vehicle.model || "Vehicle"}
-                          className="w-12 h-9 object-contain rounded-md border border-slate-200 bg-slate-50 p-0.5 shrink-0"
+                          className="w-14 h-10 object-contain rounded-xl border border-slate-200 bg-slate-50 p-0.5 shrink-0 select-none group-hover:scale-105 transition-transform"
                         />
                         <div>
-                          <div className="font-bold text-slate-900">
+                          <div className="font-bold text-slate-900 group-hover:text-[#E11D48] transition-colors">
                             {vehicle.year} {vehicle.model}
                           </div>
-                          <div className="text-[11px] text-slate-500">{vehicle.grade}</div>
+                          <div className="text-[11px] text-slate-400 font-mono mt-0.5">
+                            {vehicle.grade || "Standard Edition"}
+                          </div>
                         </div>
                       </div>
                     </td>
 
-                    <td className="py-3 px-4 font-mono">
-                      <div className="font-semibold text-slate-800">{vehicle.stockId}</div>
+                    {/* Stock ID & VIN */}
+                    <td className="py-4 px-4 font-mono">
+                      <div className="font-bold text-slate-800">#{vehicle.stockId}</div>
                       <div className="text-[10px] text-slate-400">{vehicle.vinChassis}</div>
                     </td>
 
-                    <td className="py-3 px-4">
-                      <div className="font-semibold text-slate-900">Grade {vehicle.auctionGrade}</div>
-                      <div className="text-[11px] text-slate-500 font-mono">
+                    {/* Grade & Odometer */}
+                    <td className="py-4 px-4">
+                      <div className="font-bold text-slate-900 flex items-center gap-1">
+                        <Star className="w-3 h-3 text-amber-500 fill-amber-500" />
+                        <span>Grade {vehicle.auctionGrade}</span>
+                      </div>
+                      <div className="text-[11px] text-slate-400 font-mono mt-0.5">
                         {vehicle.odometerKm.toLocaleString()} km
                       </div>
                     </td>
 
-                    <td className="py-3 px-4 text-slate-600 truncate max-w-[140px]">
-                      {vehicle.location}
+                    {/* Yard Location */}
+                    <td className="py-4 px-4 text-slate-600 truncate max-w-[150px]">
+                      <div className="flex items-center gap-1 text-slate-700 font-medium">
+                        <MapPin className="w-3 h-3 text-slate-400 shrink-0" />
+                        <span className="truncate">{vehicle.location}</span>
+                      </div>
                     </td>
 
-                    <td className="py-3 px-4 font-mono font-bold text-slate-900">
+                    {/* FOB Price JPY */}
+                    <td className="py-4 px-4 font-mono font-bold text-slate-900 text-sm">
                       ¥{vehicle.fobPriceJPY.toLocaleString()}
                     </td>
 
-                    <td className="py-3 px-4">
-                      <span
-                        className={`inline-block px-2 py-0.5 rounded text-[10px] font-semibold ${isAvailable
-                          ? "bg-slate-900 text-white"
-                          : isReserved
-                            ? "bg-amber-100 text-amber-900"
-                            : "bg-slate-100 text-slate-600"
-                          }`}
-                      >
-                        {vehicle.status}
-                      </span>
+                    {/* Status Pill Badge */}
+                    <td className="py-4 px-4">
+                      {isAvailable ? (
+                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold font-mono bg-emerald-50 text-emerald-700 border border-emerald-200">
+                          AVAILABLE
+                        </span>
+                      ) : isReserved ? (
+                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold font-mono bg-amber-50 text-amber-800 border border-amber-300">
+                          <Clock className="w-2.5 h-2.5 text-amber-600 animate-pulse" />
+                          <span>RESERVED</span>
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold font-mono bg-slate-100 text-slate-600 border border-slate-200">
+                          WITHDRAWN
+                        </span>
+                      )}
                     </td>
 
-                    <td className="py-3 px-4 text-right space-x-2">
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          audio.playSubtleClick();
-                          setSelectedVehicleForDetails(vehicle);
-                        }}
-                        className="px-2.5 py-1 rounded-lg border border-slate-200 bg-white hover:bg-slate-100 text-slate-700 text-xs font-semibold cursor-pointer inline-flex items-center gap-1"
-                      >
-                        <Eye className="w-3 h-3 text-slate-400" />
-                        <span>Details</span>
-                      </button>
-                      {isReserved ? (
-                        <span className="text-[11px] text-slate-400 italic">Held by Dealer</span>
-                      ) : (
+                    {/* Action Column - Strictly Right Aligned with Clean Details Button */}
+                    <td className="py-4 px-6 text-right whitespace-nowrap">
+                      <div className="flex items-center justify-end gap-2.5">
+                        {/* Toggle or Status Hint */}
+                        {isReserved ? (
+                          <span className="text-[11px] font-mono text-amber-700 bg-amber-50/80 px-2.5 py-1 rounded-lg border border-amber-200/60 font-semibold">
+                            Held by Dealer
+                          </span>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleToggleStatus(vehicle.id);
+                            }}
+                            className={`text-[11px] font-bold px-2.5 py-1 rounded-lg border transition-all cursor-pointer ${
+                              isAvailable
+                                ? "border-slate-200 hover:border-rose-200 hover:bg-rose-50 hover:text-rose-700 text-slate-600"
+                                : "border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
+                            }`}
+                          >
+                            {isAvailable ? "Withdraw" : "Publish"}
+                          </button>
+                        )}
+
+                        {/* Details Action Button - Rightmost */}
                         <button
                           type="button"
-                          onClick={() => handleToggleStatus(vehicle.id)}
-                          className="text-[11px] font-medium text-slate-600 hover:text-slate-900 hover:underline cursor-pointer"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            audio.playSubtleClick();
+                            setSelectedVehicleForDetails(vehicle);
+                          }}
+                          className="btn-outline text-xs py-1.5 px-3 cursor-pointer"
                         >
-                          {isAvailable ? "Withdraw" : "Publish"}
+                          <Eye className="w-3.5 h-3.5 text-slate-400" />
+                          <span>Details</span>
                         </button>
-                      )}
+                      </div>
                     </td>
                   </tr>
                 );
@@ -273,4 +380,3 @@ export default function JapanInventoryView({
     </div>
   );
 }
-
