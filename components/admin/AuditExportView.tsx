@@ -211,15 +211,15 @@ export default function AuditExportView() {
       <div className="bg-white rounded-2xl border border-slate-200/90 shadow-sm overflow-hidden">
         <div className="overflow-x-auto touch-scroll navy-scrollbar">
           <table className="w-full text-left text-xs text-slate-600 min-w-[840px]">
-            <thead className="bg-slate-50/80 border-b border-slate-200/80 text-[11px] font-bold uppercase tracking-wider text-slate-500">
+            <thead className="bg-[#0A1322] text-white text-[10px] font-bold uppercase tracking-wider border-b border-[#1B2A42]">
               <tr>
-                <th className="py-3 px-5">Timestamp</th>
-                <th className="py-3 px-4">Actor &amp; Role</th>
-                <th className="py-3 px-4">Event Action</th>
-                <th className="py-3 px-4">Category</th>
-                <th className="py-3 px-4">Object Ref</th>
-                <th className="py-3 px-5">Details</th>
-                <th className="py-3 px-4">State Diff (Before → After)</th>
+                <th className="py-3.5 px-5 text-slate-200">Timestamp</th>
+                <th className="py-3.5 px-4 text-slate-200">Actor &amp; Role</th>
+                <th className="py-3.5 px-4 text-slate-200">Event Action</th>
+                <th className="py-3.5 px-4 text-slate-200">Category</th>
+                <th className="py-3.5 px-4 text-slate-200">Object Ref</th>
+                <th className="py-3.5 px-5 text-slate-200">Details</th>
+                <th className="py-3.5 px-4 text-slate-200">State Diff (Before → After)</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">

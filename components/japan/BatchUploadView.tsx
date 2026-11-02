@@ -265,18 +265,18 @@ export default function BatchUploadView({ onSuccessReturn }: BatchUploadViewProp
               </div>
 
               {/* Parsed Rows Table */}
-              <div className="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-soft">
+              <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
                 <div className="overflow-x-auto touch-scroll navy-scrollbar">
                   <table className="w-full text-left text-xs min-w-[680px]">
-                    <thead className="bg-slate-50 border-b border-slate-200 text-[11px] font-semibold text-slate-500 uppercase tracking-wider">
+                    <thead className="bg-[#0A1322] text-white text-[10px] font-bold uppercase tracking-wider border-b border-[#1B2A42]">
                       <tr>
-                        <th className="py-2.5 px-3">Row</th>
-                        <th className="py-2.5 px-3">Stock ID</th>
-                        <th className="py-2.5 px-3">Chassis / VIN</th>
-                        <th className="py-2.5 px-3">Vehicle Details</th>
-                        <th className="py-2.5 px-3">KM</th>
-                        <th className="py-2.5 px-3">FOB (JPY)</th>
-                        <th className="py-2.5 px-3">Validation Status</th>
+                        <th className="py-3 px-3.5 text-slate-200">Row</th>
+                        <th className="py-3 px-3.5 text-slate-200">Stock ID</th>
+                        <th className="py-3 px-3.5 text-slate-200">Chassis / VIN</th>
+                        <th className="py-3 px-3.5 text-slate-200">Vehicle Details</th>
+                        <th className="py-3 px-3.5 text-slate-200">KM</th>
+                        <th className="py-3 px-3.5 text-slate-200">FOB (JPY)</th>
+                        <th className="py-3 px-3.5 text-slate-200">Validation Status</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-100">

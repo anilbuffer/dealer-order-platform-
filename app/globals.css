@@ -1,7 +1,8 @@
 @import "tailwindcss";
 
 @theme {
-  --font-sans: var(--font-inter), "Inter", "Roboto", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-sans: var(--font-roboto), "Roboto", sans-serif;
+  --font-mono: var(--font-roboto), "Roboto", monospace;
 
   --color-crimson-50: #fff1f2;
   --color-crimson-100: #ffe4e6;
@@ -40,10 +41,16 @@
   --foreground: #0a1322;
 }
 
+/* ───────────────────────────────────────────────────────────────── */
+/* 1. STRICT GLOBAL FONT ENFORCEMENT: ROBOTO ONLY                   */
+/* ───────────────────────────────────────────────────────────────── */
+html, body, button, input, select, textarea, table, pre, code, kbd, span, p, h1, h2, h3, h4, h5, h6, * {
+  font-family: var(--font-roboto), "Roboto", sans-serif !important;
+}
+
 html, body {
   background-color: var(--background);
   color: var(--foreground);
-  font-family: var(--font-inter), "Inter", "Roboto", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
@@ -76,7 +83,7 @@ html, body {
   box-shadow: 0 0 10px 2px rgba(225, 29, 72, 0.7);
 }
 
-/* WCAG AAA Focus Rings */
+/* Focus Rings */
 *:focus-visible {
   outline: none;
   box-shadow: 0 0 0 2px #f8fafc, 0 0 0 4px #e11d48;
@@ -130,24 +137,116 @@ html, body {
   box-shadow: 0 20px 35px -8px rgba(15, 23, 42, 0.09), 0 8px 16px -4px rgba(15, 23, 42, 0.04);
 }
 
+/* ───────────────────────────────────────────────────────────────── */
+/* 2. UNIFIED LUXURY DESIGN SYSTEM (Typography, Color, Buttons, Tabs) */
+/* ───────────────────────────────────────────────────────────────── */
 
+/* Action Buttons */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1.25rem;
+  border-radius: 0.75rem;
+  background: #e11d48;
+  color: #ffffff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  line-height: 1.25rem;
+  transition: all 200ms cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 2px 10px rgba(225, 29, 72, 0.28);
+  cursor: pointer;
+}
+.btn-primary:hover {
+  background: #be123c;
+  box-shadow: 0 4px 16px rgba(225, 29, 72, 0.38);
+  transform: translateY(-1px);
+}
+.btn-primary:active {
+  transform: scale(0.98);
+}
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1.25rem;
+  border-radius: 0.75rem;
+  background: #0a1322;
+  color: #ffffff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  line-height: 1.25rem;
+  transition: all 200ms cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 2px 8px rgba(10, 19, 34, 0.15);
+  cursor: pointer;
+}
+.btn-secondary:hover {
+  background: #142239;
+  transform: translateY(-1px);
+}
+.btn-secondary:active {
+  transform: scale(0.98);
+}
+
+.btn-outline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.5625rem 1.125rem;
+  border-radius: 0.75rem;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  color: #1e293b;
+  font-size: 0.75rem;
+  font-weight: 700;
+  line-height: 1.25rem;
+  transition: all 180ms ease;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+  cursor: pointer;
+}
+.btn-outline:hover {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+  color: #0a1322;
+}
+
+/* Unified Tables */
+.table-luxury-wrapper {
+  background: #ffffff;
+  border-radius: 1rem;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 1px 3px rgba(10, 19, 34, 0.04);
+  overflow: hidden;
+}
+
+.table-luxury-header {
+  background: #0a1322;
+  color: #ffffff;
+  font-size: 0.625rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid #1e293b;
+}
 
 /* ───────────────────────────────────────────────────────────────── */
-/* Ultra-Premium Responsive & Touch Utilities (iOS/Android/iPad/Mac) */
+/* 3. RESPONSIVE & TOUCH UTILITIES (iOS/Android/iPad/Mac)            */
 /* ───────────────────────────────────────────────────────────────── */
 * {
   -webkit-tap-highlight-color: transparent;
 }
 
-/* Hide scrollbar for Chrome, Safari and Opera */
+/* Hide scrollbars */
 .hide-scrollbar::-webkit-scrollbar,
 .no-scrollbar::-webkit-scrollbar {
   display: none;
   width: 0;
   height: 0;
 }
-
-/* Hide scrollbar for IE, Edge and Firefox */
 .hide-scrollbar,
 .no-scrollbar {
   -ms-overflow-style: none;
@@ -160,15 +259,13 @@ html, body {
   scroll-behavior: smooth;
 }
 
-/* Safe Area Insets for iPhone Home Indicator and Notch */
+/* Safe Area Insets */
 .pb-safe {
   padding-bottom: max(0.75rem, env(safe-area-inset-bottom, 0.75rem));
 }
-
 .pt-safe {
   padding-top: max(0.75rem, env(safe-area-inset-top, 0.75rem));
 }
-
 .mb-safe {
   margin-bottom: max(0.75rem, env(safe-area-inset-bottom, 0.75rem));
 }

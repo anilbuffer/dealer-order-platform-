@@ -347,17 +347,17 @@ export default function AdminReservationsView({ onNavigateTab }: AdminReservatio
       {/* ─────────────────────────────────────────────────────────── */}
       {activeTab === "HISTORY" && (
         <div className="bg-white rounded-2xl border border-slate-200/90 shadow-2xs overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs text-slate-600">
-              <thead className="bg-slate-50/80 border-b border-slate-200/80 text-[11px] font-bold uppercase tracking-wider text-slate-500">
+          <div className="overflow-x-auto touch-scroll navy-scrollbar">
+            <table className="w-full text-left text-xs text-slate-600 min-w-[760px]">
+              <thead className="bg-[#0A1322] text-white text-[10px] font-bold uppercase tracking-wider border-b border-[#1B2A42]">
                 <tr>
-                  <th className="py-3 px-5">Request ID</th>
-                  <th className="py-3 px-4">Vehicle</th>
-                  <th className="py-3 px-4">Dealership</th>
-                  <th className="py-3 px-4">Landed Price</th>
-                  <th className="py-3 px-4">Decision</th>
-                  <th className="py-3 px-4">Audit Reason</th>
-                  <th className="py-3 px-5 text-right">Action</th>
+                  <th className="py-3.5 px-5 text-slate-200">Request ID</th>
+                  <th className="py-3.5 px-4 text-slate-200">Vehicle</th>
+                  <th className="py-3.5 px-4 text-slate-200">Dealership</th>
+                  <th className="py-3.5 px-4 text-slate-200">Landed Price</th>
+                  <th className="py-3.5 px-4 text-slate-200">Decision</th>
+                  <th className="py-3.5 px-4 text-slate-200">Audit Reason</th>
+                  <th className="py-3.5 px-5 text-right text-slate-200">Action</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">

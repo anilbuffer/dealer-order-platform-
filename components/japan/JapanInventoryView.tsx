@@ -164,7 +164,7 @@ export default function JapanInventoryView({
       <div className="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-soft">
         <div className="overflow-x-auto touch-scroll navy-scrollbar">
           <table className="w-full text-left text-xs min-w-[700px]">
-            <thead className="bg-slate-50 border-b border-slate-200 text-[11px] font-semibold text-slate-500 uppercase tracking-wider">
+            <thead className="bg-[#0A1322] text-white text-[10px] font-bold uppercase tracking-wider border-b border-[#1B2A42]">
               <tr>
                 <th className="py-3 px-4">Vehicle / Model</th>
                 <th className="py-3 px-4">Stock ID & VIN</th>

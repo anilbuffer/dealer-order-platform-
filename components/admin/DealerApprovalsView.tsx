@@ -302,18 +302,18 @@ export default function DealerApprovalsView() {
             </div>
           </div>
 
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs text-slate-600">
-              <thead className="bg-slate-50/80 border-b border-slate-200/80 text-[11px] font-bold uppercase tracking-wider text-slate-500">
+          <div className="overflow-x-auto touch-scroll navy-scrollbar">
+            <table className="w-full text-left text-xs text-slate-600 min-w-[760px]">
+              <thead className="bg-[#0A1322] text-white text-[10px] font-bold uppercase tracking-wider border-b border-[#1B2A42]">
                 <tr>
-                  <th className="py-3 px-5">Dealership</th>
-                  <th className="py-3 px-4">NZBN</th>
-                  <th className="py-3 px-4">Pricing Zone</th>
-                  <th className="py-3 px-4">Delivery Rate</th>
-                  <th className="py-3 px-4">Primary Contact</th>
-                  <th className="py-3 px-4">Terms Version</th>
-                  <th className="py-3 px-4 text-center">Action</th>
-                  <th className="py-3 px-5 text-right">Status</th>
+                  <th className="py-3.5 px-5 text-slate-200">Dealership</th>
+                  <th className="py-3.5 px-4 text-slate-200">NZBN</th>
+                  <th className="py-3.5 px-4 text-slate-200">Pricing Zone</th>
+                  <th className="py-3.5 px-4 text-slate-200">Delivery Rate</th>
+                  <th className="py-3.5 px-4 text-slate-200">Primary Contact</th>
+                  <th className="py-3.5 px-4 text-slate-200">Terms Version</th>
+                  <th className="py-3.5 px-4 text-center text-slate-200">Action</th>
+                  <th className="py-3.5 px-5 text-right text-slate-200">Status</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">

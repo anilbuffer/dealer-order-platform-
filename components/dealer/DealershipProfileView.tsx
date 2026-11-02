@@ -457,18 +457,18 @@ export default function DealershipProfileView() {
               </span>
             </div>
 
-            <div className="overflow-x-auto rounded-2xl border border-slate-200">
-              <table className="w-full text-xs text-left">
-                <thead className="bg-slate-50 border-b border-slate-200 text-slate-600 font-bold text-[11px]">
+            <div className="overflow-x-auto rounded-2xl border border-slate-200 touch-scroll navy-scrollbar">
+              <table className="w-full text-xs text-left min-w-[720px]">
+                <thead className="bg-[#0A1322] text-white text-[10px] font-bold uppercase tracking-wider border-b border-[#1B2A42]">
                   <tr>
-                    <th className="py-3 px-4">Zone ID</th>
-                    <th className="py-3 px-4">Territory</th>
-                    <th className="py-3 px-4">RoRo Ocean</th>
-                    <th className="py-3 px-4">Customs &amp; Bio</th>
-                    <th className="py-3 px-4">MR2A Standard</th>
-                    <th className="py-3 px-4">2x NZ Tow</th>
-                    <th className="py-3 px-4">Programme Fee</th>
-                    <th className="py-3 px-4 text-right">Fixed Overhead Total</th>
+                    <th className="py-3.5 px-4 text-slate-200">Zone ID</th>
+                    <th className="py-3.5 px-4 text-slate-200">Territory</th>
+                    <th className="py-3.5 px-4 text-slate-200">RoRo Ocean</th>
+                    <th className="py-3.5 px-4 text-slate-200">Customs &amp; Bio</th>
+                    <th className="py-3.5 px-4 text-slate-200">MR2A Standard</th>
+                    <th className="py-3.5 px-4 text-slate-200">2x NZ Tow</th>
+                    <th className="py-3.5 px-4 text-slate-200">Programme Fee</th>
+                    <th className="py-3.5 px-4 text-right text-slate-200">Fixed Overhead Total</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
