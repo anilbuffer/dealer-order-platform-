@@ -92,23 +92,23 @@
 
 ---
 
-## Phase 5: Autohub Operations Command Portal ⏳
+## Phase 5: Autohub Operations Command Portal ✅
 
-- [ ] **Command Center Dashboard:**
-  - [ ] Executive KPI metric cards: Total Stock, Pending Applications, Active Holds, In Transit, Awaiting Cost Approval.
-- [ ] **Dealer Onboarding Approvals (US-03, US-04):**
-  - [ ] Pending applicants list with document review.
-  - [ ] One-click action: Assign Geographic Pricing Zone $\rightarrow$ Approve or Reject.
-- [ ] **Inventory & Allocation Controller (US-14):**
-  - [ ] Review pending vehicle reservations and confirm or release allocations.
-  - [ ] Toggle vehicle publication status (`Draft`, `Available`, `Withdrawn`).
-- [ ] **Order Milestone Manager (US-17):**
-  - [ ] Advance orders to next milestone with date picker, ETA updates, and carrier notes.
-- [ ] **Additional Cost Creator (US-18):**
-  - [ ] Form to attach unexpected compliance repair costs with photographic evidence upload.
-- [ ] **Programme Audit & Data Export (US-20, US-21):**
-  - [ ] Searchable immutable audit event log.
-  - [ ] One-click CSV and Excel export of full inventory, orders, and commercial activity.
+- [x] **Command Center Dashboard:**
+  - [x] Executive KPI metric cards: Total Stock, Pending Applications, Active Holds, In Transit, Awaiting Cost Approval.
+- [x] **Dealer Onboarding Approvals (US-03, US-04):**
+  - [x] Pending applicants list with document review.
+  - [x] One-click action: Assign Geographic Pricing Zone $\rightarrow$ Approve or Reject.
+- [x] **Inventory & Allocation Controller (US-14):**
+  - [x] Review pending vehicle reservations and confirm or release allocations.
+  - [x] Toggle vehicle publication status (`Draft`, `Available`, `Withdrawn`).
+- [x] **Order Milestone Manager (US-17):**
+  - [x] Advance orders to next milestone with date picker, ETA updates, and carrier notes.
+- [x] **Additional Cost Creator (US-18):**
+  - [x] Form to attach unexpected compliance repair costs with photographic evidence upload.
+- [x] **Programme Audit & Data Export (US-20, US-21):**
+  - [x] Searchable immutable audit event log.
+  - [x] One-click CSV and Excel export of full inventory, orders, and commercial activity.
 
 ---
 

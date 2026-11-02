@@ -2,7 +2,8 @@
 
 import React, { useState } from "react";
 import { Order, OrderMilestone } from "@/lib/types";
-import { MOCK_ORDERS } from "@/lib/mock-data";
+import { useProgramme } from "@/lib/programme-context";
+import { useAuth } from "@/lib/auth-context";
 import { audio } from "@/lib/sound";
 import {
   CheckCircle2,
@@ -25,44 +26,29 @@ const MILESTONE_STEPS: { key: OrderMilestone; label: string }[] = [
 ];
 
 export default function DealerOrdersView() {
-  const [orders, setOrders] = useState<Order[]>(MOCK_ORDERS);
-  const [selectedOrderId, setSelectedOrderId] = useState<string>(MOCK_ORDERS[1].id);
+  const { currentDealer } = useAuth();
+  const { orders, respondToAdditionalCost } = useProgramme();
 
-  const selectedOrder = orders.find((o) => o.id === selectedOrderId) || orders[0];
+  // Filter orders for this dealer or all if not filtered
+  const dealerOrders = orders.filter(
+    (o) => !currentDealer?.id || o.dealerId === currentDealer.id
+  );
+
+  const [selectedOrderId, setSelectedOrderId] = useState<string>(
+    dealerOrders[0]?.id || orders[0]?.id || ""
+  );
+
+  const selectedOrder =
+    dealerOrders.find((o) => o.id === selectedOrderId) || dealerOrders[0] || orders[0];
 
   const handleApproveCost = (orderId: string, costId: string) => {
     audio.playSuccessChime();
-    setOrders((prev) =>
-      prev.map((ord) => {
-        if (ord.id === orderId) {
-          return {
-            ...ord,
-            currentMilestone: "COMPLIANCE",
-            additionalCosts: ord.additionalCosts.map((c) =>
-              c.id === costId ? { ...c, status: "APPROVED", decidedAt: new Date().toISOString() } : c
-            ),
-          };
-        }
-        return ord;
-      })
-    );
+    respondToAdditionalCost(orderId, costId, "APPROVED");
   };
 
   const handleDeclineCost = (orderId: string, costId: string) => {
     audio.playSubtleClick();
-    setOrders((prev) =>
-      prev.map((ord) => {
-        if (ord.id === orderId) {
-          return {
-            ...ord,
-            additionalCosts: ord.additionalCosts.map((c) =>
-              c.id === costId ? { ...c, status: "DECLINED", decidedAt: new Date().toISOString() } : c
-            ),
-          };
-        }
-        return ord;
-      })
-    );
+    respondToAdditionalCost(orderId, costId, "DECLINED");
   };
 
   const getMilestoneIndex = (milestone: OrderMilestone) => {

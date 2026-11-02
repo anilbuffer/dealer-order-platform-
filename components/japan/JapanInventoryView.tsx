@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { Vehicle } from "@/lib/types";
-import { MOCK_VEHICLES } from "@/lib/mock-data";
+import { useProgramme } from "@/lib/programme-context";
 import { audio } from "@/lib/sound";
 import {
   Search,
@@ -26,7 +26,7 @@ export default function JapanInventoryView({
   onNavigateAdd,
   onNavigateBatch,
 }: JapanInventoryViewProps) {
-  const [vehicles, setVehicles] = useState<Vehicle[]>(MOCK_VEHICLES);
+  const { vehicles, toggleVehicleStatus } = useProgramme();
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("ALL");
 
@@ -48,15 +48,7 @@ export default function JapanInventoryView({
 
   const handleToggleStatus = (vehicleId: string) => {
     audio.playSubtleClick();
-    setVehicles((prev) =>
-      prev.map((v) => {
-        if (v.id === vehicleId) {
-          const nextStatus = v.status === "AVAILABLE" ? "WITHDRAWN" : "AVAILABLE";
-          return { ...v, status: nextStatus };
-        }
-        return v;
-      })
-    );
+    toggleVehicleStatus(vehicleId);
   };
 
   const availableCount = vehicles.filter((v) => v.status === "AVAILABLE").length;

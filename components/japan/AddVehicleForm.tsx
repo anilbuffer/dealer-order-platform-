@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { useProgramme } from "@/lib/programme-context";
 import { audio } from "@/lib/sound";
 import {
   Car,
@@ -14,6 +15,7 @@ interface AddVehicleFormProps {
 }
 
 export default function AddVehicleForm({ onSuccessReturn }: AddVehicleFormProps) {
+  const { addVehicle } = useProgramme();
   const [stockId, setStockId] = useState("NIS-2026-9055");
   const [vinChassis, setVinChassis] = useState("");
   const [model, setModel] = useState("Note e-Power");
@@ -45,6 +47,30 @@ export default function AddVehicleForm({ onSuccessReturn }: AddVehicleFormProps)
 
     setIsSubmitting(true);
     audio.playSubtleClick();
+
+    addVehicle({
+      stockId,
+      vinChassis,
+      make: "Nissan",
+      model,
+      grade,
+      year,
+      odometerKm,
+      transmission: transmission as any,
+      color,
+      fuelType: fuelType as any,
+      driveType: driveType as any,
+      engineCc,
+      auctionGrade,
+      interiorGrade,
+      exteriorGrade,
+      location,
+      images: [imageUrl, "/images/cars/nissan-note.jpg"],
+      conditionReportUrl: "https://example.com/reports/yokohama_pass.pdf",
+      knownDefects: defectsText ? [defectsText] : ["Clean pass"],
+      fobPriceJPY,
+      status: status === "AVAILABLE" ? "AVAILABLE" : "WITHDRAWN",
+    });
 
     setTimeout(() => {
       audio.playSuccessChime();

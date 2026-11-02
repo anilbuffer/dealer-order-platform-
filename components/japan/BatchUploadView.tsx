@@ -1,6 +1,8 @@
 "use client";
 
 import React, { useState } from "react";
+import { Vehicle } from "@/lib/types";
+import { useProgramme } from "@/lib/programme-context";
 import { audio } from "@/lib/sound";
 import {
   UploadCloud,
@@ -80,6 +82,7 @@ interface BatchUploadViewProps {
 }
 
 export default function BatchUploadView({ onSuccessReturn }: BatchUploadViewProps) {
+  const { batchAddVehicles } = useProgramme();
   const [batchRows, setBatchRows] = useState<BatchRow[]>([]);
   const [fileName, setFileName] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -107,6 +110,38 @@ export default function BatchUploadView({ onSuccessReturn }: BatchUploadViewProp
   const handlePublishBatch = () => {
     audio.playSuccessChime();
     setIsProcessing(true);
+
+    const validRows = batchRows.filter((r) => r.status === "VALID");
+    const newVehicles: Vehicle[] = validRows.map((r, idx) => ({
+      id: `VEH_BATCH_${Date.now()}_${idx}`,
+      stockId: r.stockId,
+      vinChassis: r.vinChassis,
+      make: "Nissan",
+      model: r.model,
+      grade: r.grade,
+      year: r.year,
+      odometerKm: r.odometerKm,
+      transmission: "e-Power Drive",
+      color: "Diamond White",
+      fuelType: "e-Power",
+      driveType: "2WD",
+      engineCc: 1200,
+      auctionGrade: "4.5",
+      interiorGrade: "A",
+      exteriorGrade: "A",
+      location: "Yokohama Yard (Bay 5)",
+      images: [
+        "/images/cars/nissan-note.jpg",
+        "/images/cars/nissan-suv.png",
+      ],
+      conditionReportUrl: "https://example.com/reports/batch_inspection.pdf",
+      knownDefects: ["Zero panel structural repairs detected", "Verified export condition pass"],
+      fobPriceJPY: r.fobJPY,
+      status: "AVAILABLE",
+    }));
+
+    batchAddVehicles(newVehicles);
+
     setTimeout(() => {
       setIsProcessing(false);
       setPublishedSuccess(true);

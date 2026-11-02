@@ -1,0 +1,257 @@
+"use client";
+
+import React, { useState, useMemo } from "react";
+import { AuditEvent } from "@/lib/types";
+import { useProgramme } from "@/lib/programme-context";
+import { calculateLandedPrice } from "@/lib/pricing-calculator";
+import { audio } from "@/lib/sound";
+import {
+  Download,
+  Search,
+  Filter,
+  ShieldCheck,
+  FileSpreadsheet,
+  CheckCircle2,
+  Calendar,
+  User,
+} from "lucide-react";
+
+export default function AuditExportView() {
+  const { auditLogs, vehicles } = useProgramme();
+  const [searchQuery, setSearchQuery] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState<string>("ALL");
+  const [downloadNotice, setDownloadNotice] = useState<string | null>(null);
+
+  const filteredLogs = useMemo(() => {
+    return auditLogs.filter((log) => {
+      if (searchQuery) {
+        const q = searchQuery.toLowerCase();
+        const mActor = log.actorName.toLowerCase().includes(q);
+        const mAction = log.action.toLowerCase().includes(q);
+        const mObj = log.objectId.toLowerCase().includes(q);
+        const mDetails = log.details.toLowerCase().includes(q);
+        if (!mActor && !mAction && !mObj && !mDetails) return false;
+      }
+
+      if (categoryFilter !== "ALL" && log.category !== categoryFilter) {
+        return false;
+      }
+
+      return true;
+    });
+  }, [auditLogs, searchQuery, categoryFilter]);
+
+  // Export Audit Trail to CSV
+  const handleExportAuditCSV = () => {
+    audio.playSuccessChime();
+    const headers = ["Event ID", "Timestamp", "Actor Name", "Actor Role", "Action", "Category", "Object ID", "Details"];
+    const rows = filteredLogs.map((l) => [
+      l.id,
+      l.timestamp,
+      `"${l.actorName}"`,
+      l.actorRole,
+      l.action,
+      l.category,
+      l.objectId,
+      `"${l.details.replace(/"/g, '""')}"`,
+    ]);
+
+    const csvContent = "data:text/csv;charset=utf-8," + [headers.join(","), ...rows.map((r) => r.join(","))].join("\n");
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `Autohub_Audit_Trail_${new Date().toISOString().slice(0, 10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    setDownloadNotice("Audit trail CSV export generated successfully.");
+    setTimeout(() => setDownloadNotice(null), 3500);
+  };
+
+  // Export Stock to CSV
+  const handleExportStockCSV = () => {
+    audio.playSuccessChime();
+    const headers = ["Stock ID", "Chassis VIN", "Model", "Grade", "Year", "Odometer", "Fuel", "Drive", "FOB JPY", "Zone 1 Landed NZD", "Status", "Location"];
+    const rows = vehicles.map((v) => {
+      const price = calculateLandedPrice(v.fobPriceJPY, "ZONE_1");
+      return [
+        v.stockId,
+        v.vinChassis,
+        `"${v.model}"`,
+        `"${v.grade}"`,
+        v.year,
+        v.odometerKm,
+        v.fuelType,
+        v.driveType,
+        v.fobPriceJPY,
+        price.totalBuyPriceNZD,
+        v.status,
+        `"${v.location}"`,
+      ];
+    });
+
+    const csvContent = "data:text/csv;charset=utf-8," + [headers.join(","), ...rows.map((r) => r.join(","))].join("\n");
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `Nissan_NZ_Stock_Export_${new Date().toISOString().slice(0, 10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    setDownloadNotice("Programme stock CSV export downloaded successfully.");
+    setTimeout(() => setDownloadNotice(null), 3500);
+  };
+
+  return (
+    <div className="space-y-6">
+      {/* ─────────────────────────────────────────────────────────── */}
+      {/* 1. Header Banner & CSV Export Actions                      */}
+      {/* ─────────────────────────────────────────────────────────── */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-100">
+        <div>
+          <div className="flex items-center gap-2 mb-1">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-[#E11D48]">
+              Compliance &amp; Reporting
+            </span>
+            <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 border border-slate-200">
+              Immutable Ledger (US-20, US-21)
+            </span>
+          </div>
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900">
+            Programme Audit Trail &amp; Data Export
+          </h1>
+          <p className="text-xs text-slate-500 mt-0.5">
+            Cryptographically timestamped record of dealer onboarding, pricing profile calculations, atomic vehicle holds, and logistics transitions.
+          </p>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={handleExportStockCSV}
+            className="px-3.5 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold transition-colors cursor-pointer flex items-center gap-1.5 shadow-xs"
+          >
+            <FileSpreadsheet className="w-3.5 h-3.5 text-emerald-600" />
+            <span>Export Stock (CSV)</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={handleExportAuditCSV}
+            className="px-4 py-2 rounded-xl bg-[#E11D48] hover:bg-[#BE123C] text-white text-xs font-bold transition-all shadow-xs cursor-pointer flex items-center gap-1.5"
+          >
+            <Download className="w-3.5 h-3.5" />
+            <span>Export Audit Trail (CSV)</span>
+          </button>
+        </div>
+      </div>
+
+      {downloadNotice && (
+        <div className="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-900 text-xs font-semibold flex items-center gap-2 shadow-xs animate-in fade-in">
+          <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+          <span>{downloadNotice}</span>
+        </div>
+      )}
+
+      {/* ─────────────────────────────────────────────────────────── */}
+      {/* 2. Filter & Search Controls                                */}
+      {/* ─────────────────────────────────────────────────────────── */}
+      <div className="bg-white rounded-2xl border border-slate-200/90 p-4 shadow-sm space-y-3">
+        <div className="flex flex-col sm:flex-row items-center gap-4">
+          <div className="relative flex-1 w-full">
+            <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-2.5 pointer-events-none" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search by actor, action, object ID, or details..."
+              className="w-full pl-9 pr-3 py-2 text-xs bg-slate-50 hover:bg-slate-100/60 focus:bg-white rounded-xl border border-slate-200 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-slate-400 transition-all"
+            />
+          </div>
+
+          <div className="flex flex-wrap items-center gap-1.5 w-full sm:w-auto">
+            {["ALL", "ALLOCATION", "RESERVATION", "TERMS", "INVENTORY", "PRICING"].map((cat) => (
+              <button
+                key={cat}
+                type="button"
+                onClick={() => {
+                  audio.playSubtleClick();
+                  setCategoryFilter(cat);
+                }}
+                className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-colors cursor-pointer ${
+                  categoryFilter === cat
+                    ? "bg-slate-900 text-white"
+                    : "bg-slate-50 hover:bg-slate-100 text-slate-600 border border-slate-200/80"
+                }`}
+              >
+                {cat === "ALL" ? "All" : cat.charAt(0) + cat.slice(1).toLowerCase()}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* ─────────────────────────────────────────────────────────── */}
+      {/* 3. Audit Event Table                                       */}
+      {/* ─────────────────────────────────────────────────────────── */}
+      <div className="bg-white rounded-2xl border border-slate-200/90 shadow-sm overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full text-left text-xs text-slate-600">
+            <thead className="bg-slate-50/80 border-b border-slate-200/80 text-[11px] font-bold uppercase tracking-wider text-slate-500">
+              <tr>
+                <th className="py-3 px-5">Timestamp (UTC)</th>
+                <th className="py-3 px-4">Actor &amp; Role</th>
+                <th className="py-3 px-4">Event Action</th>
+                <th className="py-3 px-4">Category</th>
+                <th className="py-3 px-4">Object Ref</th>
+                <th className="py-3 px-5">Details</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100">
+              {filteredLogs.map((log) => (
+                <tr key={log.id} className="hover:bg-slate-50/50 transition-colors">
+                  <td className="py-3.5 px-5 font-mono text-slate-500 whitespace-nowrap">
+                    {new Date(log.timestamp).toLocaleString("en-NZ", {
+                      timeZone: "Pacific/Auckland",
+                      year: "numeric",
+                      month: "short",
+                      day: "2-digit",
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+                  </td>
+
+                  <td className="py-3.5 px-4">
+                    <div className="font-semibold text-slate-900">{log.actorName}</div>
+                    <div className="text-[10px] font-mono text-slate-400">{log.actorRole}</div>
+                  </td>
+
+                  <td className="py-3.5 px-4 font-mono font-bold text-slate-800">
+                    {log.action}
+                  </td>
+
+                  <td className="py-3.5 px-4">
+                    <span className="px-2 py-0.5 rounded-md bg-slate-100 text-[10px] font-mono font-semibold text-slate-700">
+                      {log.category}
+                    </span>
+                  </td>
+
+                  <td className="py-3.5 px-4 font-mono text-slate-600 font-semibold">
+                    {log.objectId}
+                  </td>
+
+                  <td className="py-3.5 px-5 text-slate-600 max-w-md">
+                    {log.details}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  );
+}
+

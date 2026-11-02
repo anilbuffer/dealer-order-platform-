@@ -11,6 +11,11 @@ import CommercialBoundaryView from "@/components/dealer/CommercialBoundaryView";
 import JapanInventoryView from "@/components/japan/JapanInventoryView";
 import BatchUploadView from "@/components/japan/BatchUploadView";
 import AddVehicleForm from "@/components/japan/AddVehicleForm";
+import AdminDashboardView from "@/components/admin/AdminDashboardView";
+import DealerApprovalsView from "@/components/admin/DealerApprovalsView";
+import AdminInventoryControllerView from "@/components/admin/AdminInventoryControllerView";
+import AllocationMilestonesView from "@/components/admin/AllocationMilestonesView";
+import AuditExportView from "@/components/admin/AuditExportView";
 
 export default function DashboardShell() {
   const { currentUser } = useAuth();
@@ -79,22 +84,25 @@ export default function DashboardShell() {
       }
     }
 
-    // 3. AUTOHUB ADMIN VIEWS (Next Phase)
-    return (
-      <div className="space-y-6">
-        <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-soft">
-          <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">
-            Autohub Operations Admin
-          </div>
-          <h2 className="text-xl font-bold text-slate-900 tracking-tight">
-            Operations Command Center
-          </h2>
-          <p className="text-xs text-slate-500 mt-1">
-            Switch between Auckland Nissan, Nissan Japan, and Admin via the top-right Role Switcher.
-          </p>
-        </div>
-      </div>
-    );
+    // 3. AUTOHUB ADMIN VIEWS (Operations Command Center)
+    if (currentUser?.role === "AUTOHUB_ADMIN") {
+      switch (activeTab) {
+        case "admin-dashboard":
+          return <AdminDashboardView onNavigateTab={(t) => setActiveTab(t)} />;
+        case "admin-approvals":
+          return <DealerApprovalsView />;
+        case "admin-stock":
+          return <AdminInventoryControllerView />;
+        case "admin-milestones":
+          return <AllocationMilestonesView />;
+        case "admin-audit":
+          return <AuditExportView />;
+        default:
+          return <AdminDashboardView onNavigateTab={(t) => setActiveTab(t)} />;
+      }
+    }
+
+    return <DealerStockCatalog />;
   };
 
   return (
@@ -108,16 +116,13 @@ export default function DashboardShell() {
       />
 
       {/* 2. Main Content Container */}
-      <div className="flex-1 flex flex-col h-full min-w-0 overflow-hidden">
-        {/* Aligned 68px Top Header Bar */}
-        <Header
-          searchValue={searchQuery}
-          onSearchChange={(val) => setSearchQuery(val)}
-        />
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+        {/* Top Header with Search shortcut, Notifications & Role Switcher */}
+        <Header />
 
-        {/* Scrollable View Area */}
+        {/* Scrollable View Content Canvas */}
         <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
-          {renderViewContent()}
+          <div className="max-w-7xl mx-auto">{renderViewContent()}</div>
         </main>
       </div>
     </div>

@@ -4,6 +4,8 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Vehicle, LandedPriceBreakdown } from "@/lib/types";
+import { useProgramme } from "@/lib/programme-context";
+import { useAuth } from "@/lib/auth-context";
 import { MOCK_VEHICLES } from "@/lib/mock-data";
 import { calculateLandedPrice } from "@/lib/pricing-calculator";
 import { audio } from "@/lib/sound";
@@ -33,11 +35,15 @@ export default function FullPageVehicleDetail({
   onBack,
 }: FullPageVehicleDetailProps) {
   const router = useRouter();
+  const { vehicles, reserveVehicle: atomicReserve } = useProgramme();
+  const { currentDealer } = useAuth();
+  const dealerZone = currentDealer?.pricingZoneId || "ZONE_1";
 
-  // Find vehicle by ID or prop or fallback
+  // Find vehicle from live programme context
   const vehicle =
     vehicleData ||
-    MOCK_VEHICLES.find((v) => v.id === vehicleId) ||
+    vehicles.find((v) => v.id === vehicleId) ||
+    vehicles[0] ||
     MOCK_VEHICLES[0];
 
   const [activeImageIdx, setActiveImageIdx] = useState(0);
@@ -69,7 +75,7 @@ export default function FullPageVehicleDetail({
     }
   };
 
-  const price: LandedPriceBreakdown = calculateLandedPrice(vehicle.fobPriceJPY, "ZONE_1");
+  const price: LandedPriceBreakdown = calculateLandedPrice(vehicle.fobPriceJPY, dealerZone);
   const retailEstimateNZD = Math.round(price.totalBuyPriceNZD * 1.28);
   const dealerMarginNZD = retailEstimateNZD - price.totalBuyPriceNZD;
 
@@ -632,7 +638,8 @@ export default function FullPageVehicleDetail({
       <AtomicReservationModal
         vehicle={isReserveModalOpen ? vehicle : null}
         onClose={() => setIsReserveModalOpen(false)}
-        onSuccess={() => {
+        onSuccess={(vId) => {
+          atomicReserve(vId, currentDealer?.id || "DEALER_001");
           setIsReserveModalOpen(false);
           handleBack();
         }}
